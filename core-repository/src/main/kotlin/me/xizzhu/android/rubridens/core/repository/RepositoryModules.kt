@@ -16,14 +16,16 @@
 
 package me.xizzhu.android.rubridens.core.repository
 
+import me.xizzhu.android.rubridens.core.repository.network.createMoshi
+import me.xizzhu.android.rubridens.core.repository.network.createOkHttpClient
+import me.xizzhu.android.rubridens.core.repository.network.createRetrofit
 import org.koin.dsl.module
 
 val repositoryModule = module {
     single { createMoshi() }
-
     single { createOkHttpClient() }
-
     factory { (baseUrl: String) -> createRetrofit(get(), get(), "https://$baseUrl") }
 
+    single<AuthRepository> { AuthRepositoryImpl() }
     single<InstanceRepository> { InstanceRepositoryImpl() }
 }

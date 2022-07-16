@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package me.xizzhu.android.rubridens.core.repository
+package me.xizzhu.android.rubridens.core.repository.network
 
 import com.squareup.moshi.Moshi
 import okhttp3.OkHttpClient

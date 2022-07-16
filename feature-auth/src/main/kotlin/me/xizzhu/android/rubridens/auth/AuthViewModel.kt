@@ -19,10 +19,11 @@ package me.xizzhu.android.rubridens.auth
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import me.xizzhu.android.rubridens.core.mvvm.BaseViewModel
+import me.xizzhu.android.rubridens.core.repository.AuthRepository
 import me.xizzhu.android.rubridens.core.repository.InstanceRepository
 
 class AuthViewModel(
-        private val authManager: AuthManager,
+        private val authRepository: AuthRepository,
         private val instanceRepository: InstanceRepository
 ) : BaseViewModel<AuthViewModel.ViewAction, AuthViewModel.ViewState>(
         initialViewState = ViewState(
@@ -51,6 +52,21 @@ class AuthViewModel(
                                             userCount = instance.stats.userCount,
                                             statusCount = instance.stats.statusCount,
                                     ),
+                            )
+                        }
+                    }
+        }
+
+        viewModelScope.launch {
+            authRepository.loadApplicationCredential(instanceUrl)
+                    .onSuccess {
+                        emitViewState { currentViewState -> currentViewState.copy(loading = false) }
+                    }
+                    .onFailure {
+                        emitViewState { currentViewState ->
+                            currentViewState.copy(
+                                    loading = false,
+                                    // TODO show error
                             )
                         }
                     }

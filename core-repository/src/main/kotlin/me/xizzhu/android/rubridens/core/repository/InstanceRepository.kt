@@ -16,13 +16,11 @@
 
 package me.xizzhu.android.rubridens.core.repository
 
-import com.squareup.moshi.Json
-import com.squareup.moshi.JsonClass
+import me.xizzhu.android.rubridens.core.repository.network.MastodonInstanceService
 import org.koin.core.parameter.parametersOf
 import org.koin.java.KoinJavaComponent.inject
 import retrofit2.Retrofit
 import retrofit2.create
-import retrofit2.http.GET
 
 data class Instance(
         val title: String,
@@ -43,37 +41,4 @@ internal class InstanceRepositoryImpl : InstanceRepository {
         val retrofit: Retrofit by inject(Retrofit::class.java) { parametersOf(instanceUrl) }
         retrofit.create<MastodonInstanceService>().fetch().toInstance()
     }
-}
-
-/**
- * See https://docs.joinmastodon.org/methods/instance/
- */
-internal interface MastodonInstanceService {
-    @GET("api/v1/instance")
-    suspend fun fetch(): MastodonInstance
-}
-
-/**
- * See https://docs.joinmastodon.org/entities/instance/
- */
-@JsonClass(generateAdapter = true)
-internal class MastodonInstance(
-        @Json(name = "title") val title: String,
-        @Json(name = "stats") val stats: MastodonStats,
-) {
-    @JsonClass(generateAdapter = true)
-    class MastodonStats(
-            @Json(name = "user_count") val userCount: Long,
-            @Json(name = "status_count") val statusCount: Long,
-    ) {
-        fun toStats(): Instance.Stats = Instance.Stats(
-                userCount = userCount,
-                statusCount = statusCount
-        )
-    }
-
-    fun toInstance(): Instance = Instance(
-            title = title,
-            stats = stats.toStats()
-    )
 }
