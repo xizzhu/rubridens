@@ -19,18 +19,29 @@ package me.xizzhu.android.rubridens.core.mvvm
 import android.os.Bundle
 import androidx.annotation.CallSuper
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.viewbinding.ViewBinding
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
-abstract class BaseActivity<VB : ViewBinding> : AppCompatActivity() {
-    protected lateinit var viewBinding: VB
+abstract class BaseActivity<ViewAction, ViewState, VB : ViewBinding, VM : BaseViewModel<ViewAction, ViewState>> : AppCompatActivity() {
+    protected abstract val viewBinding: VB
+    protected abstract val viewModel: VM
 
     @CallSuper
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        viewBinding = inflateViewBinding()
         setContentView(viewBinding.root)
+        onViewCreated()
+
+        viewModel.viewAction().onEach(::onViewAction).launchIn(lifecycleScope)
+        viewModel.viewState().onEach(::onViewState).launchIn(lifecycleScope)
     }
 
-    protected abstract fun inflateViewBinding(): VB
+    protected abstract fun onViewCreated()
+
+    protected abstract fun onViewAction(viewAction: ViewAction)
+
+    protected abstract fun onViewState(viewState: ViewState)
 }

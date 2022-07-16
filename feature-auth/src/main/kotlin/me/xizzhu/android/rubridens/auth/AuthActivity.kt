@@ -18,13 +18,63 @@ package me.xizzhu.android.rubridens.auth
 
 import android.content.Context
 import android.content.Intent
+import android.view.View
+import android.view.inputmethod.EditorInfo
 import me.xizzhu.android.rubridens.auth.databinding.ActivityAuthBinding
 import me.xizzhu.android.rubridens.core.mvvm.BaseActivity
+import me.xizzhu.android.rubridens.core.view.fadeOut
+import me.xizzhu.android.rubridens.core.view.hideKeyboard
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class AuthActivity : BaseActivity<ActivityAuthBinding>() {
+class AuthActivity : BaseActivity<AuthViewModel.ViewAction, AuthViewModel.ViewState, ActivityAuthBinding, AuthViewModel>() {
     companion object {
         fun newStartIntent(context: Context): Intent = Intent(context, AuthActivity::class.java)
     }
 
-    override fun inflateViewBinding(): ActivityAuthBinding = ActivityAuthBinding.inflate(layoutInflater)
+    override val viewBinding: ActivityAuthBinding by lazy { ActivityAuthBinding.inflate(layoutInflater) }
+
+    override val viewModel: AuthViewModel by viewModel()
+
+    override fun onViewCreated() = with(viewBinding) {
+        instance.setOnEditorActionListener { _, actionId, _ ->
+            when (actionId) {
+                EditorInfo.IME_ACTION_NEXT -> {
+                    selectInstance()
+                    true
+                }
+                else -> false
+            }
+        }
+        next.setOnClickListener { selectInstance() }
+    }
+
+    private fun selectInstance() {
+        viewBinding.instance.text?.toString().takeUnless { it.isNullOrEmpty() }
+                ?.let { instanceUrl ->
+                    instanceUrl.trim().let { trimmed ->
+                        when {
+                            trimmed.startsWith("http://") -> trimmed.substring(7)
+                            trimmed.startsWith("https://") -> trimmed.substring(8)
+                            else -> trimmed
+                        }
+                    }
+                }
+                ?.let { viewModel.selectInstance(it) }
+    }
+
+    override fun onViewAction(viewAction: AuthViewModel.ViewAction) {
+    }
+
+    override fun onViewState(viewState: AuthViewModel.ViewState) = with(viewBinding) {
+        if (viewState.loading) {
+            instance.hideKeyboard()
+            instance.isEnabled = false
+            next.isEnabled = false
+            loadingSpinner.visibility = View.VISIBLE
+        } else {
+            instance.isEnabled = true
+            next.isEnabled = true
+            loadingSpinner.fadeOut()
+        }
+    }
 }

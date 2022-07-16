@@ -16,11 +16,20 @@
 
 package me.xizzhu.android.rubridens.auth
 
-import org.koin.androidx.viewmodel.dsl.viewModel
-import org.koin.dsl.module
+import me.xizzhu.android.rubridens.core.mvvm.BaseViewModel
 
-val authModule = module {
-    single<AuthManager> { AuthManagerImpl() }
+class AuthViewModel(
+        private val authManager: AuthManager
+) : BaseViewModel<AuthViewModel.ViewAction, AuthViewModel.ViewState>(
+        initialViewState = ViewState(
+                loading = false
+        )
+) {
+    sealed class ViewAction {}
 
-    viewModel { AuthViewModel(get()) }
+    data class ViewState(val loading: Boolean)
+
+    fun selectInstance(instanceUrl: String) {
+        emitViewState { currentViewState -> currentViewState.copy(loading = true) }
+    }
 }

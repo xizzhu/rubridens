@@ -129,6 +129,7 @@ dependencies {
     implementation(Dependencies.AndroidX.activity)
     implementation(Dependencies.AndroidX.annotation)
     implementation(Dependencies.AndroidX.appCompat)
+    implementation(Dependencies.AndroidX.Lifecycle.common)
 
     implementation(Dependencies.Koin.core)
 

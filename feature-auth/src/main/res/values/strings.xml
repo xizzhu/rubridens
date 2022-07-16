@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="auth_instance_selection_btn_next">NEXT</string>
+    <string name="auth_instance_selection_hint_select_instance">Select an instance</string>
+    <string name="auth_instance_selection_error_failed_to_select_instance">Error occurred while fetching information from the instance.</string>
+    <string name="auth_instance_selection_text_instance_info">%1$d users have posted %2$d statuses on %3$s.</string>
+    <string name="auth_instance_selection_text_login_failed">Failed to login, please check the Internet connection and try again.</string>
+</resources>

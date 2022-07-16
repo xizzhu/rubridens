@@ -96,13 +96,8 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
 dependencies {
     implementation(Dependencies.Kotlin.coroutines)
 
+    implementation(Dependencies.AndroidX.activity)
     implementation(Dependencies.AndroidX.appCompat)
     implementation(Dependencies.AndroidX.core)
     implementation(Dependencies.AndroidX.Lifecycle.viewModel)
-
-    testImplementation(Dependencies.Kotlin.test)
-    testImplementation(Dependencies.Kotlin.coroutinesTest)
-    testImplementation(Dependencies.AndroidX.Test.core)
-    testImplementation(Dependencies.mockk)
-    testImplementation(Dependencies.robolectric)
 }

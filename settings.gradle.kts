@@ -15,5 +15,6 @@
  */
 
 include(":core-mvvm")
+include(":core-view")
 include(":feature-auth")
 include(":app")

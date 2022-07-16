@@ -53,6 +53,10 @@ object Versions {
         const val core = "1.8.0"
         const val lifecycle = "2.5.0"
 
+        object View {
+            const val constraintLayout = "2.1.4"
+        }
+
         object Test {
             const val core = "1.4.0"
         }
@@ -90,6 +94,10 @@ object Dependencies {
         object Lifecycle {
             const val common = "androidx.lifecycle:lifecycle-common-java8:${Versions.AndroidX.lifecycle}"
             const val viewModel = "androidx.lifecycle:lifecycle-viewmodel-ktx:${Versions.AndroidX.lifecycle}"
+        }
+
+        object View {
+            const val constraintLayout = "androidx.constraintlayout:constraintlayout:${Versions.AndroidX.View.constraintLayout}"
         }
 
         object Test {

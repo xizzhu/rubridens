@@ -94,18 +94,6 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
 }
 
 dependencies {
-    implementation(project(":core-mvvm"))
-    implementation(project(":core-view"))
-
-    implementation(Dependencies.Kotlin.coroutines)
-
-    implementation(Dependencies.AndroidX.activity)
-    implementation(Dependencies.AndroidX.View.constraintLayout)
-
-    implementation(Dependencies.Koin.core)
-
-    implementation(Dependencies.materialComponent)
-
     testImplementation(Dependencies.Kotlin.test)
     testImplementation(Dependencies.Kotlin.coroutinesTest)
     testImplementation(Dependencies.AndroidX.Test.core)
