@@ -17,7 +17,12 @@
 package me.xizzhu.android.rubridens
 
 import me.xizzhu.android.rubridens.auth.authModule
+import me.xizzhu.android.rubridens.core.repository.repositoryModule
 
 val appModules = listOf(
-        authModule
+        // core modules
+        repositoryModule,
+
+        // feature modules
+        authModule,
 )

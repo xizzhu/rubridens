@@ -16,20 +16,44 @@
 
 package me.xizzhu.android.rubridens.auth
 
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import me.xizzhu.android.rubridens.core.mvvm.BaseViewModel
+import me.xizzhu.android.rubridens.core.repository.InstanceRepository
 
 class AuthViewModel(
-        private val authManager: AuthManager
+        private val authManager: AuthManager,
+        private val instanceRepository: InstanceRepository
 ) : BaseViewModel<AuthViewModel.ViewAction, AuthViewModel.ViewState>(
         initialViewState = ViewState(
-                loading = false
+                loading = false,
+                instanceInfo = null,
         )
 ) {
     sealed class ViewAction {}
 
-    data class ViewState(val loading: Boolean)
+    data class ViewState(val loading: Boolean, val instanceInfo: InstanceInfo?) {
+        class InstanceInfo(val title: String, val userCount: Long, val statusCount: Long)
+    }
 
     fun selectInstance(instanceUrl: String) {
-        emitViewState { currentViewState -> currentViewState.copy(loading = true) }
+        emitViewState { currentViewState ->
+            currentViewState.copy(loading = true, instanceInfo = null)
+        }
+
+        viewModelScope.launch {
+            instanceRepository.fetch(instanceUrl)
+                    .onSuccess { instance ->
+                        emitViewState { currentViewState ->
+                            currentViewState.copy(
+                                    instanceInfo = ViewState.InstanceInfo(
+                                            title = instance.title,
+                                            userCount = instance.stats.userCount,
+                                            statusCount = instance.stats.statusCount,
+                                    ),
+                            )
+                        }
+                    }
+        }
     }
 }

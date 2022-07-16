@@ -76,5 +76,16 @@ class AuthActivity : BaseActivity<AuthViewModel.ViewAction, AuthViewModel.ViewSt
             next.isEnabled = true
             loadingSpinner.fadeOut()
         }
+
+        if (viewState.instanceInfo != null) {
+            info.text = getString(
+                    R.string.auth_instance_selection_text_instance_info,
+                    viewState.instanceInfo.userCount,
+                    viewState.instanceInfo.statusCount,
+                    viewState.instanceInfo.title
+            )
+        } else {
+            info.text = null
+        }
     }
 }

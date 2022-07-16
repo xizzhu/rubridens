@@ -14,13 +14,16 @@
  * limitations under the License.
  */
 
-package me.xizzhu.android.rubridens.auth
+package me.xizzhu.android.rubridens.core.repository
 
-import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
-val authModule = module {
-    single<AuthManager> { AuthManagerImpl() }
+val repositoryModule = module {
+    single { createMoshi() }
 
-    viewModel { AuthViewModel(get(), get()) }
+    single { createOkHttpClient() }
+
+    factory { (baseUrl: String) -> createRetrofit(get(), get(), "https://$baseUrl") }
+
+    single<InstanceRepository> { InstanceRepositoryImpl() }
 }

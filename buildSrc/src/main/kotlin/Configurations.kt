@@ -63,7 +63,14 @@ object Versions {
     }
 
     const val koin = "3.2.0"
+    const val ksp = "1.7.10-1.0.6"
     const val materialComponent = "1.6.1"
+
+    object Retrofit {
+        const val moshi = "1.13.0"
+        const val okhttp = "4.10.0"
+        const val retrofit = "2.9.0"
+    }
 
     const val mockk = "1.12.4"
     const val robolectric = "4.8.1"
@@ -110,6 +117,20 @@ object Dependencies {
     }
 
     const val materialComponent = "com.google.android.material:material:${Versions.materialComponent}"
+
+    object Retrofit {
+        object Moshi {
+            const val core = "com.squareup.moshi:moshi:${Versions.Retrofit.moshi}"
+            const val codegen = "com.squareup.moshi:moshi-kotlin-codegen:${Versions.Retrofit.moshi}"
+        }
+
+        const val okhttp = "com.squareup.okhttp3:okhttp:${Versions.Retrofit.okhttp}"
+
+        object Retrofit {
+            const val core = "com.squareup.retrofit2:retrofit:${Versions.Retrofit.retrofit}"
+            const val moshi = "com.squareup.retrofit2:converter-moshi:${Versions.Retrofit.retrofit}"
+        }
+    }
 
     const val mockk = "io.mockk:mockk:${Versions.mockk}"
     const val robolectric = "org.robolectric:robolectric:${Versions.robolectric}"

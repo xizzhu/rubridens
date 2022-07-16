@@ -15,6 +15,7 @@
  */
 
 include(":core-mvvm")
+include(":core-repository")
 include(":core-view")
 include(":feature-auth")
 include(":app")
