@@ -14,6 +14,23 @@
  * limitations under the License.
  */
 
-include(":core-mvvm")
-include(":feature-auth")
-include(":app")
+package me.xizzhu.android.rubridens.core.mvvm
+
+import android.os.Bundle
+import androidx.annotation.CallSuper
+import androidx.appcompat.app.AppCompatActivity
+import androidx.viewbinding.ViewBinding
+
+abstract class BaseActivity<VB : ViewBinding> : AppCompatActivity() {
+    protected lateinit var viewBinding: VB
+
+    @CallSuper
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        viewBinding = inflateViewBinding()
+        setContentView(viewBinding.root)
+    }
+
+    protected abstract fun inflateViewBinding(): VB
+}

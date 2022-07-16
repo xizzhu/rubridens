@@ -50,13 +50,15 @@ object Versions {
         const val activity = "1.5.0"
         const val annotation = "1.4.0"
         const val appCompat = "1.4.2"
-        const val fragment = "1.5.0"
+        const val core = "1.8.0"
+        const val lifecycle = "2.5.0"
 
         object Test {
             const val core = "1.4.0"
         }
     }
 
+    const val koin = "3.2.0"
     const val materialComponent = "1.6.1"
 
     const val mockk = "1.12.4"
@@ -83,11 +85,20 @@ object Dependencies {
         const val activity = "androidx.activity:activity-ktx:${Versions.AndroidX.activity}"
         const val annotation = "androidx.annotation:annotation:${Versions.AndroidX.annotation}"
         const val appCompat = "androidx.appcompat:appcompat:${Versions.AndroidX.appCompat}"
-        const val fragment = "androidx.fragment:fragment-ktx:${Versions.AndroidX.fragment}"
+        const val core = "androidx.core:core-ktx:${Versions.AndroidX.core}"
+
+        object Lifecycle {
+            const val common = "androidx.lifecycle:lifecycle-common-java8:${Versions.AndroidX.lifecycle}"
+            const val viewModel = "androidx.lifecycle:lifecycle-viewmodel-ktx:${Versions.AndroidX.lifecycle}"
+        }
 
         object Test {
             const val core = "androidx.test:core:${Versions.AndroidX.Test.core}"
         }
+    }
+
+    object Koin {
+        const val core = "io.insert-koin:koin-android:${Versions.koin}"
     }
 
     const val materialComponent = "com.google.android.material:material:${Versions.materialComponent}"

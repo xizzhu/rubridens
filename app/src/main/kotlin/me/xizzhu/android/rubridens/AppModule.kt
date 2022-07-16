@@ -16,7 +16,8 @@
 
 package me.xizzhu.android.rubridens
 
-import androidx.activity.ComponentActivity
+import me.xizzhu.android.rubridens.auth.authModule
 
-class MainActivity : ComponentActivity() {
-}
+val appModules = listOf(
+        authModule
+)

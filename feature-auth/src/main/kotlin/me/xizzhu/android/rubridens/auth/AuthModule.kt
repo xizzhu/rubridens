@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 
-include(":core-mvvm")
-include(":feature-auth")
-include(":app")
+package me.xizzhu.android.rubridens.auth
+
+import org.koin.dsl.module
+
+val authModule = module {
+    single<AuthManager> { AuthManagerImpl() }
+}

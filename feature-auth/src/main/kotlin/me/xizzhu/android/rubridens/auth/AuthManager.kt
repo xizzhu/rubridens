@@ -14,6 +14,15 @@
  * limitations under the License.
  */
 
-include(":core-mvvm")
-include(":feature-auth")
-include(":app")
+package me.xizzhu.android.rubridens.auth
+
+interface AuthManager {
+    suspend fun hasUserCredential(): Boolean
+}
+
+internal class AuthManagerImpl : AuthManager {
+    override suspend fun hasUserCredential(): Boolean {
+        // TODO
+        return false
+    }
+}

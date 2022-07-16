@@ -14,6 +14,17 @@
  * limitations under the License.
  */
 
-include(":core-mvvm")
-include(":feature-auth")
-include(":app")
+package me.xizzhu.android.rubridens.auth
+
+import android.content.Context
+import android.content.Intent
+import me.xizzhu.android.rubridens.auth.databinding.ActivityAuthBinding
+import me.xizzhu.android.rubridens.core.mvvm.BaseActivity
+
+class AuthActivity : BaseActivity<ActivityAuthBinding>() {
+    companion object {
+        fun newStartIntent(context: Context): Intent = Intent(context, AuthActivity::class.java)
+    }
+
+    override fun inflateViewBinding(): ActivityAuthBinding = ActivityAuthBinding.inflate(layoutInflater)
+}

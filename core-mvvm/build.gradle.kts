@@ -17,7 +17,7 @@
 import java.util.Properties
 
 plugins {
-    id("com.android.application")
+    id("com.android.library")
     id("kotlin-android")
 }
 apply(plugin = "kover")
@@ -35,15 +35,8 @@ android {
     compileSdk = Versions.Sdk.compile
 
     defaultConfig {
-        applicationId = Configurations.applicationId
-
         minSdk = Versions.Sdk.min
         targetSdk = Versions.Sdk.target
-
-        versionCode = Versions.App.code
-        versionName = Versions.App.name
-
-        resourceConfigurations.addAll(Configurations.supportedLocales)
     }
 
     buildFeatures {
@@ -58,31 +51,10 @@ android {
         getByName("test").java.srcDirs("src/test/kotlin")
     }
 
-    signingConfigs {
-        create("release") {
-            val keystorePropertiesFile = File("keystore.properties")
-            if (keystorePropertiesFile.exists()) {
-                val keystoreProperties = Properties()
-                keystoreProperties.load(keystorePropertiesFile.inputStream())
-
-                storeFile = File(rootDir, keystoreProperties.getProperty("KEYSTORE_FILE"))
-                storePassword = keystoreProperties.getProperty("KEYSTORE_PASSWORD")
-                keyAlias = keystoreProperties.getProperty("KEY_ALIAS")
-                keyPassword = keystoreProperties.getProperty("KEY_PASSWORD")
-            }
-        }
-    }
-
     buildTypes {
         getByName("release") {
-            isMinifyEnabled = true
-            isShrinkResources = true
-            signingConfig = signingConfigs.getByName("release")
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-        }
-        getByName("debug") {
-            applicationIdSuffix = ".debug"
-            versionNameSuffix = " debug"
+            isMinifyEnabled = false
+            isShrinkResources = false
         }
     }
 
@@ -122,17 +94,11 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
 }
 
 dependencies {
-    implementation(project(":feature-auth"))
-
     implementation(Dependencies.Kotlin.coroutines)
 
-    implementation(Dependencies.AndroidX.activity)
-    implementation(Dependencies.AndroidX.annotation)
     implementation(Dependencies.AndroidX.appCompat)
-
-    implementation(Dependencies.Koin.core)
-
-    implementation(Dependencies.materialComponent)
+    implementation(Dependencies.AndroidX.core)
+    implementation(Dependencies.AndroidX.Lifecycle.viewModel)
 
     testImplementation(Dependencies.Kotlin.test)
     testImplementation(Dependencies.Kotlin.coroutinesTest)
