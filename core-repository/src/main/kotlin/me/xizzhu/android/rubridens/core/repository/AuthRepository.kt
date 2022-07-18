@@ -16,6 +16,8 @@
 
 package me.xizzhu.android.rubridens.core.repository
 
+import me.xizzhu.android.rubridens.core.repository.local.AppDatabase
+import me.xizzhu.android.rubridens.core.repository.local.ApplicationCredentialEntity
 import me.xizzhu.android.rubridens.core.repository.network.MastodonAppsService
 import me.xizzhu.android.rubridens.core.repository.network.MastodonOAuthService
 import org.koin.core.parameter.parametersOf
@@ -35,9 +37,10 @@ interface AuthRepository {
     suspend fun loadApplicationCredential(instanceUrl: String): Result<ApplicationCredential>
 }
 
-internal class AuthRepositoryImpl : AuthRepository {
+internal class AuthRepositoryImpl(private val appDatabase: AppDatabase) : AuthRepository {
     override suspend fun loadApplicationCredential(instanceUrl: String): Result<ApplicationCredential> = kotlin.runCatching {
-        // TODO reads from local cache
+        appDatabase.applicationCredentialDao().readByInstanceUrl(instanceUrl)?.toApplicationCredential()
+                ?.takeIf { it.accessToken.isNotEmpty() }?.let { return@runCatching it }
 
         val retrofit: Retrofit by inject(Retrofit::class.java) { parametersOf(instanceUrl) }
         val mastodonApplication = retrofit.create<MastodonAppsService>().create(
@@ -46,22 +49,23 @@ internal class AuthRepositoryImpl : AuthRepository {
                 scopes = "read write follow push",
                 website = "https://xizzhu.me/"
         )
-        val mastodonOAuthToken = retrofit.create<MastodonOAuthService>().createToken(
+        val applicationCredential = retrofit.create<MastodonOAuthService>().createToken(
                 grantType = "client_credentials",
                 clientId = mastodonApplication.clientId,
                 clientSecret = mastodonApplication.clientSecret,
                 redirectUri = "urn:ietf:wg:oauth:2.0:oob",
                 scopes = "read write follow push",
                 code = ""
-        )
-        val applicationCredential = ApplicationCredential(
-                instanceUrl = instanceUrl,
-                clientId = mastodonApplication.clientId,
-                clientSecret = mastodonApplication.clientSecret,
-                accessToken = mastodonOAuthToken.accessToken,
-                vapidKey = mastodonApplication.vapidKey,
-        )
-        // TODO saves the created application credential
+        ).let { mastodonOAuthToken ->
+            ApplicationCredential(
+                    instanceUrl = instanceUrl,
+                    clientId = mastodonApplication.clientId,
+                    clientSecret = mastodonApplication.clientSecret,
+                    accessToken = mastodonOAuthToken.accessToken,
+                    vapidKey = mastodonApplication.vapidKey,
+            )
+        }
+        appDatabase.applicationCredentialDao().save(ApplicationCredentialEntity(applicationCredential))
         applicationCredential
     }
 }

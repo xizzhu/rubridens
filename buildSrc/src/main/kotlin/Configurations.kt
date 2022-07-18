@@ -52,6 +52,7 @@ object Versions {
         const val appCompat = "1.4.2"
         const val core = "1.8.0"
         const val lifecycle = "2.5.0"
+        const val room = "2.4.2"
 
         object View {
             const val constraintLayout = "2.1.4"
@@ -101,6 +102,11 @@ object Dependencies {
         object Lifecycle {
             const val common = "androidx.lifecycle:lifecycle-common-java8:${Versions.AndroidX.lifecycle}"
             const val viewModel = "androidx.lifecycle:lifecycle-viewmodel-ktx:${Versions.AndroidX.lifecycle}"
+        }
+
+        object Room {
+            const val compiler = "androidx.room:room-compiler:${Versions.AndroidX.room}"
+            const val runtime = "androidx.room:room-ktx:${Versions.AndroidX.room}"
         }
 
         object View {

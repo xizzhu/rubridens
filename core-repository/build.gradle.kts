@@ -97,6 +97,9 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
 dependencies {
     implementation(Dependencies.Kotlin.coroutines)
 
+    ksp(Dependencies.AndroidX.Room.compiler)
+    implementation(Dependencies.AndroidX.Room.runtime)
+
     implementation(Dependencies.Koin.core)
 
     implementation(Dependencies.Retrofit.Moshi.core)
