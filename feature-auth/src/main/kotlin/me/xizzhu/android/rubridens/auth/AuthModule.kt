@@ -23,4 +23,5 @@ val authModule = module {
     single<AuthManager> { AuthManagerImpl() }
 
     viewModel { AuthViewModel(get(), get()) }
+    viewModel { LoginViewModel(get()) }
 }

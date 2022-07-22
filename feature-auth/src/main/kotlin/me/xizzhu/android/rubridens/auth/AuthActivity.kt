@@ -16,10 +16,12 @@
 
 package me.xizzhu.android.rubridens.auth
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.view.View
 import android.view.inputmethod.EditorInfo
+import androidx.activity.result.contract.ActivityResultContracts
 import me.xizzhu.android.rubridens.auth.databinding.ActivityAuthBinding
 import me.xizzhu.android.rubridens.core.mvvm.BaseActivity
 import me.xizzhu.android.rubridens.core.view.fadeOut
@@ -28,7 +30,15 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class AuthActivity : BaseActivity<AuthViewModel.ViewAction, AuthViewModel.ViewState, ActivityAuthBinding, AuthViewModel>() {
     companion object {
+        internal const val KEY_LOGIN_SUCCESSFUL = "AuthActivity.KEY_LOGIN_SUCCESSFUL"
+
         fun newStartIntent(context: Context): Intent = Intent(context, AuthActivity::class.java)
+    }
+
+    private val loginResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            viewModel.onLoginResult(result.data?.getBooleanExtra(KEY_LOGIN_SUCCESSFUL, false) == true)
+        }
     }
 
     override val viewBinding: ActivityAuthBinding by lazy { ActivityAuthBinding.inflate(layoutInflater) }
@@ -62,7 +72,14 @@ class AuthActivity : BaseActivity<AuthViewModel.ViewAction, AuthViewModel.ViewSt
                 ?.let { viewModel.selectInstance(it) }
     }
 
-    override fun onViewAction(viewAction: AuthViewModel.ViewAction) {
+    override fun onViewAction(viewAction: AuthViewModel.ViewAction) = when (viewAction) {
+        is AuthViewModel.ViewAction.OpenLoginView -> {
+            loginResultLauncher.launch(LoginActivity.newStartIntent(this, viewAction.instanceUrl))
+        }
+        AuthViewModel.ViewAction.PopBack -> {
+            // TODO open the next intent
+            finish()
+        }
     }
 
     override fun onViewState(viewState: AuthViewModel.ViewState) = with(viewBinding) {

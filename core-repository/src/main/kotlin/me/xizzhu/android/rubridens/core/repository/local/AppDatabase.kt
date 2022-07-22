@@ -22,11 +22,16 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 
 @Database(
-        entities = [ApplicationCredentialEntity::class],
+        entities = [
+            ApplicationCredentialEntity::class,
+            UserCredentialEntity::class
+        ],
         version = 1
 )
 internal abstract class AppDatabase : RoomDatabase() {
     abstract fun applicationCredentialDao(): ApplicationCredentialDao
+
+    abstract fun userCredentialDao(): UserCredentialDao
 }
 
 internal fun createAppDatabase(appContext: Context): AppDatabase =

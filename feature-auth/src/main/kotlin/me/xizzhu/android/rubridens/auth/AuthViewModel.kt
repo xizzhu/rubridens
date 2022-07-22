@@ -31,7 +31,10 @@ class AuthViewModel(
                 instanceInfo = null,
         )
 ) {
-    sealed class ViewAction {}
+    sealed class ViewAction {
+        class OpenLoginView(val instanceUrl: String) : ViewAction()
+        object PopBack : ViewAction()
+    }
 
     data class ViewState(val loading: Boolean, val instanceInfo: InstanceInfo?) {
         class InstanceInfo(val title: String, val userCount: Long, val statusCount: Long)
@@ -60,6 +63,7 @@ class AuthViewModel(
         viewModelScope.launch {
             authRepository.loadApplicationCredential(instanceUrl)
                     .onSuccess {
+                        emitViewAction(ViewAction.OpenLoginView(instanceUrl = instanceUrl))
                         emitViewState { currentViewState -> currentViewState.copy(loading = false) }
                     }
                     .onFailure {
@@ -70,6 +74,19 @@ class AuthViewModel(
                             )
                         }
                     }
+        }
+    }
+
+    fun onLoginResult(loginSuccessful: Boolean) {
+        if (loginSuccessful) {
+            emitViewAction(ViewAction.PopBack)
+        } else {
+            emitViewState { currentViewState ->
+                currentViewState.copy(
+                        loading = false,
+                        // TODO show error
+                )
+            }
         }
     }
 }

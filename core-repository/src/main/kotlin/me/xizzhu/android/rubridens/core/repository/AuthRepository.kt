@@ -18,8 +18,11 @@ package me.xizzhu.android.rubridens.core.repository
 
 import me.xizzhu.android.rubridens.core.repository.local.AppDatabase
 import me.xizzhu.android.rubridens.core.repository.local.ApplicationCredentialEntity
+import me.xizzhu.android.rubridens.core.repository.local.UserCredentialEntity
+import me.xizzhu.android.rubridens.core.repository.network.MastodonAccountsService
 import me.xizzhu.android.rubridens.core.repository.network.MastodonAppsService
 import me.xizzhu.android.rubridens.core.repository.network.MastodonOAuthService
+import okhttp3.HttpUrl
 import org.koin.core.parameter.parametersOf
 import org.koin.java.KoinJavaComponent.inject
 import retrofit2.Retrofit
@@ -33,11 +36,35 @@ data class ApplicationCredential(
         val vapidKey: String
 )
 
+data class UserCredential(
+        val username: String,
+        val instanceUrl: String,
+        val accessToken: String
+)
+
 interface AuthRepository {
+    suspend fun getLoginUrl(instanceUrl: String): Result<String>
+
     suspend fun loadApplicationCredential(instanceUrl: String): Result<ApplicationCredential>
+
+    suspend fun createUserToken(instanceUrl: String, authCode: String): Result<UserCredential>
 }
 
 internal class AuthRepositoryImpl(private val appDatabase: AppDatabase) : AuthRepository {
+    override suspend fun getLoginUrl(instanceUrl: String): Result<String> = kotlin.runCatching {
+        val clientId = loadApplicationCredential(instanceUrl).getOrNull()?.clientId ?: ""
+        HttpUrl.Builder()
+                .scheme("https")
+                .host(instanceUrl)
+                .encodedPath("/oauth/authorize")
+                .addQueryParameter("response_type", "code")
+                .addQueryParameter("client_id", clientId)
+                .addQueryParameter("redirect_uri", "urn:ietf:wg:oauth:2.0:oob")
+                .addQueryParameter("scope", "read write follow push")
+                .addQueryParameter("force_login", "false")
+                .toString()
+    }
+
     override suspend fun loadApplicationCredential(instanceUrl: String): Result<ApplicationCredential> = kotlin.runCatching {
         appDatabase.applicationCredentialDao().readByInstanceUrl(instanceUrl)?.toApplicationCredential()
                 ?.takeIf { it.accessToken.isNotEmpty() }?.let { return@runCatching it }
@@ -68,4 +95,31 @@ internal class AuthRepositoryImpl(private val appDatabase: AppDatabase) : AuthRe
         appDatabase.applicationCredentialDao().save(ApplicationCredentialEntity(applicationCredential))
         applicationCredential
     }
+
+    override suspend fun createUserToken(instanceUrl: String, authCode: String): Result<UserCredential> =
+            loadApplicationCredential(instanceUrl)
+                    .mapCatching { applicationCredential ->
+                        val retrofit: Retrofit by inject(Retrofit::class.java) { parametersOf(instanceUrl) }
+                        retrofit.create<MastodonOAuthService>().createToken(
+                                grantType = "authorization_code",
+                                clientId = applicationCredential.clientId,
+                                clientSecret = applicationCredential.clientSecret,
+                                redirectUri = "urn:ietf:wg:oauth:2.0:oob",
+                                scopes = "read write follow push",
+                                code = authCode
+                        ).let { mastodonOAuthToken ->
+                            val username = retrofit.create<MastodonAccountsService>().verifyCredentials("Bearer ${mastodonOAuthToken.accessToken}").username
+                            UserCredential(
+                                    username = username,
+                                    instanceUrl = instanceUrl,
+                                    accessToken = mastodonOAuthToken.accessToken
+                            )
+                        }
+                    }
+                    .onSuccess { userCredential ->
+                        appDatabase.userCredentialDao().save(UserCredentialEntity(userCredential))
+                    }
+                    .onFailure {
+                        it.printStackTrace()
+                    }
 }
