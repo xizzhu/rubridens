@@ -46,34 +46,35 @@ class AuthViewModel(
         }
 
         viewModelScope.launch {
-            instanceRepository.fetch(instanceUrl)
-                    .onSuccess { instance ->
-                        emitViewState { currentViewState ->
-                            currentViewState.copy(
-                                    instanceInfo = ViewState.InstanceInfo(
-                                            title = instance.title,
-                                            userCount = instance.stats.userCount,
-                                            statusCount = instance.stats.statusCount,
-                                    ),
-                            )
-                        }
-                    }
+            kotlin.runCatching {
+                instanceRepository.fetch(instanceUrl)
+            }.onSuccess { instance ->
+                emitViewState { currentViewState ->
+                    currentViewState.copy(
+                            instanceInfo = ViewState.InstanceInfo(
+                                    title = instance.title,
+                                    userCount = instance.stats.userCount,
+                                    statusCount = instance.stats.statusCount,
+                            ),
+                    )
+                }
+            }
         }
 
         viewModelScope.launch {
-            authRepository.loadApplicationCredential(instanceUrl)
-                    .onSuccess {
-                        emitViewAction(ViewAction.OpenLoginView(instanceUrl = instanceUrl))
-                        emitViewState { currentViewState -> currentViewState.copy(loading = false) }
-                    }
-                    .onFailure {
-                        emitViewState { currentViewState ->
-                            currentViewState.copy(
-                                    loading = false,
-                                    // TODO show error
-                            )
-                        }
-                    }
+            kotlin.runCatching {
+                authRepository.loadApplicationCredential(instanceUrl)
+            }.onSuccess {
+                emitViewAction(ViewAction.OpenLoginView(instanceUrl = instanceUrl))
+                emitViewState { currentViewState -> currentViewState.copy(loading = false) }
+            }.onFailure {
+                emitViewState { currentViewState ->
+                    currentViewState.copy(
+                            loading = false,
+                            // TODO show error
+                    )
+                }
+            }
         }
     }
 

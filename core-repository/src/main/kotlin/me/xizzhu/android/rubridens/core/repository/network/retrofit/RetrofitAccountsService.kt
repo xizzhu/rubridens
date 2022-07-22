@@ -14,15 +14,30 @@
  * limitations under the License.
  */
 
-package me.xizzhu.android.rubridens.core.repository.network
+package me.xizzhu.android.rubridens.core.repository.network.retrofit
 
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
-import retrofit2.http.Field
-import retrofit2.http.FormUrlEncoded
+import me.xizzhu.android.rubridens.core.repository.model.User
+import me.xizzhu.android.rubridens.core.repository.network.AccountsService
+import retrofit2.create
 import retrofit2.http.GET
 import retrofit2.http.Header
-import retrofit2.http.POST
+
+internal class RetrofitAccountsService : AccountsService {
+    override suspend fun verifyCredentials(instanceUrl: String, userOAuthToken: String): User {
+        if (instanceUrl.isEmpty()) {
+            throw IllegalArgumentException("instanceUrl is empty")
+        }
+        if (userOAuthToken.isEmpty()) {
+            throw IllegalArgumentException("userOAuthToken is empty")
+        }
+        return RetrofitFactory.get(instanceUrl)
+                .create<MastodonAccountsService>()
+                .verifyCredentials(createAuthHeader(userOAuthToken))
+                .toUser(instanceUrl)
+    }
+}
 
 /**
  * See https://docs.joinmastodon.org/methods/accounts/
@@ -42,4 +57,12 @@ internal class MastodonAccount(
         @Json(name = "username") val username: String,
         @Json(name = "display_name") val displayName: String = "",
         @Json(name = "avatar") val avatarUrl: String = "",
-)
+) {
+    fun toUser(instanceUrl: String): User = User(
+            id = id,
+            instanceUrl = accountName.indexOf('@').takeIf { it >= 0 }?.let { accountName.substring(it + 1) } ?: instanceUrl,
+            username = username,
+            displayName = displayName.takeIf { it.isNotEmpty() } ?: "",
+            avatarUrl = avatarUrl.takeIf { it.isNotEmpty() } ?: ""
+    )
+}

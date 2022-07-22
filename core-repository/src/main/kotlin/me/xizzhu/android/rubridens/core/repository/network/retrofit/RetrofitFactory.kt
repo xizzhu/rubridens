@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package me.xizzhu.android.rubridens.core.repository
+package me.xizzhu.android.rubridens.core.repository.network.retrofit
 
-import me.xizzhu.android.rubridens.core.repository.model.Instance
-import me.xizzhu.android.rubridens.core.repository.network.InstanceService
+import org.koin.core.parameter.parametersOf
+import org.koin.java.KoinJavaComponent.inject
+import retrofit2.Retrofit
 
-interface InstanceRepository {
-    suspend fun fetch(instanceUrl: String): Instance
-}
-
-internal class InstanceRepositoryImpl(private val instanceService: InstanceService) : InstanceRepository {
-    override suspend fun fetch(instanceUrl: String): Instance = instanceService.fetch(instanceUrl)
+internal object RetrofitFactory {
+    fun get(instanceUrl: String): Retrofit {
+        val retrofit: Retrofit by inject(Retrofit::class.java) { parametersOf(instanceUrl) }
+        return retrofit
+    }
 }

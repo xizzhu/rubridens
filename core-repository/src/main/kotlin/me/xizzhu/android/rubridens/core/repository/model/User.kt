@@ -14,15 +14,18 @@
  * limitations under the License.
  */
 
-package me.xizzhu.android.rubridens.core.repository
+package me.xizzhu.android.rubridens.core.repository.model
 
-import me.xizzhu.android.rubridens.core.repository.model.Instance
-import me.xizzhu.android.rubridens.core.repository.network.InstanceService
+data class User(
+        val id: String,
+        val instanceUrl: String,
+        val username: String,
+        val displayName: String,
+        val avatarUrl: String,
+)
 
-interface InstanceRepository {
-    suspend fun fetch(instanceUrl: String): Instance
-}
-
-internal class InstanceRepositoryImpl(private val instanceService: InstanceService) : InstanceRepository {
-    override suspend fun fetch(instanceUrl: String): Instance = instanceService.fetch(instanceUrl)
-}
+data class UserCredential(
+        val username: String,
+        val instanceUrl: String,
+        val accessToken: String
+)

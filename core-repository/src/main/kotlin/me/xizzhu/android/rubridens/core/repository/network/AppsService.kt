@@ -14,15 +14,17 @@
  * limitations under the License.
  */
 
-package me.xizzhu.android.rubridens.core.repository
+package me.xizzhu.android.rubridens.core.repository.network
 
-import me.xizzhu.android.rubridens.core.repository.model.Instance
-import me.xizzhu.android.rubridens.core.repository.network.InstanceService
+import me.xizzhu.android.rubridens.core.repository.model.ApplicationCredential
+import me.xizzhu.android.rubridens.core.repository.model.OAuthScope
 
-interface InstanceRepository {
-    suspend fun fetch(instanceUrl: String): Instance
-}
-
-internal class InstanceRepositoryImpl(private val instanceService: InstanceService) : InstanceRepository {
-    override suspend fun fetch(instanceUrl: String): Instance = instanceService.fetch(instanceUrl)
+internal interface AppsService {
+    suspend fun create(
+            instanceUrl: String,
+            clientName: String,
+            redirectUris: String = "urn:ietf:wg:oauth:2.0:oob",
+            scopes: Set<OAuthScope> = setOf(OAuthScope.READ, OAuthScope.WRITE, OAuthScope.FOLLOW, OAuthScope.PUSH),
+            website: String = "",
+    ): ApplicationCredential
 }

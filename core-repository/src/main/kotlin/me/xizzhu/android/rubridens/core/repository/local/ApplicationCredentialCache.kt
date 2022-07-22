@@ -16,23 +16,10 @@
 
 package me.xizzhu.android.rubridens.core.repository.local
 
-import android.content.Context
-import androidx.room.Database
-import androidx.room.Room
-import androidx.room.RoomDatabase
+import me.xizzhu.android.rubridens.core.repository.model.ApplicationCredential
 
-@Database(
-        entities = [
-            ApplicationCredentialEntity::class,
-            UserCredentialEntity::class
-        ],
-        version = 1
-)
-internal abstract class AppDatabase : RoomDatabase() {
-    abstract fun applicationCredentialDao(): ApplicationCredentialDao
+internal interface ApplicationCredentialCache {
+    suspend fun readByInstanceUrl(instanceUrl: String): ApplicationCredential?
 
-    abstract fun userCredentialDao(): UserCredentialDao
+    suspend fun save(applicationCredential: ApplicationCredential)
 }
-
-internal fun createAppDatabase(appContext: Context): AppDatabase =
-        Room.databaseBuilder(appContext, AppDatabase::class.java, "app_database").build()

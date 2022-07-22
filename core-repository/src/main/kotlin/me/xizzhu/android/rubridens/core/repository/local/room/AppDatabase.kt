@@ -14,15 +14,21 @@
  * limitations under the License.
  */
 
-package me.xizzhu.android.rubridens.core.repository
+package me.xizzhu.android.rubridens.core.repository.local.room
 
-import me.xizzhu.android.rubridens.core.repository.model.Instance
-import me.xizzhu.android.rubridens.core.repository.network.InstanceService
+import androidx.room.Database
+import androidx.room.RoomDatabase
 
-interface InstanceRepository {
-    suspend fun fetch(instanceUrl: String): Instance
+@Database(
+        entities = [
+            ApplicationCredentialEntity::class,
+            UserCredentialEntity::class
+        ],
+        version = 1
+)
+internal abstract class AppDatabase : RoomDatabase() {
+    abstract fun applicationCredentialDao(): ApplicationCredentialDao
+
+    abstract fun userCredentialDao(): UserCredentialDao
 }
 
-internal class InstanceRepositoryImpl(private val instanceService: InstanceService) : InstanceRepository {
-    override suspend fun fetch(instanceUrl: String): Instance = instanceService.fetch(instanceUrl)
-}

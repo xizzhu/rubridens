@@ -14,12 +14,24 @@
  * limitations under the License.
  */
 
-package me.xizzhu.android.rubridens.core.repository.network
+package me.xizzhu.android.rubridens.core.repository.network.retrofit
 
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
-import me.xizzhu.android.rubridens.core.repository.Instance
+import me.xizzhu.android.rubridens.core.repository.model.Instance
+import me.xizzhu.android.rubridens.core.repository.network.InstanceService
+import retrofit2.create
 import retrofit2.http.GET
+
+internal class RetrofitInstanceService : InstanceService {
+    override suspend fun fetch(instanceUrl: String): Instance {
+        if (instanceUrl.isEmpty()) {
+            throw IllegalArgumentException("instanceUrl is empty")
+        }
+
+        return RetrofitFactory.get(instanceUrl).create<MastodonInstanceService>().fetch().toInstance()
+    }
+}
 
 /**
  * See https://docs.joinmastodon.org/methods/instance/

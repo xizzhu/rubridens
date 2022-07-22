@@ -50,16 +50,17 @@ class LoginViewModel(
         this.instanceUrl = instanceUrl
 
         viewModelScope.launch {
-            authRepository.getLoginUrl(instanceUrl)
-                    .onSuccess { loginUrl ->
-                        this@LoginViewModel.loginUrl = loginUrl
-                        emitViewAction(ViewAction.OpenLoginView(loginUrl))
-                    }.onFailure {
-                        it.printStackTrace()
-                        emitViewAction(ViewAction.PopBack(
-                                loginSuccessful = false
-                        ))
-                    }
+            kotlin.runCatching {
+                authRepository.getLoginUrl(instanceUrl)
+            }.onSuccess { loginUrl ->
+                this@LoginViewModel.loginUrl = loginUrl
+                emitViewAction(ViewAction.OpenLoginView(loginUrl))
+            }.onFailure {
+                it.printStackTrace()
+                emitViewAction(ViewAction.PopBack(
+                        loginSuccessful = false
+                ))
+            }
         }
     }
 
@@ -85,7 +86,7 @@ class LoginViewModel(
             }
 
             viewModelScope.launch {
-                val loginSuccessful = authRepository.createUserToken(instanceUrl, authCode).isSuccess
+                val loginSuccessful = kotlin.runCatching { authRepository.createUserToken(instanceUrl, authCode) }.isSuccess
                 emitViewAction(ViewAction.PopBack(
                         loginSuccessful = loginSuccessful
                 ))

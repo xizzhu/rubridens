@@ -14,14 +14,21 @@
  * limitations under the License.
  */
 
-package me.xizzhu.android.rubridens.core.repository.local
+package me.xizzhu.android.rubridens.core.repository.local.room
 
 import androidx.room.ColumnInfo
 import androidx.room.Dao
 import androidx.room.Entity
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
-import me.xizzhu.android.rubridens.core.repository.UserCredential
+import me.xizzhu.android.rubridens.core.repository.local.UserCredentialCache
+import me.xizzhu.android.rubridens.core.repository.model.UserCredential
+
+internal class RoomUserCredentialCache(private val appDatabase: AppDatabase) : UserCredentialCache {
+    override suspend fun save(userCredential: UserCredential) {
+        appDatabase.userCredentialDao().save(UserCredentialEntity(userCredential))
+    }
+}
 
 @Dao
 internal interface UserCredentialDao {

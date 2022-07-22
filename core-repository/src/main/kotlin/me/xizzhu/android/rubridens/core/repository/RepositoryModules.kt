@@ -16,20 +16,52 @@
 
 package me.xizzhu.android.rubridens.core.repository
 
-import me.xizzhu.android.rubridens.core.repository.local.AppDatabase
-import me.xizzhu.android.rubridens.core.repository.local.createAppDatabase
-import me.xizzhu.android.rubridens.core.repository.network.createMoshi
-import me.xizzhu.android.rubridens.core.repository.network.createOkHttpClient
-import me.xizzhu.android.rubridens.core.repository.network.createRetrofit
+import androidx.room.Room
+import com.squareup.moshi.Moshi
+import me.xizzhu.android.rubridens.core.repository.local.ApplicationCredentialCache
+import me.xizzhu.android.rubridens.core.repository.local.UserCredentialCache
+import me.xizzhu.android.rubridens.core.repository.local.room.AppDatabase
+import me.xizzhu.android.rubridens.core.repository.local.room.RoomApplicationCredentialCache
+import me.xizzhu.android.rubridens.core.repository.local.room.RoomUserCredentialCache
+import me.xizzhu.android.rubridens.core.repository.network.AccountsService
+import me.xizzhu.android.rubridens.core.repository.network.AppsService
+import me.xizzhu.android.rubridens.core.repository.network.InstanceService
+import me.xizzhu.android.rubridens.core.repository.network.OAuthService
+import me.xizzhu.android.rubridens.core.repository.network.retrofit.RetrofitAccountsService
+import me.xizzhu.android.rubridens.core.repository.network.retrofit.RetrofitAppsService
+import me.xizzhu.android.rubridens.core.repository.network.retrofit.RetrofitInstanceService
+import me.xizzhu.android.rubridens.core.repository.network.retrofit.RetrofitOAuthService
+import okhttp3.OkHttpClient
 import org.koin.dsl.module
+import retrofit2.Retrofit
+import retrofit2.converter.moshi.MoshiConverterFactory
+import java.util.concurrent.TimeUnit
 
 val repositoryModule = module {
-    single { createAppDatabase(get()) }
+    single { Room.databaseBuilder(get(), AppDatabase::class.java, "app_database").build() }
+    single<ApplicationCredentialCache> { RoomApplicationCredentialCache(get()) }
+    single<UserCredentialCache> { RoomUserCredentialCache(get()) }
 
-    single { createMoshi() }
-    single { createOkHttpClient() }
-    factory { (baseUrl: String) -> createRetrofit(get(), get(), "https://$baseUrl") }
+    single { Moshi.Builder().build() }
+    single {
+        OkHttpClient.Builder()
+                .connectTimeout(30, TimeUnit.SECONDS)
+                .readTimeout(30, TimeUnit.SECONDS)
+                .writeTimeout(30, TimeUnit.SECONDS)
+                .build()
+    }
+    factory { (instanceUrl: String) ->
+        Retrofit.Builder()
+                .client(get())
+                .addConverterFactory(MoshiConverterFactory.create(get()))
+                .baseUrl("https://$instanceUrl")
+                .build()
+    }
+    single<AccountsService> { RetrofitAccountsService() }
+    single<AppsService> { RetrofitAppsService() }
+    single<InstanceService> { RetrofitInstanceService() }
+    single<OAuthService> { RetrofitOAuthService() }
 
-    single<AuthRepository> { AuthRepositoryImpl(get()) }
-    single<InstanceRepository> { InstanceRepositoryImpl() }
+    single<AuthRepository> { AuthRepositoryImpl(get(), get(), get(), get(), get()) }
+    single<InstanceRepository> { InstanceRepositoryImpl(get()) }
 }
