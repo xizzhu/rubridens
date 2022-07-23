@@ -14,13 +14,10 @@
  * limitations under the License.
  */
 
-import java.util.Properties
-
 plugins {
     id("com.android.library")
     id("kotlin-android")
 }
-apply(plugin = "kover")
 
 android {
     compileOptions {
@@ -64,16 +61,6 @@ android {
 
         unitTests.all { test ->
             test.maxParallelForks = Runtime.getRuntime().availableProcessors() / 2
-
-            test.extensions.configure(kotlinx.kover.api.KoverTaskExtension::class) {
-                isDisabled = test.name != "testDebugUnitTest"
-                includes = listOf("me.xizzhu.android.rubridens.*")
-                excludes = listOf(
-                        "me.xizzhu.android.rubridens.BuildConfig",
-                        "me.xizzhu.android.rubridens.databinding.*",
-                        "me.xizzhu.android.rubridens.*_*",
-                )
-            }
         }
     }
 

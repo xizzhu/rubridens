@@ -26,7 +26,18 @@ buildscript {
     }
 }
 
+plugins {
+    id("org.jetbrains.kotlinx.kover") version Versions.Kotlin.kover
+}
 
+tasks.koverMergedHtmlReport {
+    includes = listOf("me.xizzhu.android.rubridens.*")
+    excludes = listOf(
+            "me.xizzhu.android.rubridens.BuildConfig",
+            "me.xizzhu.android.rubridens.databinding.*",
+            "me.xizzhu.android.rubridens.*_*",
+    )
+}
 
 allprojects {
     repositories {
