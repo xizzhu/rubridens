@@ -22,6 +22,7 @@ import android.content.Intent
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.view.isVisible
 import me.xizzhu.android.rubridens.auth.databinding.ActivityAuthBinding
 import me.xizzhu.android.rubridens.core.mvvm.BaseActivity
 import me.xizzhu.android.rubridens.core.view.fadeOut
@@ -100,15 +101,26 @@ class AuthActivity : BaseActivity<AuthViewModel.ViewAction, AuthViewModel.ViewSt
             loadingSpinner.fadeOut()
         }
 
-        if (viewState.instanceInfo != null) {
-            info.text = getString(
-                    R.string.auth_instance_selection_text_instance_info,
-                    viewState.instanceInfo.userCount,
-                    viewState.instanceInfo.statusCount,
-                    viewState.instanceInfo.title
-            )
+        if (viewState.errorInfo == null) {
+            info.isVisible = true
+            info.text = viewState.instanceInfo?.let { instanceInfo ->
+                getString(
+                        R.string.auth_instance_selection_text_instance_info,
+                        instanceInfo.userCount,
+                        instanceInfo.statusCount,
+                        instanceInfo.title
+                )
+            }
+
+            error.isVisible = false
         } else {
-            info.text = null
+            info.isVisible = false
+
+            error.isVisible = true
+            error.setText(when (viewState.errorInfo) {
+                AuthViewModel.ViewState.ErrorInfo.FailedToLogin -> R.string.auth_instance_selection_error_failed_to_login
+                AuthViewModel.ViewState.ErrorInfo.FailedToSelectInstance -> R.string.auth_instance_selection_error_failed_to_select_instance
+            })
         }
     }
 }

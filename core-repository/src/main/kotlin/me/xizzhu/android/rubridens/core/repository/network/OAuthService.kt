@@ -29,6 +29,8 @@ internal interface OAuthService {
             forceLogin: Boolean = false
     ): String
 
+    fun getAuthCode(url: String): String?
+
     suspend fun createToken(
             instanceUrl: String,
             grantType: OAuthGrantType,

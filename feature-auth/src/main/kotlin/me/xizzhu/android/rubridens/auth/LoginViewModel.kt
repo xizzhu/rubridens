@@ -16,7 +16,6 @@
 
 package me.xizzhu.android.rubridens.auth
 
-import android.net.Uri
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import me.xizzhu.android.rubridens.core.mvvm.BaseViewModel
@@ -56,7 +55,6 @@ class LoginViewModel(
                 this@LoginViewModel.loginUrl = loginUrl
                 emitViewAction(ViewAction.OpenLoginView(loginUrl))
             }.onFailure {
-                it.printStackTrace()
                 emitViewAction(ViewAction.PopBack(
                         loginSuccessful = false
                 ))
@@ -75,7 +73,7 @@ class LoginViewModel(
             return
         }
 
-        val authCode = Uri.parse(url).getQueryParameter("code")
+        val authCode = authRepository.getAuthCode(url)
         if (authCode?.isNotEmpty() == true) {
             // user has granted the access and we got the auth code
             emitViewState { currentViewState ->
@@ -91,8 +89,6 @@ class LoginViewModel(
                         loginSuccessful = loginSuccessful
                 ))
             }
-
-            return
         }
     }
 }

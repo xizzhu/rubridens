@@ -28,6 +28,8 @@ import me.xizzhu.android.rubridens.core.repository.network.OAuthService
 interface AuthRepository {
     suspend fun getLoginUrl(instanceUrl: String): String
 
+    fun getAuthCode(url: String): String?
+
     suspend fun loadApplicationCredential(instanceUrl: String): ApplicationCredential
 
     suspend fun createUserToken(instanceUrl: String, authCode: String): UserCredential
@@ -45,31 +47,33 @@ internal class AuthRepositoryImpl(
     override suspend fun getLoginUrl(instanceUrl: String): String =
             oAuthService.getLoginUrl(instanceUrl, loadApplicationCredential(instanceUrl).clientId)
 
-    override suspend fun loadApplicationCredential(instanceUrl: String): ApplicationCredential {
-        applicationCredentialCache.readByInstanceUrl(instanceUrl)
-                ?.takeIf { it.accessToken.isNotEmpty() }
-                ?.let { return it }
+    override fun getAuthCode(url: String): String? = oAuthService.getAuthCode(url)
 
-        val partialAppCredential = appsService.create(
-                instanceUrl = instanceUrl,
-                clientName = "Rubridens",
-                website = "https://xizzhu.me/"
-        )
-        val applicationToken = oAuthService.createToken(
-                instanceUrl = instanceUrl,
-                grantType = OAuthGrantType.CLIENT_CREDENTIALS,
-                clientId = partialAppCredential.clientId,
-                clientSecret = partialAppCredential.clientSecret,
-        )
-        val applicationCredential = ApplicationCredential(
-                instanceUrl = instanceUrl,
-                clientId = partialAppCredential.clientId,
-                clientSecret = partialAppCredential.clientSecret,
-                accessToken = applicationToken.accessToken,
-                vapidKey = partialAppCredential.vapidKey,
-        )
-        applicationCredentialCache.save(applicationCredential)
-        return applicationCredential
+    override suspend fun loadApplicationCredential(instanceUrl: String): ApplicationCredential {
+        val cachedApplicationCredential = applicationCredentialCache.readByInstanceUrl(instanceUrl)
+        if (cachedApplicationCredential?.accessToken?.isNotEmpty() == true) {
+            return cachedApplicationCredential
+        }
+
+        val partialApplicationCredential = cachedApplicationCredential
+                ?: appsService.create(
+                        instanceUrl = instanceUrl,
+                        clientName = "Rubridens",
+                        website = "https://xizzhu.me/"
+                ).also {
+                    kotlin.runCatching { applicationCredentialCache.save(it) }
+                }
+
+        return partialApplicationCredential.copy(
+                accessToken = oAuthService.createToken(
+                        instanceUrl = instanceUrl,
+                        grantType = OAuthGrantType.CLIENT_CREDENTIALS,
+                        clientId = partialApplicationCredential.clientId,
+                        clientSecret = partialApplicationCredential.clientSecret,
+                ).accessToken
+        ).also {
+            kotlin.runCatching { applicationCredentialCache.save(it) }
+        }
     }
 
     override suspend fun createUserToken(instanceUrl: String, authCode: String): UserCredential {
@@ -81,14 +85,13 @@ internal class AuthRepositoryImpl(
                 clientSecret = applicationCredential.clientSecret,
                 code = authCode,
         )
-        val user = accountsService.verifyCredentials(instanceUrl, userToken.accessToken)
-        val userCredential = UserCredential(
-                username = user.username,
+        return UserCredential(
                 instanceUrl = instanceUrl,
+                username = accountsService.verifyCredentials(instanceUrl, userToken.accessToken).username,
                 accessToken = userToken.accessToken
-        )
-        userCredentialCache.save(userCredential)
-        return userCredential
+        ).also {
+            kotlin.runCatching { userCredentialCache.save(it) }
+        }
     }
 
     override suspend fun hasUserCredential(): Boolean = userCredentialCache.hasCredential()

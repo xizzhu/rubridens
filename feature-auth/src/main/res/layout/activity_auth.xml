@@ -62,7 +62,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/padding"
-        android:text="@string/auth_instance_selection_error_failed_to_select_instance"
         android:textColor="?colorError"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"

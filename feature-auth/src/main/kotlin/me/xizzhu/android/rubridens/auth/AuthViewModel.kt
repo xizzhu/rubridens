@@ -24,11 +24,12 @@ import me.xizzhu.android.rubridens.core.repository.InstanceRepository
 
 class AuthViewModel(
         private val authRepository: AuthRepository,
-        private val instanceRepository: InstanceRepository
+        private val instanceRepository: InstanceRepository,
 ) : BaseViewModel<AuthViewModel.ViewAction, AuthViewModel.ViewState>(
         initialViewState = ViewState(
                 loading = false,
                 instanceInfo = null,
+                errorInfo = null,
         )
 ) {
     sealed class ViewAction {
@@ -36,13 +37,18 @@ class AuthViewModel(
         object PopBack : ViewAction()
     }
 
-    data class ViewState(val loading: Boolean, val instanceInfo: InstanceInfo?) {
-        class InstanceInfo(val title: String, val userCount: Long, val statusCount: Long)
+    data class ViewState(val loading: Boolean, val instanceInfo: InstanceInfo?, val errorInfo: ErrorInfo?) {
+        data class InstanceInfo(val title: String, val userCount: Long, val statusCount: Long)
+
+        sealed class ErrorInfo {
+            object FailedToLogin : ErrorInfo()
+            object FailedToSelectInstance : ErrorInfo()
+        }
     }
 
     fun selectInstance(instanceUrl: String) {
         emitViewState { currentViewState ->
-            currentViewState.copy(loading = true, instanceInfo = null)
+            currentViewState.copy(loading = true, instanceInfo = null, errorInfo = null)
         }
 
         viewModelScope.launch {
@@ -71,7 +77,7 @@ class AuthViewModel(
                 emitViewState { currentViewState ->
                     currentViewState.copy(
                             loading = false,
-                            // TODO show error
+                            errorInfo = ViewState.ErrorInfo.FailedToSelectInstance,
                     )
                 }
             }
@@ -85,7 +91,7 @@ class AuthViewModel(
             emitViewState { currentViewState ->
                 currentViewState.copy(
                         loading = false,
-                        // TODO show error
+                        errorInfo = ViewState.ErrorInfo.FailedToLogin,
                 )
             }
         }

@@ -23,6 +23,7 @@ import me.xizzhu.android.rubridens.core.repository.model.OAuthScope
 import me.xizzhu.android.rubridens.core.repository.model.OAuthToken
 import me.xizzhu.android.rubridens.core.repository.network.OAuthService
 import okhttp3.HttpUrl
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import retrofit2.create
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
@@ -48,6 +49,8 @@ internal class RetrofitOAuthService : OAuthService {
                 .addQueryParameter("force_login", forceLogin.toString())
                 .toString()
     }
+
+    override fun getAuthCode(url: String): String? = url.toHttpUrlOrNull()?.queryParameter("code")
 
     override suspend fun createToken(
             instanceUrl: String,

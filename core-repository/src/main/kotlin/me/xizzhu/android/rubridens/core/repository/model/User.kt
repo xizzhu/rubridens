@@ -25,7 +25,7 @@ data class User(
 )
 
 data class UserCredential(
-        val username: String,
         val instanceUrl: String,
+        val username: String,
         val accessToken: String
 )

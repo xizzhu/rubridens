@@ -94,4 +94,8 @@ dependencies {
     implementation(Dependencies.Retrofit.okhttp)
     implementation(Dependencies.Retrofit.Retrofit.core)
     implementation(Dependencies.Retrofit.Retrofit.moshi)
+
+    testImplementation(Dependencies.Kotlin.test)
+    testImplementation(Dependencies.Kotlin.coroutinesTest)
+    testImplementation(Dependencies.mockk)
 }

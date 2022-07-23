@@ -35,6 +35,7 @@ tasks.koverMergedXmlReport {
     excludes = listOf(
             "me.xizzhu.android.rubridens.*.BuildConfig",
             "me.xizzhu.android.rubridens.*.databinding.*",
+            "me.xizzhu.android.rubridens.*_*",
     )
 }
 
