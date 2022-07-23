@@ -120,6 +120,7 @@ object Dependencies {
 
     object Koin {
         const val core = "io.insert-koin:koin-android:${Versions.koin}"
+        const val test = "io.insert-koin:koin-test:${Versions.koin}"
     }
 
     const val materialComponent = "com.google.android.material:material:${Versions.materialComponent}"
