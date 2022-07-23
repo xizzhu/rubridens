@@ -33,9 +33,8 @@ plugins {
 tasks.koverMergedHtmlReport {
     includes = listOf("me.xizzhu.android.rubridens.*")
     excludes = listOf(
-            "me.xizzhu.android.rubridens.BuildConfig",
-            "me.xizzhu.android.rubridens.databinding.*",
-            "me.xizzhu.android.rubridens.*_*",
+            "me.xizzhu.android.rubridens.*.BuildConfig",
+            "me.xizzhu.android.rubridens.*.databinding.*",
     )
 }
 
