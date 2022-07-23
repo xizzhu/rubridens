@@ -31,8 +31,12 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 class AuthActivity : BaseActivity<AuthViewModel.ViewAction, AuthViewModel.ViewState, ActivityAuthBinding, AuthViewModel>() {
     companion object {
         internal const val KEY_LOGIN_SUCCESSFUL = "AuthActivity.KEY_LOGIN_SUCCESSFUL"
+        private const val KEY_INTENT_TO_START_ON_SUCCESS = "AuthActivity.KEY_INTENT_TO_START_ON_SUCCESS"
 
-        fun newStartIntent(context: Context): Intent = Intent(context, AuthActivity::class.java)
+        fun newStartIntent(context: Context, intentToStartOnSuccess: Intent?): Intent =
+                Intent(context, AuthActivity::class.java).apply {
+                    intentToStartOnSuccess?.let { putExtra(KEY_INTENT_TO_START_ON_SUCCESS, it) }
+                }
     }
 
     private val loginResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -77,7 +81,9 @@ class AuthActivity : BaseActivity<AuthViewModel.ViewAction, AuthViewModel.ViewSt
             loginResultLauncher.launch(LoginActivity.newStartIntent(this, viewAction.instanceUrl))
         }
         AuthViewModel.ViewAction.PopBack -> {
-            // TODO open the next intent
+            intent.getParcelableExtra<Intent>(KEY_INTENT_TO_START_ON_SUCCESS)?.let { intentToStartOnSuccess ->
+                startActivity(intentToStartOnSuccess)
+            }
             finish()
         }
     }

@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-package me.xizzhu.android.rubridens.auth
+package me.xizzhu.android.rubridens.home
 
-interface AuthManager {
-    suspend fun hasUserCredential(): Boolean
-}
+import me.xizzhu.android.rubridens.core.mvvm.BaseViewModel
 
-internal class AuthManagerImpl : AuthManager {
-    override suspend fun hasUserCredential(): Boolean {
-        // TODO
-        return false
-    }
+class HomeViewModel() : BaseViewModel<HomeViewModel.ViewAction, HomeViewModel.ViewState>(
+        initialViewState = ViewState(
+                loading = false,
+        )
+) {
+    sealed class ViewAction
+
+    data class ViewState(val loading: Boolean)
 }

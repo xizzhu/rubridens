@@ -21,20 +21,22 @@ import androidx.activity.ComponentActivity
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import me.xizzhu.android.rubridens.auth.AuthActivity
-import me.xizzhu.android.rubridens.auth.AuthManager
+import me.xizzhu.android.rubridens.core.repository.AuthRepository
+import me.xizzhu.android.rubridens.home.HomeActivity
 import org.koin.android.ext.android.inject
 
 class LauncherActivity : ComponentActivity() {
-    private val authManager: AuthManager by inject()
+    private val authRepository: AuthRepository by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         lifecycleScope.launch {
-            val intentToStart = if (authManager.hasUserCredential()) {
-                TODO()
+            val homeIntent = HomeActivity.newStartIntent(this@LauncherActivity)
+            val intentToStart = if (authRepository.hasUserCredential()) {
+                homeIntent
             } else {
-                AuthActivity.newStartIntent(this@LauncherActivity)
+                AuthActivity.newStartIntent(this@LauncherActivity, homeIntent)
             }
             startActivity(intentToStart)
 

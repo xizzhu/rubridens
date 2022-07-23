@@ -14,17 +14,11 @@
  * limitations under the License.
  */
 
-package me.xizzhu.android.rubridens
+package me.xizzhu.android.rubridens.home
 
-import me.xizzhu.android.rubridens.auth.authModule
-import me.xizzhu.android.rubridens.core.repository.repositoryModule
-import me.xizzhu.android.rubridens.home.homeModule
+import org.koin.androidx.viewmodel.dsl.viewModel
+import org.koin.dsl.module
 
-val appModules = listOf(
-        // core modules
-        repositoryModule,
-
-        // feature modules
-        authModule,
-        homeModule,
-)
+val homeModule = module {
+    viewModel { HomeViewModel() }
+}
