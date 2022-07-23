@@ -30,7 +30,7 @@ plugins {
     id("org.jetbrains.kotlinx.kover") version Versions.Kotlin.kover
 }
 
-tasks.koverMergedHtmlReport {
+tasks.koverMergedXmlReport {
     includes = listOf("me.xizzhu.android.rubridens.*")
     excludes = listOf(
             "me.xizzhu.android.rubridens.*.BuildConfig",
