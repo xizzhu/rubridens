@@ -73,22 +73,22 @@ class AuthViewModelTest {
         coEvery {
             instanceRepository.fetch("xizzhu.me")
         } returns Instance(
-                title = "title",
-                stats = Instance.Stats(
-                        userCount = 64,
-                        statusCount = 1989,
-                )
+            title = "title",
+            stats = Instance.Stats(
+                userCount = 64,
+                statusCount = 1989,
+            )
         )
         coEvery {
             authRepository.loadApplicationCredential("xizzhu.me")
         } coAnswers {
             delay(200)
             ApplicationCredential(
-                    instanceUrl = "xizzhu.me",
-                    clientId = "client_id",
-                    clientSecret = "client_secret",
-                    accessToken = "access_token",
-                    vapidKey = "vapid_key",
+                instanceUrl = "xizzhu.me",
+                clientId = "client_id",
+                clientSecret = "client_secret",
+                accessToken = "access_token",
+                vapidKey = "vapid_key",
             )
         }
 
@@ -98,29 +98,29 @@ class AuthViewModelTest {
         authViewModel.selectInstance("xizzhu.me")
 
         assertEquals(
-                AuthViewModel.ViewState(
-                        loading = true,
-                        instanceInfo = AuthViewModel.ViewState.InstanceInfo(
-                                title = "title",
-                                userCount = 64,
-                                statusCount = 1989,
-                        ),
-                        errorInfo = null
+            AuthViewModel.ViewState(
+                loading = true,
+                instanceInfo = AuthViewModel.ViewState.InstanceInfo(
+                    title = "title",
+                    userCount = 64,
+                    statusCount = 1989,
                 ),
-                authViewModel.viewState().first()
+                errorInfo = null
+            ),
+            authViewModel.viewState().first()
         )
         assertEquals("xizzhu.me", (viewAction.await() as AuthViewModel.ViewAction.OpenLoginView).instanceUrl)
         assertEquals(
-                AuthViewModel.ViewState(
-                        loading = false,
-                        instanceInfo = AuthViewModel.ViewState.InstanceInfo(
-                                title = "title",
-                                userCount = 64,
-                                statusCount = 1989,
-                        ),
-                        errorInfo = null
+            AuthViewModel.ViewState(
+                loading = false,
+                instanceInfo = AuthViewModel.ViewState.InstanceInfo(
+                    title = "title",
+                    userCount = 64,
+                    statusCount = 1989,
                 ),
-                authViewModel.viewState().first()
+                errorInfo = null
+            ),
+            authViewModel.viewState().first()
         )
     }
 
@@ -131,21 +131,21 @@ class AuthViewModelTest {
         } coAnswers {
             delay(100)
             Instance(
-                    title = "title",
-                    stats = Instance.Stats(
-                            userCount = 64,
-                            statusCount = 1989,
-                    )
+                title = "title",
+                stats = Instance.Stats(
+                    userCount = 64,
+                    statusCount = 1989,
+                )
             )
         }
         coEvery {
             authRepository.loadApplicationCredential("xizzhu.me")
         } returns ApplicationCredential(
-                instanceUrl = "xizzhu.me",
-                clientId = "client_id",
-                clientSecret = "client_secret",
-                accessToken = "access_token",
-                vapidKey = "vapid_key",
+            instanceUrl = "xizzhu.me",
+            clientId = "client_id",
+            clientSecret = "client_secret",
+            accessToken = "access_token",
+            vapidKey = "vapid_key",
         )
 
         val viewAction = async { authViewModel.viewAction().first() }
@@ -162,11 +162,11 @@ class AuthViewModelTest {
         coEvery {
             authRepository.loadApplicationCredential("xizzhu.me")
         } returns ApplicationCredential(
-                instanceUrl = "xizzhu.me",
-                clientId = "client_id",
-                clientSecret = "client_secret",
-                accessToken = "access_token",
-                vapidKey = "vapid_key",
+            instanceUrl = "xizzhu.me",
+            clientId = "client_id",
+            clientSecret = "client_secret",
+            accessToken = "access_token",
+            vapidKey = "vapid_key",
         )
 
         val viewAction = async { authViewModel.viewAction().first() }
@@ -182,11 +182,11 @@ class AuthViewModelTest {
         coEvery {
             instanceRepository.fetch("xizzhu.me")
         } returns Instance(
-                title = "title",
-                stats = Instance.Stats(
-                        userCount = 64,
-                        statusCount = 1989,
-                )
+            title = "title",
+            stats = Instance.Stats(
+                userCount = 64,
+                statusCount = 1989,
+            )
         )
         coEvery {
             authRepository.loadApplicationCredential("xizzhu.me")
@@ -199,16 +199,16 @@ class AuthViewModelTest {
         delay(150)
 
         assertEquals(
-                AuthViewModel.ViewState(
-                        loading = false,
-                        instanceInfo = AuthViewModel.ViewState.InstanceInfo(
-                                title = "title",
-                                userCount = 64,
-                                statusCount = 1989,
-                        ),
-                        errorInfo = AuthViewModel.ViewState.ErrorInfo.FailedToSelectInstance,
+            AuthViewModel.ViewState(
+                loading = false,
+                instanceInfo = AuthViewModel.ViewState.InstanceInfo(
+                    title = "title",
+                    userCount = 64,
+                    statusCount = 1989,
                 ),
-                authViewModel.viewState().first()
+                errorInfo = AuthViewModel.ViewState.ErrorInfo.FailedToSelectInstance,
+            ),
+            authViewModel.viewState().first()
         )
     }
 
@@ -220,12 +220,12 @@ class AuthViewModelTest {
         authViewModel.selectInstance("xizzhu.me")
 
         assertEquals(
-                AuthViewModel.ViewState(
-                        loading = false,
-                        instanceInfo = null,
-                        errorInfo = AuthViewModel.ViewState.ErrorInfo.FailedToSelectInstance,
-                ),
-                authViewModel.viewState().first()
+            AuthViewModel.ViewState(
+                loading = false,
+                instanceInfo = null,
+                errorInfo = AuthViewModel.ViewState.ErrorInfo.FailedToSelectInstance,
+            ),
+            authViewModel.viewState().first()
         )
     }
 
@@ -244,8 +244,8 @@ class AuthViewModelTest {
         authViewModel.onLoginResult(false)
 
         assertEquals(
-                AuthViewModel.ViewState(loading = false, instanceInfo = null, errorInfo = AuthViewModel.ViewState.ErrorInfo.FailedToLogin),
-                authViewModel.viewState().first()
+            AuthViewModel.ViewState(loading = false, instanceInfo = null, errorInfo = AuthViewModel.ViewState.ErrorInfo.FailedToLogin),
+            authViewModel.viewState().first()
         )
     }
 }

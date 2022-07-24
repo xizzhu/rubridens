@@ -38,27 +38,27 @@ internal class RetrofitOAuthService : OAuthService {
         }
 
         return HttpUrl.Builder()
-                .scheme("https")
-                .host(instanceUrl)
-                .encodedPath("/oauth/authorize")
-                .addQueryParameter("response_type", "code")
-                .addQueryParameter("client_id", clientId)
-                .addQueryParameter("redirect_uri", redirectUri)
-                .addQueryParameter("scope", scopes.toMastodonString())
-                .addQueryParameter("force_login", forceLogin.toString())
-                .toString()
+            .scheme("https")
+            .host(instanceUrl)
+            .encodedPath("/oauth/authorize")
+            .addQueryParameter("response_type", "code")
+            .addQueryParameter("client_id", clientId)
+            .addQueryParameter("redirect_uri", redirectUri)
+            .addQueryParameter("scope", scopes.toMastodonString())
+            .addQueryParameter("force_login", forceLogin.toString())
+            .toString()
     }
 
     override fun getAuthCode(url: String): String? = url.toHttpUrlOrNull()?.queryParameter("code")
 
     override suspend fun createToken(
-            instanceUrl: String,
-            grantType: OAuthGrantType,
-            clientId: String,
-            clientSecret: String,
-            redirectUri: String,
-            scopes: Set<OAuthScope>,
-            code: String
+        instanceUrl: String,
+        grantType: OAuthGrantType,
+        clientId: String,
+        clientSecret: String,
+        redirectUri: String,
+        scopes: Set<OAuthScope>,
+        code: String
     ): OAuthToken {
         if (instanceUrl.isEmpty()) {
             throw IllegalArgumentException("instanceUrl is empty")
@@ -78,12 +78,12 @@ internal class RetrofitOAuthService : OAuthService {
 
         return request<MastodonOAuthService, MastodonOAuthToken>(instanceUrl) {
             createToken(
-                    grantType = grantType.toMastodonString(),
-                    clientId = clientId,
-                    clientSecret = clientSecret,
-                    redirectUri = redirectUri,
-                    scopes = scopes.toMastodonString(),
-                    code = code
+                grantType = grantType.toMastodonString(),
+                clientId = clientId,
+                clientSecret = clientSecret,
+                redirectUri = redirectUri,
+                scopes = scopes.toMastodonString(),
+                code = code
             )
         }.toOAuthToken()
     }
@@ -96,12 +96,12 @@ internal interface MastodonOAuthService {
     @POST("oauth/token")
     @FormUrlEncoded
     suspend fun createToken(
-            @Field("grant_type") grantType: String,
-            @Field("client_id") clientId: String,
-            @Field("client_secret") clientSecret: String,
-            @Field("redirect_uri") redirectUri: String,
-            @Field("scopes") scopes: String,
-            @Field("code") code: String
+        @Field("grant_type") grantType: String,
+        @Field("client_id") clientId: String,
+        @Field("client_secret") clientSecret: String,
+        @Field("redirect_uri") redirectUri: String,
+        @Field("scopes") scopes: String,
+        @Field("code") code: String
     ): MastodonOAuthToken
 }
 
@@ -110,14 +110,14 @@ internal interface MastodonOAuthService {
  */
 @JsonClass(generateAdapter = true)
 internal class MastodonOAuthToken(
-        @Json(name = "access_token") val accessToken: String,
-        @Json(name = "token_type") val tokenType: String,
-        @Json(name = "scope") val scope: String,
+    @Json(name = "access_token") val accessToken: String,
+    @Json(name = "token_type") val tokenType: String,
+    @Json(name = "scope") val scope: String,
 ) {
     fun toOAuthToken(): OAuthToken = OAuthToken(
-            accessToken = accessToken,
-            tokenType = tokenType,
-            scopes = scope.toOAuthScopes()
+        accessToken = accessToken,
+        tokenType = tokenType,
+        scopes = scope.toOAuthScopes()
     )
 }
 
@@ -134,11 +134,11 @@ internal fun OAuthScope.toMastodonString(): String = when (this) {
 }
 
 internal fun Set<OAuthScope>.toMastodonString(): String =
-        (takeIf { it.isNotEmpty() } ?: setOf(OAuthScope.READ)).joinToString(separator = " ") { it.toMastodonString() }
+    (takeIf { it.isNotEmpty() } ?: setOf(OAuthScope.READ)).joinToString(separator = " ") { it.toMastodonString() }
 
 internal fun String.toOAuthScopes(): Set<OAuthScope> =
-        (split(" ").mapNotNull { value -> OAuthScope.values().firstOrNull { it.toMastodonString() == value } }
-                .takeIf { it.isNotEmpty() })?.toSet() ?: setOf(OAuthScope.READ)
+    (split(" ").mapNotNull { value -> OAuthScope.values().firstOrNull { it.toMastodonString() == value } }
+        .takeIf { it.isNotEmpty() })?.toSet() ?: setOf(OAuthScope.READ)
 
 /**
  * See https://docs.joinmastodon.org/methods/apps/oauth/

@@ -45,22 +45,22 @@ internal interface MastodonInstanceService {
  */
 @JsonClass(generateAdapter = true)
 internal class MastodonInstance(
-        @Json(name = "title") val title: String,
-        @Json(name = "stats") val stats: MastodonStats,
+    @Json(name = "title") val title: String,
+    @Json(name = "stats") val stats: MastodonStats,
 ) {
     @JsonClass(generateAdapter = true)
     class MastodonStats(
-            @Json(name = "user_count") val userCount: Long,
-            @Json(name = "status_count") val statusCount: Long,
+        @Json(name = "user_count") val userCount: Long,
+        @Json(name = "status_count") val statusCount: Long,
     ) {
         fun toStats(): Instance.Stats = Instance.Stats(
-                userCount = userCount,
-                statusCount = statusCount
+            userCount = userCount,
+            statusCount = statusCount
         )
     }
 
     fun toInstance(): Instance = Instance(
-            title = title,
-            stats = stats.toStats()
+        title = title,
+        stats = stats.toStats()
     )
 }

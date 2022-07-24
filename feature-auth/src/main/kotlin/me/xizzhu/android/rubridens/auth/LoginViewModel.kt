@@ -22,12 +22,12 @@ import me.xizzhu.android.rubridens.core.mvvm.BaseViewModel
 import me.xizzhu.android.rubridens.core.repository.AuthRepository
 
 class LoginViewModel(
-        private val authRepository: AuthRepository
+    private val authRepository: AuthRepository
 ) : BaseViewModel<LoginViewModel.ViewAction, LoginViewModel.ViewState>(
-        initialViewState = ViewState(
-                loading = false,
-                hideWebView = false
-        )
+    initialViewState = ViewState(
+        loading = false,
+        hideWebView = false
+    )
 ) {
     sealed class ViewAction {
         class OpenLoginView(val loginUrl: String) : ViewAction()
@@ -42,8 +42,8 @@ class LoginViewModel(
     fun login(instanceUrl: String) {
         emitViewState { currentViewState ->
             currentViewState.copy(
-                    loading = true,
-                    hideWebView = false
+                loading = true,
+                hideWebView = false
             )
         }
         this.instanceUrl = instanceUrl
@@ -56,7 +56,7 @@ class LoginViewModel(
                 emitViewAction(ViewAction.OpenLoginView(loginUrl))
             }.onFailure {
                 emitViewAction(ViewAction.PopBack(
-                        loginSuccessful = false
+                    loginSuccessful = false
                 ))
             }
         }
@@ -67,7 +67,7 @@ class LoginViewModel(
             // login page loaded
             emitViewState { currentViewState ->
                 currentViewState.copy(
-                        loading = false
+                    loading = false
                 )
             }
             return
@@ -78,15 +78,15 @@ class LoginViewModel(
             // user has granted the access and we got the auth code
             emitViewState { currentViewState ->
                 currentViewState.copy(
-                        loading = true,
-                        hideWebView = true
+                    loading = true,
+                    hideWebView = true
                 )
             }
 
             viewModelScope.launch {
                 val loginSuccessful = kotlin.runCatching { authRepository.createUserToken(instanceUrl, authCode) }.isSuccess
                 emitViewAction(ViewAction.PopBack(
-                        loginSuccessful = loginSuccessful
+                    loginSuccessful = loginSuccessful
                 ))
             }
         }

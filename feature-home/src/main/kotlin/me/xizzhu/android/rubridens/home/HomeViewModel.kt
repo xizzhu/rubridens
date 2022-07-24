@@ -19,9 +19,9 @@ package me.xizzhu.android.rubridens.home
 import me.xizzhu.android.rubridens.core.mvvm.BaseViewModel
 
 class HomeViewModel() : BaseViewModel<HomeViewModel.ViewAction, HomeViewModel.ViewState>(
-        initialViewState = ViewState(
-                loading = false,
-        )
+    initialViewState = ViewState(
+        loading = false,
+    )
 ) {
     sealed class ViewAction
 

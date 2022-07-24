@@ -29,16 +29,16 @@ internal val retrofitTestModule = module {
     single { Moshi.Builder().build() }
     single {
         OkHttpClient.Builder()
-                .connectTimeout(1, TimeUnit.SECONDS)
-                .readTimeout(1, TimeUnit.SECONDS)
-                .writeTimeout(1, TimeUnit.SECONDS)
-                .build()
+            .connectTimeout(1, TimeUnit.SECONDS)
+            .readTimeout(1, TimeUnit.SECONDS)
+            .writeTimeout(1, TimeUnit.SECONDS)
+            .build()
     }
     factory { (instanceUrl: String) ->
         Retrofit.Builder()
-                .client(get())
-                .addConverterFactory(MoshiConverterFactory.create(get()))
-                .baseUrl(get<MockWebServer>().url("/$instanceUrl/"))
-                .build()
+            .client(get())
+            .addConverterFactory(MoshiConverterFactory.create(get()))
+            .baseUrl(get<MockWebServer>().url("/$instanceUrl/"))
+            .build()
     }
 }

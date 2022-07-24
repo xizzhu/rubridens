@@ -43,13 +43,13 @@ internal interface UserCredentialDao {
 }
 
 @Entity(
-        tableName = UserCredentialEntity.TABLE_NAME,
-        primaryKeys = [UserCredentialEntity.COLUMN_NAME_INSTANCE_URL, UserCredentialEntity.COLUMN_NAME_USERNAME]
+    tableName = UserCredentialEntity.TABLE_NAME,
+    primaryKeys = [UserCredentialEntity.COLUMN_NAME_INSTANCE_URL, UserCredentialEntity.COLUMN_NAME_USERNAME]
 )
 internal class UserCredentialEntity(
-        @ColumnInfo(name = COLUMN_NAME_INSTANCE_URL) val instanceUrl: String,
-        @ColumnInfo(name = COLUMN_NAME_USERNAME) val username: String,
-        @ColumnInfo(name = COLUMN_NAME_ACCESS_TOKEN) val accessToken: String,
+    @ColumnInfo(name = COLUMN_NAME_INSTANCE_URL) val instanceUrl: String,
+    @ColumnInfo(name = COLUMN_NAME_USERNAME) val username: String,
+    @ColumnInfo(name = COLUMN_NAME_ACCESS_TOKEN) val accessToken: String,
 ) {
     companion object {
         const val TABLE_NAME = "user_credential"
@@ -59,8 +59,8 @@ internal class UserCredentialEntity(
     }
 
     constructor(userCredential: UserCredential) : this(
-            instanceUrl = userCredential.instanceUrl,
-            username = userCredential.username,
-            accessToken = userCredential.accessToken,
+        instanceUrl = userCredential.instanceUrl,
+        username = userCredential.username,
+        accessToken = userCredential.accessToken,
     )
 }

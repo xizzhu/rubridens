@@ -35,36 +35,36 @@ class RetrofitErrorTest : BaseRetrofitTest() {
     @Test
     fun `test fromJson with only error fields`() {
         assertEquals(
-                NetworkException.HttpError.ErrorInfo(
-                        error = "invalid_grant",
-                        description = ""
-                ),
-                MastodonError.fromJson(
-                        """
+            NetworkException.HttpError.ErrorInfo(
+                error = "invalid_grant",
+                description = ""
+            ),
+            MastodonError.fromJson(
+                """
                             {
                                 "error": "invalid_grant",
                                 "unknown_field": 123456789
                             }
                         """.trimIndent()
-                )?.toErrorInfo()
+            )?.toErrorInfo()
         )
     }
 
     @Test
     fun `test fromJson with all fields`() {
         assertEquals(
-                NetworkException.HttpError.ErrorInfo(
-                        error = "invalid_grant",
-                        description = "The provided authorization grant is invalid, expired, revoked, does not match the redirection URI used in the authorization request, or was issued to another client."
-                ),
-                MastodonError.fromJson(
-                        """
+            NetworkException.HttpError.ErrorInfo(
+                error = "invalid_grant",
+                description = "The provided authorization grant is invalid, expired, revoked, does not match the redirection URI used in the authorization request, or was issued to another client."
+            ),
+            MastodonError.fromJson(
+                """
                             {
                                 "error": "invalid_grant",
                                 "error_description": "The provided authorization grant is invalid, expired, revoked, does not match the redirection URI used in the authorization request, or was issued to another client."
                             }
                         """.trimIndent()
-                )?.toErrorInfo()
+            )?.toErrorInfo()
         )
     }
 }

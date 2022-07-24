@@ -21,10 +21,10 @@ import me.xizzhu.android.rubridens.core.repository.model.OAuthScope
 
 internal interface AppsService {
     suspend fun create(
-            instanceUrl: String,
-            clientName: String,
-            redirectUris: String = "urn:ietf:wg:oauth:2.0:oob",
-            scopes: Set<OAuthScope> = setOf(OAuthScope.READ, OAuthScope.WRITE, OAuthScope.FOLLOW, OAuthScope.PUSH),
-            website: String = "",
+        instanceUrl: String,
+        clientName: String,
+        redirectUris: String = "urn:ietf:wg:oauth:2.0:oob",
+        scopes: Set<OAuthScope> = setOf(OAuthScope.READ, OAuthScope.WRITE, OAuthScope.FOLLOW, OAuthScope.PUSH),
+        website: String = "",
     ): ApplicationCredential
 }

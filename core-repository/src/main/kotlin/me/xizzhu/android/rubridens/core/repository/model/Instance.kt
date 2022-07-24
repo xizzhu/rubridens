@@ -17,11 +17,11 @@
 package me.xizzhu.android.rubridens.core.repository.model
 
 data class Instance(
-        val title: String,
-        val stats: Stats,
+    val title: String,
+    val stats: Stats,
 ) {
     data class Stats(
-            val userCount: Long,
-            val statusCount: Long,
+        val userCount: Long,
+        val statusCount: Long,
     )
 }

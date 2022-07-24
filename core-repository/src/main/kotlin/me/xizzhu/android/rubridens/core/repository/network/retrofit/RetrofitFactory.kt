@@ -34,9 +34,9 @@ internal inline fun <reified T, R> request(instanceUrl: String, block: T.() -> R
     block(RetrofitFactory.get(instanceUrl).create())
 } catch (e: retrofit2.HttpException) {
     throw NetworkException.HttpError(
-            code = e.code(),
-            error = e.response()?.errorBody()?.string()?.let { MastodonError.fromJson(it)?.toErrorInfo() },
-            cause = e,
+        code = e.code(),
+        error = e.response()?.errorBody()?.string()?.let { MastodonError.fromJson(it)?.toErrorInfo() },
+        cause = e,
     )
 } catch (e: JsonDataException) {
     throw NetworkException.MalformedResponseError(e)

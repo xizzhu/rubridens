@@ -34,7 +34,7 @@ internal class LoginActivity : BaseActivity<LoginViewModel.ViewAction, LoginView
             }
 
             return Intent(context, LoginActivity::class.java)
-                    .putExtra(KEY_INSTANCE_URL, instanceUrl)
+                .putExtra(KEY_INSTANCE_URL, instanceUrl)
         }
     }
 

@@ -21,10 +21,10 @@ import me.xizzhu.android.rubridens.core.repository.repositoryModule
 import me.xizzhu.android.rubridens.home.homeModule
 
 val appModules = listOf(
-        // core modules
-        repositoryModule,
+    // core modules
+    repositoryModule,
 
-        // feature modules
-        authModule,
-        homeModule,
+    // feature modules
+    authModule,
+    homeModule,
 )

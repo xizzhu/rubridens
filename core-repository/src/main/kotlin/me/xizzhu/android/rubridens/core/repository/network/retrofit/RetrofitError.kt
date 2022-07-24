@@ -28,8 +28,8 @@ import org.koin.java.KoinJavaComponent.inject
  */
 @JsonClass(generateAdapter = true)
 internal class MastodonError(
-        @Json(name = "error") val error: String = "",
-        @Json(name = "error_description") val description: String = "",
+    @Json(name = "error") val error: String = "",
+    @Json(name = "error_description") val description: String = "",
 ) {
     companion object {
         private val adapter: JsonAdapter<MastodonError> by lazy {
@@ -41,7 +41,7 @@ internal class MastodonError(
     }
 
     fun toErrorInfo(): NetworkException.HttpError.ErrorInfo = NetworkException.HttpError.ErrorInfo(
-            error = error,
-            description = description
+        error = error,
+        description = description
     )
 }

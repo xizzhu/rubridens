@@ -27,11 +27,11 @@ import retrofit2.http.POST
 
 internal class RetrofitAppsService : AppsService {
     override suspend fun create(
-            instanceUrl: String,
-            clientName: String,
-            redirectUris: String,
-            scopes: Set<OAuthScope>,
-            website: String
+        instanceUrl: String,
+        clientName: String,
+        redirectUris: String,
+        scopes: Set<OAuthScope>,
+        website: String
     ): ApplicationCredential {
         if (instanceUrl.isEmpty()) {
             throw IllegalArgumentException("instanceUrl is empty")
@@ -45,10 +45,10 @@ internal class RetrofitAppsService : AppsService {
 
         return request<MastodonAppsService, MastodonApplication>(instanceUrl) {
             create(
-                    clientName = clientName,
-                    redirectUris = redirectUris,
-                    scopes = scopes.toMastodonString(),
-                    website = website
+                clientName = clientName,
+                redirectUris = redirectUris,
+                scopes = scopes.toMastodonString(),
+                website = website
             )
         }.toApplicationCredential(instanceUrl)
     }
@@ -61,10 +61,10 @@ internal interface MastodonAppsService {
     @POST("api/v1/apps")
     @FormUrlEncoded
     suspend fun create(
-            @Field("client_name") clientName: String,
-            @Field("redirect_uris") redirectUris: String,
-            @Field("scopes") scopes: String,
-            @Field("website") website: String
+        @Field("client_name") clientName: String,
+        @Field("redirect_uris") redirectUris: String,
+        @Field("scopes") scopes: String,
+        @Field("website") website: String
     ): MastodonApplication
 }
 
@@ -73,15 +73,15 @@ internal interface MastodonAppsService {
  */
 @JsonClass(generateAdapter = true)
 internal class MastodonApplication(
-        @Json(name = "client_id") val clientId: String,
-        @Json(name = "client_secret") val clientSecret: String,
-        @Json(name = "vapid_key") val vapidKey: String = "",
+    @Json(name = "client_id") val clientId: String,
+    @Json(name = "client_secret") val clientSecret: String,
+    @Json(name = "vapid_key") val vapidKey: String = "",
 ) {
     fun toApplicationCredential(instanceUrl: String): ApplicationCredential = ApplicationCredential(
-            instanceUrl = instanceUrl,
-            clientId = clientId,
-            clientSecret = clientSecret,
-            accessToken = "",
-            vapidKey = vapidKey
+        instanceUrl = instanceUrl,
+        clientId = clientId,
+        clientSecret = clientSecret,
+        accessToken = "",
+        vapidKey = vapidKey
     )
 }

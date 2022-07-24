@@ -29,7 +29,7 @@ enum class OAuthGrantType {
 }
 
 data class OAuthToken(
-        val accessToken: String,
-        val tokenType: String,
-        val scopes: Set<OAuthScope>,
+    val accessToken: String,
+    val tokenType: String,
+    val scopes: Set<OAuthScope>,
 )

@@ -23,14 +23,14 @@ import me.xizzhu.android.rubridens.core.repository.AuthRepository
 import me.xizzhu.android.rubridens.core.repository.InstanceRepository
 
 class AuthViewModel(
-        private val authRepository: AuthRepository,
-        private val instanceRepository: InstanceRepository,
+    private val authRepository: AuthRepository,
+    private val instanceRepository: InstanceRepository,
 ) : BaseViewModel<AuthViewModel.ViewAction, AuthViewModel.ViewState>(
-        initialViewState = ViewState(
-                loading = false,
-                instanceInfo = null,
-                errorInfo = null,
-        )
+    initialViewState = ViewState(
+        loading = false,
+        instanceInfo = null,
+        errorInfo = null,
+    )
 ) {
     sealed class ViewAction {
         class OpenLoginView(val instanceUrl: String) : ViewAction()
@@ -57,11 +57,11 @@ class AuthViewModel(
             }.onSuccess { instance ->
                 emitViewState { currentViewState ->
                     currentViewState.copy(
-                            instanceInfo = ViewState.InstanceInfo(
-                                    title = instance.title,
-                                    userCount = instance.stats.userCount,
-                                    statusCount = instance.stats.statusCount,
-                            ),
+                        instanceInfo = ViewState.InstanceInfo(
+                            title = instance.title,
+                            userCount = instance.stats.userCount,
+                            statusCount = instance.stats.statusCount,
+                        ),
                     )
                 }
             }
@@ -76,8 +76,8 @@ class AuthViewModel(
             }.onFailure {
                 emitViewState { currentViewState ->
                     currentViewState.copy(
-                            loading = false,
-                            errorInfo = ViewState.ErrorInfo.FailedToSelectInstance,
+                        loading = false,
+                        errorInfo = ViewState.ErrorInfo.FailedToSelectInstance,
                     )
                 }
             }
@@ -90,8 +90,8 @@ class AuthViewModel(
         } else {
             emitViewState { currentViewState ->
                 currentViewState.copy(
-                        loading = false,
-                        errorInfo = ViewState.ErrorInfo.FailedToLogin,
+                    loading = false,
+                    errorInfo = ViewState.ErrorInfo.FailedToLogin,
                 )
             }
         }

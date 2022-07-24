@@ -35,9 +35,9 @@ class AuthActivity : BaseActivity<AuthViewModel.ViewAction, AuthViewModel.ViewSt
         private const val KEY_INTENT_TO_START_ON_SUCCESS = "AuthActivity.KEY_INTENT_TO_START_ON_SUCCESS"
 
         fun newStartIntent(context: Context, intentToStartOnSuccess: Intent?): Intent =
-                Intent(context, AuthActivity::class.java).apply {
-                    intentToStartOnSuccess?.let { putExtra(KEY_INTENT_TO_START_ON_SUCCESS, it) }
-                }
+            Intent(context, AuthActivity::class.java).apply {
+                intentToStartOnSuccess?.let { putExtra(KEY_INTENT_TO_START_ON_SUCCESS, it) }
+            }
     }
 
     private val loginResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -65,16 +65,16 @@ class AuthActivity : BaseActivity<AuthViewModel.ViewAction, AuthViewModel.ViewSt
 
     private fun selectInstance() {
         viewBinding.instance.text?.toString().takeUnless { it.isNullOrEmpty() }
-                ?.let { instanceUrl ->
-                    instanceUrl.trim().let { trimmed ->
-                        when {
-                            trimmed.startsWith("http://") -> trimmed.substring(7)
-                            trimmed.startsWith("https://") -> trimmed.substring(8)
-                            else -> trimmed
-                        }
+            ?.let { instanceUrl ->
+                instanceUrl.trim().let { trimmed ->
+                    when {
+                        trimmed.startsWith("http://") -> trimmed.substring(7)
+                        trimmed.startsWith("https://") -> trimmed.substring(8)
+                        else -> trimmed
                     }
                 }
-                ?.let { viewModel.selectInstance(it) }
+            }
+            ?.let { viewModel.selectInstance(it) }
     }
 
     override fun onViewAction(viewAction: AuthViewModel.ViewAction) = when (viewAction) {
@@ -105,10 +105,10 @@ class AuthActivity : BaseActivity<AuthViewModel.ViewAction, AuthViewModel.ViewSt
             info.isVisible = true
             info.text = viewState.instanceInfo?.let { instanceInfo ->
                 getString(
-                        R.string.auth_instance_selection_text_instance_info,
-                        instanceInfo.userCount,
-                        instanceInfo.statusCount,
-                        instanceInfo.title
+                    R.string.auth_instance_selection_text_instance_info,
+                    instanceInfo.userCount,
+                    instanceInfo.statusCount,
+                    instanceInfo.title
                 )
             }
 

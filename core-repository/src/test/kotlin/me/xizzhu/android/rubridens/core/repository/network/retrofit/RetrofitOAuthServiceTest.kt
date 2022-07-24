@@ -39,30 +39,30 @@ class RetrofitOAuthServiceTest : BaseRetrofitTest() {
     @Test(expected = IllegalArgumentException::class)
     fun `test getLoginUrl with empty instanceUrl`() {
         retrofitOAuthService.getLoginUrl(
-                instanceUrl = "",
-                clientId = "client_id",
-                redirectUri = "urn:ietf:wg:oauth:2.0:oob",
-                scopes = setOf(OAuthScope.READ),
-                forceLogin = true,
+            instanceUrl = "",
+            clientId = "client_id",
+            redirectUri = "urn:ietf:wg:oauth:2.0:oob",
+            scopes = setOf(OAuthScope.READ),
+            forceLogin = true,
         )
     }
 
     @Test(expected = IllegalArgumentException::class)
     fun `test getLoginUrl with empty redirectUri`() {
         retrofitOAuthService.getLoginUrl(
-                instanceUrl = "xizzhu.me",
-                clientId = "client_id",
-                redirectUri = "",
-                scopes = setOf(OAuthScope.READ),
-                forceLogin = true,
+            instanceUrl = "xizzhu.me",
+            clientId = "client_id",
+            redirectUri = "",
+            scopes = setOf(OAuthScope.READ),
+            forceLogin = true,
         )
     }
 
     @Test
     fun `test getLoginUrl`() {
         assertEquals(
-                "https://xizzhu.me/oauth/authorize?response_type=code&client_id=my_client_id&redirect_uri=urn%3Aietf%3Awg%3Aoauth%3A2.0%3Aoob&scope=read%20write%20follow%20push&force_login=false",
-                retrofitOAuthService.getLoginUrl(instanceUrl = "xizzhu.me", clientId = "my_client_id")
+            "https://xizzhu.me/oauth/authorize?response_type=code&client_id=my_client_id&redirect_uri=urn%3Aietf%3Awg%3Aoauth%3A2.0%3Aoob&scope=read%20write%20follow%20push&force_login=false",
+            retrofitOAuthService.getLoginUrl(instanceUrl = "xizzhu.me", clientId = "my_client_id")
         )
     }
 
@@ -86,94 +86,94 @@ class RetrofitOAuthServiceTest : BaseRetrofitTest() {
     @Test(expected = IllegalArgumentException::class)
     fun `test createToken with empty instanceUrl`() = runTest {
         retrofitOAuthService.createToken(
-                instanceUrl = "",
-                grantType = OAuthGrantType.CLIENT_CREDENTIALS,
-                clientId = "client_id",
-                clientSecret = "client_secret",
-                redirectUri = "urn:ietf:wg:oauth:2.0:oob",
-                scopes = setOf(OAuthScope.READ),
+            instanceUrl = "",
+            grantType = OAuthGrantType.CLIENT_CREDENTIALS,
+            clientId = "client_id",
+            clientSecret = "client_secret",
+            redirectUri = "urn:ietf:wg:oauth:2.0:oob",
+            scopes = setOf(OAuthScope.READ),
         )
     }
 
     @Test(expected = IllegalArgumentException::class)
     fun `test createToken with empty clientId`() = runTest {
         retrofitOAuthService.createToken(
-                instanceUrl = "xizzhu.me",
-                grantType = OAuthGrantType.CLIENT_CREDENTIALS,
-                clientId = "",
-                clientSecret = "client_secret",
-                redirectUri = "urn:ietf:wg:oauth:2.0:oob",
-                scopes = setOf(OAuthScope.READ),
+            instanceUrl = "xizzhu.me",
+            grantType = OAuthGrantType.CLIENT_CREDENTIALS,
+            clientId = "",
+            clientSecret = "client_secret",
+            redirectUri = "urn:ietf:wg:oauth:2.0:oob",
+            scopes = setOf(OAuthScope.READ),
         )
     }
 
     @Test(expected = IllegalArgumentException::class)
     fun `test createToken with empty clientSecret`() = runTest {
         retrofitOAuthService.createToken(
-                instanceUrl = "xizzhu.me",
-                grantType = OAuthGrantType.CLIENT_CREDENTIALS,
-                clientId = "client_id",
-                clientSecret = "",
-                redirectUri = "urn:ietf:wg:oauth:2.0:oob",
-                scopes = setOf(OAuthScope.READ),
+            instanceUrl = "xizzhu.me",
+            grantType = OAuthGrantType.CLIENT_CREDENTIALS,
+            clientId = "client_id",
+            clientSecret = "",
+            redirectUri = "urn:ietf:wg:oauth:2.0:oob",
+            scopes = setOf(OAuthScope.READ),
         )
     }
 
     @Test(expected = IllegalArgumentException::class)
     fun `test createToken with empty redirectUri`() = runTest {
         retrofitOAuthService.createToken(
-                instanceUrl = "xizzhu.me",
-                grantType = OAuthGrantType.CLIENT_CREDENTIALS,
-                clientId = "client_id",
-                clientSecret = "client_secret",
-                redirectUri = "",
-                scopes = setOf(OAuthScope.READ),
+            instanceUrl = "xizzhu.me",
+            grantType = OAuthGrantType.CLIENT_CREDENTIALS,
+            clientId = "client_id",
+            clientSecret = "client_secret",
+            redirectUri = "",
+            scopes = setOf(OAuthScope.READ),
         )
     }
 
     @Test(expected = IllegalArgumentException::class)
     fun `test createToken with AUTHORIZATION_CODE and empty code`() = runTest {
         retrofitOAuthService.createToken(
-                instanceUrl = "xizzhu.me",
-                grantType = OAuthGrantType.AUTHORIZATION_CODE,
-                clientId = "client_id",
-                clientSecret = "client_secret",
-                redirectUri = "urn:ietf:wg:oauth:2.0:oob",
-                scopes = setOf(OAuthScope.READ),
-                code = "",
+            instanceUrl = "xizzhu.me",
+            grantType = OAuthGrantType.AUTHORIZATION_CODE,
+            clientId = "client_id",
+            clientSecret = "client_secret",
+            redirectUri = "urn:ietf:wg:oauth:2.0:oob",
+            scopes = setOf(OAuthScope.READ),
+            code = "",
         )
     }
 
     @Test
     fun `test createToken with successful response`() = runTest {
         mockWebServer.enqueue(
-                MockResponse()
-                        .setResponseCode(200)
-                        .setBody(
-                                """
+            MockResponse()
+                .setResponseCode(200)
+                .setBody(
+                    """
                                     {
                                         "access_token": "my_access_token",
                                         "token_type": "Bearer",
                                         "scope": "read write follow push"
                                     }
                                 """.trimIndent()
-                        )
+                )
         )
 
         assertEquals(
-                OAuthToken(
-                        accessToken = "my_access_token",
-                        tokenType = "Bearer",
-                        scopes = setOf(OAuthScope.READ, OAuthScope.WRITE, OAuthScope.FOLLOW, OAuthScope.PUSH)
-                ),
-                retrofitOAuthService.createToken(
-                        instanceUrl = "xizzhu.me",
-                        grantType = OAuthGrantType.CLIENT_CREDENTIALS,
-                        clientId = "client_id",
-                        clientSecret = "client_secret",
-                        redirectUri = "urn:ietf:wg:oauth:2.0:oob",
-                        scopes = setOf(OAuthScope.READ),
-                )
+            OAuthToken(
+                accessToken = "my_access_token",
+                tokenType = "Bearer",
+                scopes = setOf(OAuthScope.READ, OAuthScope.WRITE, OAuthScope.FOLLOW, OAuthScope.PUSH)
+            ),
+            retrofitOAuthService.createToken(
+                instanceUrl = "xizzhu.me",
+                grantType = OAuthGrantType.CLIENT_CREDENTIALS,
+                clientId = "client_id",
+                clientSecret = "client_secret",
+                redirectUri = "urn:ietf:wg:oauth:2.0:oob",
+                scopes = setOf(OAuthScope.READ),
+            )
         )
     }
 
@@ -182,12 +182,12 @@ class RetrofitOAuthServiceTest : BaseRetrofitTest() {
         mockWebServer.enqueue(MockResponse().setResponseCode(400))
 
         retrofitOAuthService.createToken(
-                instanceUrl = "xizzhu.me",
-                grantType = OAuthGrantType.CLIENT_CREDENTIALS,
-                clientId = "client_id",
-                clientSecret = "client_secret",
-                redirectUri = "urn:ietf:wg:oauth:2.0:oob",
-                scopes = setOf(OAuthScope.READ),
+            instanceUrl = "xizzhu.me",
+            grantType = OAuthGrantType.CLIENT_CREDENTIALS,
+            clientId = "client_id",
+            clientSecret = "client_secret",
+            redirectUri = "urn:ietf:wg:oauth:2.0:oob",
+            scopes = setOf(OAuthScope.READ),
         )
     }
 
@@ -196,12 +196,12 @@ class RetrofitOAuthServiceTest : BaseRetrofitTest() {
         mockWebServer.enqueue(MockResponse().setResponseCode(200).setBody("{}"))
 
         retrofitOAuthService.createToken(
-                instanceUrl = "xizzhu.me",
-                grantType = OAuthGrantType.CLIENT_CREDENTIALS,
-                clientId = "client_id",
-                clientSecret = "client_secret",
-                redirectUri = "urn:ietf:wg:oauth:2.0:oob",
-                scopes = setOf(OAuthScope.READ),
+            instanceUrl = "xizzhu.me",
+            grantType = OAuthGrantType.CLIENT_CREDENTIALS,
+            clientId = "client_id",
+            clientSecret = "client_secret",
+            redirectUri = "urn:ietf:wg:oauth:2.0:oob",
+            scopes = setOf(OAuthScope.READ),
         )
     }
 

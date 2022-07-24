@@ -17,15 +17,15 @@
 package me.xizzhu.android.rubridens.core.repository.model
 
 data class User(
-        val id: String,
-        val instanceUrl: String,
-        val username: String,
-        val displayName: String,
-        val avatarUrl: String,
+    val id: String,
+    val instanceUrl: String,
+    val username: String,
+    val displayName: String,
+    val avatarUrl: String,
 )
 
 data class UserCredential(
-        val instanceUrl: String,
-        val username: String,
-        val accessToken: String
+    val instanceUrl: String,
+    val username: String,
+    val accessToken: String
 )

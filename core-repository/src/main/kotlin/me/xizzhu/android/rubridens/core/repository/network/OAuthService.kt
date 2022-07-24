@@ -22,22 +22,22 @@ import me.xizzhu.android.rubridens.core.repository.model.OAuthToken
 
 internal interface OAuthService {
     fun getLoginUrl(
-            instanceUrl: String,
-            clientId: String,
-            redirectUri: String = "urn:ietf:wg:oauth:2.0:oob",
-            scopes: Set<OAuthScope> = setOf(OAuthScope.READ, OAuthScope.WRITE, OAuthScope.FOLLOW, OAuthScope.PUSH),
-            forceLogin: Boolean = false
+        instanceUrl: String,
+        clientId: String,
+        redirectUri: String = "urn:ietf:wg:oauth:2.0:oob",
+        scopes: Set<OAuthScope> = setOf(OAuthScope.READ, OAuthScope.WRITE, OAuthScope.FOLLOW, OAuthScope.PUSH),
+        forceLogin: Boolean = false
     ): String
 
     fun getAuthCode(url: String): String?
 
     suspend fun createToken(
-            instanceUrl: String,
-            grantType: OAuthGrantType,
-            clientId: String,
-            clientSecret: String,
-            redirectUri: String = "urn:ietf:wg:oauth:2.0:oob",
-            scopes: Set<OAuthScope> = setOf(OAuthScope.READ, OAuthScope.WRITE, OAuthScope.FOLLOW, OAuthScope.PUSH),
-            code: String = ""
+        instanceUrl: String,
+        grantType: OAuthGrantType,
+        clientId: String,
+        clientSecret: String,
+        redirectUri: String = "urn:ietf:wg:oauth:2.0:oob",
+        scopes: Set<OAuthScope> = setOf(OAuthScope.READ, OAuthScope.WRITE, OAuthScope.FOLLOW, OAuthScope.PUSH),
+        code: String = ""
     ): OAuthToken
 }

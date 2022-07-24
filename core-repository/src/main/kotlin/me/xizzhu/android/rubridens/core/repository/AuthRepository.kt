@@ -38,14 +38,14 @@ interface AuthRepository {
 }
 
 internal class AuthRepositoryImpl(
-        private val accountsService: AccountsService,
-        private val appsService: AppsService,
-        private val oAuthService: OAuthService,
-        private val applicationCredentialCache: ApplicationCredentialCache,
-        private val userCredentialCache: UserCredentialCache,
+    private val accountsService: AccountsService,
+    private val appsService: AppsService,
+    private val oAuthService: OAuthService,
+    private val applicationCredentialCache: ApplicationCredentialCache,
+    private val userCredentialCache: UserCredentialCache,
 ) : AuthRepository {
     override suspend fun getLoginUrl(instanceUrl: String): String =
-            oAuthService.getLoginUrl(instanceUrl, loadApplicationCredential(instanceUrl).clientId)
+        oAuthService.getLoginUrl(instanceUrl, loadApplicationCredential(instanceUrl).clientId)
 
     override fun getAuthCode(url: String): String? = oAuthService.getAuthCode(url)
 
@@ -56,21 +56,21 @@ internal class AuthRepositoryImpl(
         }
 
         val partialApplicationCredential = cachedApplicationCredential
-                ?: appsService.create(
-                        instanceUrl = instanceUrl,
-                        clientName = "Rubridens",
-                        website = "https://xizzhu.me/"
-                ).also {
-                    kotlin.runCatching { applicationCredentialCache.save(it) }
-                }
+            ?: appsService.create(
+                instanceUrl = instanceUrl,
+                clientName = "Rubridens",
+                website = "https://xizzhu.me/"
+            ).also {
+                kotlin.runCatching { applicationCredentialCache.save(it) }
+            }
 
         return partialApplicationCredential.copy(
-                accessToken = oAuthService.createToken(
-                        instanceUrl = instanceUrl,
-                        grantType = OAuthGrantType.CLIENT_CREDENTIALS,
-                        clientId = partialApplicationCredential.clientId,
-                        clientSecret = partialApplicationCredential.clientSecret,
-                ).accessToken
+            accessToken = oAuthService.createToken(
+                instanceUrl = instanceUrl,
+                grantType = OAuthGrantType.CLIENT_CREDENTIALS,
+                clientId = partialApplicationCredential.clientId,
+                clientSecret = partialApplicationCredential.clientSecret,
+            ).accessToken
         ).also {
             kotlin.runCatching { applicationCredentialCache.save(it) }
         }
@@ -79,16 +79,16 @@ internal class AuthRepositoryImpl(
     override suspend fun createUserToken(instanceUrl: String, authCode: String): UserCredential {
         val applicationCredential = loadApplicationCredential(instanceUrl)
         val userToken = oAuthService.createToken(
-                instanceUrl = instanceUrl,
-                grantType = OAuthGrantType.AUTHORIZATION_CODE,
-                clientId = applicationCredential.clientId,
-                clientSecret = applicationCredential.clientSecret,
-                code = authCode,
+            instanceUrl = instanceUrl,
+            grantType = OAuthGrantType.AUTHORIZATION_CODE,
+            clientId = applicationCredential.clientId,
+            clientSecret = applicationCredential.clientSecret,
+            code = authCode,
         )
         return UserCredential(
-                instanceUrl = instanceUrl,
-                username = accountsService.verifyCredentials(instanceUrl, userToken.accessToken).username,
-                accessToken = userToken.accessToken
+            instanceUrl = instanceUrl,
+            username = accountsService.verifyCredentials(instanceUrl, userToken.accessToken).username,
+            accessToken = userToken.accessToken
         ).also {
             kotlin.runCatching { userCredentialCache.save(it) }
         }

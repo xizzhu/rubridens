@@ -17,9 +17,7 @@
 package me.xizzhu.android.rubridens.core.repository.network.retrofit
 
 import kotlinx.coroutines.test.runTest
-import me.xizzhu.android.rubridens.core.repository.model.ApplicationCredential
 import me.xizzhu.android.rubridens.core.repository.model.Instance
-import me.xizzhu.android.rubridens.core.repository.model.OAuthScope
 import me.xizzhu.android.rubridens.core.repository.network.NetworkException
 import okhttp3.mockwebserver.MockResponse
 import kotlin.test.BeforeTest
@@ -43,10 +41,10 @@ class RetrofitInstanceServiceTest : BaseRetrofitTest() {
     @Test
     fun `test fetch with successful response`() = runTest {
         mockWebServer.enqueue(
-                MockResponse()
-                        .setResponseCode(200)
-                        .setBody(
-                                """
+            MockResponse()
+                .setResponseCode(200)
+                .setBody(
+                    """
                                     {
                                         "title": "my_title",
                                         "stats": {
@@ -55,18 +53,18 @@ class RetrofitInstanceServiceTest : BaseRetrofitTest() {
                                         }
                                     }
                                 """.trimIndent()
-                        )
+                )
         )
 
         assertEquals(
-                Instance(
-                        title = "my_title",
-                        stats = Instance.Stats(
-                                userCount = 89,
-                                statusCount = 1989,
-                        ),
+            Instance(
+                title = "my_title",
+                stats = Instance.Stats(
+                    userCount = 89,
+                    statusCount = 1989,
                 ),
-                retrofitInstanceService.fetch("xizzhu.me")
+            ),
+            retrofitInstanceService.fetch("xizzhu.me")
         )
     }
 

@@ -51,17 +51,17 @@ internal interface MastodonAccountsService {
  */
 @JsonClass(generateAdapter = true)
 internal class MastodonAccount(
-        @Json(name = "id") val id: String,
-        @Json(name = "acct") val accountName: String,
-        @Json(name = "username") val username: String,
-        @Json(name = "display_name") val displayName: String = "",
-        @Json(name = "avatar") val avatarUrl: String = "",
+    @Json(name = "id") val id: String,
+    @Json(name = "acct") val accountName: String,
+    @Json(name = "username") val username: String,
+    @Json(name = "display_name") val displayName: String = "",
+    @Json(name = "avatar") val avatarUrl: String = "",
 ) {
     fun toUser(instanceUrl: String): User = User(
-            id = id,
-            instanceUrl = accountName.indexOf('@').takeIf { it >= 0 }?.let { accountName.substring(it + 1) } ?: instanceUrl,
-            username = username,
-            displayName = displayName.takeIf { it.isNotEmpty() } ?: "",
-            avatarUrl = avatarUrl.takeIf { it.isNotEmpty() } ?: ""
+        id = id,
+        instanceUrl = accountName.indexOf('@').takeIf { it >= 0 }?.let { accountName.substring(it + 1) } ?: instanceUrl,
+        username = username,
+        displayName = displayName.takeIf { it.isNotEmpty() } ?: "",
+        avatarUrl = avatarUrl.takeIf { it.isNotEmpty() } ?: ""
     )
 }

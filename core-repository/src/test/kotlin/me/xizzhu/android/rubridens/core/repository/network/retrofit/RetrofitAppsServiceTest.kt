@@ -37,61 +37,61 @@ class RetrofitAppsServiceTest : BaseRetrofitTest() {
     @Test(expected = IllegalArgumentException::class)
     fun `test create with empty instanceUrl`() = runTest {
         retrofitAppsService.create(
-                instanceUrl = "",
-                clientName = "client_name",
-                redirectUris = "redirect_uris",
-                scopes = setOf(OAuthScope.READ),
-                website = "https://xizzhu.me/",
+            instanceUrl = "",
+            clientName = "client_name",
+            redirectUris = "redirect_uris",
+            scopes = setOf(OAuthScope.READ),
+            website = "https://xizzhu.me/",
         )
     }
 
     @Test(expected = IllegalArgumentException::class)
     fun `test create with empty clientName`() = runTest {
         retrofitAppsService.create(
-                instanceUrl = "instance_url",
-                clientName = "",
-                redirectUris = "redirect_uris",
-                scopes = setOf(OAuthScope.READ),
-                website = "https://xizzhu.me/",
+            instanceUrl = "instance_url",
+            clientName = "",
+            redirectUris = "redirect_uris",
+            scopes = setOf(OAuthScope.READ),
+            website = "https://xizzhu.me/",
         )
     }
 
     @Test(expected = IllegalArgumentException::class)
     fun `test create with empty redirectUril`() = runTest {
         retrofitAppsService.create(
-                instanceUrl = "instance_url",
-                clientName = "client_name",
-                redirectUris = "",
-                scopes = setOf(OAuthScope.READ),
-                website = "https://xizzhu.me/",
+            instanceUrl = "instance_url",
+            clientName = "client_name",
+            redirectUris = "",
+            scopes = setOf(OAuthScope.READ),
+            website = "https://xizzhu.me/",
         )
     }
 
     @Test
     fun `test create with successful response`() = runTest {
         mockWebServer.enqueue(
-                MockResponse()
-                        .setResponseCode(200)
-                        .setBody(
-                                """
+            MockResponse()
+                .setResponseCode(200)
+                .setBody(
+                    """
                                     {
                                         "client_id": "my_client_id",
                                         "client_secret": "my_client_secret",
                                         "vapid_key": "my_vapid_key"
                                     }
                                 """.trimIndent()
-                        )
+                )
         )
 
         assertEquals(
-                ApplicationCredential(
-                        instanceUrl = "xizzhu.me",
-                        clientId = "my_client_id",
-                        clientSecret = "my_client_secret",
-                        accessToken = "",
-                        vapidKey = "my_vapid_key",
-                ),
-                retrofitAppsService.create("xizzhu.me", "client_name")
+            ApplicationCredential(
+                instanceUrl = "xizzhu.me",
+                clientId = "my_client_id",
+                clientSecret = "my_client_secret",
+                accessToken = "",
+                vapidKey = "my_vapid_key",
+            ),
+            retrofitAppsService.create("xizzhu.me", "client_name")
         )
     }
 

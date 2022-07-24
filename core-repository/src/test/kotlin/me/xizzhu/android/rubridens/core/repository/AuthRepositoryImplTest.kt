@@ -73,22 +73,22 @@ class AuthRepositoryImplTest {
     @Test
     fun `test loadApplicationCredential with local cache`() = runTest {
         coEvery { applicationCredentialCache.readByInstanceUrl("xizzhu.me") } returns ApplicationCredential(
+            instanceUrl = "xizzhu.me",
+            clientId = "client_id",
+            clientSecret = "client_secret",
+            accessToken = "access_token",
+            vapidKey = "vapid_key",
+        )
+
+        assertEquals(
+            ApplicationCredential(
                 instanceUrl = "xizzhu.me",
                 clientId = "client_id",
                 clientSecret = "client_secret",
                 accessToken = "access_token",
                 vapidKey = "vapid_key",
-        )
-
-        assertEquals(
-                ApplicationCredential(
-                        instanceUrl = "xizzhu.me",
-                        clientId = "client_id",
-                        clientSecret = "client_secret",
-                        accessToken = "access_token",
-                        vapidKey = "vapid_key",
-                ),
-                authRepositoryImpl.loadApplicationCredential("xizzhu.me")
+            ),
+            authRepositoryImpl.loadApplicationCredential("xizzhu.me")
         )
         coVerify(exactly = 1) { applicationCredentialCache.readByInstanceUrl("xizzhu.me") }
     }
@@ -98,29 +98,29 @@ class AuthRepositoryImplTest {
         coEvery {
             applicationCredentialCache.readByInstanceUrl("xizzhu.me")
         } returns ApplicationCredential(
-                instanceUrl = "xizzhu.me",
-                clientId = "client_id",
-                clientSecret = "client_secret",
-                accessToken = "",
-                vapidKey = "vapid_key",
+            instanceUrl = "xizzhu.me",
+            clientId = "client_id",
+            clientSecret = "client_secret",
+            accessToken = "",
+            vapidKey = "vapid_key",
         )
         coEvery {
             oAuthService.createToken("xizzhu.me", OAuthGrantType.CLIENT_CREDENTIALS, "client_id", "client_secret")
         } returns OAuthToken(
-                accessToken = "access_token",
-                tokenType = "bearer",
-                scopes = setOf(OAuthScope.READ, OAuthScope.WRITE, OAuthScope.FOLLOW, OAuthScope.PUSH),
+            accessToken = "access_token",
+            tokenType = "bearer",
+            scopes = setOf(OAuthScope.READ, OAuthScope.WRITE, OAuthScope.FOLLOW, OAuthScope.PUSH),
         )
 
         assertEquals(
-                ApplicationCredential(
-                        instanceUrl = "xizzhu.me",
-                        clientId = "client_id",
-                        clientSecret = "client_secret",
-                        accessToken = "access_token",
-                        vapidKey = "vapid_key",
-                ),
-                authRepositoryImpl.loadApplicationCredential("xizzhu.me")
+            ApplicationCredential(
+                instanceUrl = "xizzhu.me",
+                clientId = "client_id",
+                clientSecret = "client_secret",
+                accessToken = "access_token",
+                vapidKey = "vapid_key",
+            ),
+            authRepositoryImpl.loadApplicationCredential("xizzhu.me")
         )
         coVerify(ordering = Ordering.SEQUENCE) {
             applicationCredentialCache.readByInstanceUrl("xizzhu.me")
@@ -137,29 +137,29 @@ class AuthRepositoryImplTest {
         coEvery {
             appsService.create("xizzhu.me", "Rubridens", website = "https://xizzhu.me/")
         } returns ApplicationCredential(
-                instanceUrl = "xizzhu.me",
-                clientId = "client_id",
-                clientSecret = "client_secret",
-                accessToken = "",
-                vapidKey = "vapid_key",
+            instanceUrl = "xizzhu.me",
+            clientId = "client_id",
+            clientSecret = "client_secret",
+            accessToken = "",
+            vapidKey = "vapid_key",
         )
         coEvery {
             oAuthService.createToken("xizzhu.me", OAuthGrantType.CLIENT_CREDENTIALS, "client_id", "client_secret")
         } returns OAuthToken(
-                accessToken = "access_token",
-                tokenType = "bearer",
-                scopes = setOf(OAuthScope.READ, OAuthScope.WRITE, OAuthScope.FOLLOW, OAuthScope.PUSH),
+            accessToken = "access_token",
+            tokenType = "bearer",
+            scopes = setOf(OAuthScope.READ, OAuthScope.WRITE, OAuthScope.FOLLOW, OAuthScope.PUSH),
         )
 
         assertEquals(
-                ApplicationCredential(
-                        instanceUrl = "xizzhu.me",
-                        clientId = "client_id",
-                        clientSecret = "client_secret",
-                        accessToken = "access_token",
-                        vapidKey = "vapid_key",
-                ),
-                authRepositoryImpl.loadApplicationCredential("xizzhu.me")
+            ApplicationCredential(
+                instanceUrl = "xizzhu.me",
+                clientId = "client_id",
+                clientSecret = "client_secret",
+                accessToken = "access_token",
+                vapidKey = "vapid_key",
+            ),
+            authRepositoryImpl.loadApplicationCredential("xizzhu.me")
         )
         coVerify(ordering = Ordering.SEQUENCE) {
             applicationCredentialCache.readByInstanceUrl("xizzhu.me")
@@ -175,36 +175,36 @@ class AuthRepositoryImplTest {
         coEvery {
             oAuthService.createToken("xizzhu.me", OAuthGrantType.AUTHORIZATION_CODE, "client_id", "client_secret", code = "code")
         } returns OAuthToken(
-                accessToken = "access_token",
-                tokenType = "bearer",
-                scopes = setOf(OAuthScope.READ, OAuthScope.WRITE, OAuthScope.FOLLOW, OAuthScope.PUSH),
+            accessToken = "access_token",
+            tokenType = "bearer",
+            scopes = setOf(OAuthScope.READ, OAuthScope.WRITE, OAuthScope.FOLLOW, OAuthScope.PUSH),
         )
         coEvery {
             accountsService.verifyCredentials("xizzhu.me", "access_token")
         } returns User(
-                id = "user_id",
-                instanceUrl = "xizzhu.me",
-                username = "username",
-                displayName = "display_name",
-                avatarUrl = ""
+            id = "user_id",
+            instanceUrl = "xizzhu.me",
+            username = "username",
+            displayName = "display_name",
+            avatarUrl = ""
         )
 
         authRepositoryImpl = spyk(authRepositoryImpl)
         coEvery { authRepositoryImpl.loadApplicationCredential("xizzhu.me") } returns ApplicationCredential(
-                instanceUrl = "xizzhu.me",
-                clientId = "client_id",
-                clientSecret = "client_secret",
-                accessToken = "access_token",
-                vapidKey = "vapid_key",
+            instanceUrl = "xizzhu.me",
+            clientId = "client_id",
+            clientSecret = "client_secret",
+            accessToken = "access_token",
+            vapidKey = "vapid_key",
         )
 
         assertEquals(
-                UserCredential(
-                        instanceUrl = "xizzhu.me",
-                        username = "username",
-                        accessToken = "access_token",
-                ),
-                authRepositoryImpl.createUserToken("xizzhu.me", "code")
+            UserCredential(
+                instanceUrl = "xizzhu.me",
+                username = "username",
+                accessToken = "access_token",
+            ),
+            authRepositoryImpl.createUserToken("xizzhu.me", "code")
         )
         coVerify(ordering = Ordering.SEQUENCE) {
             oAuthService.createToken("xizzhu.me", OAuthGrantType.AUTHORIZATION_CODE, "client_id", "client_secret", code = "code")

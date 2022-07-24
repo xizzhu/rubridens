@@ -46,10 +46,10 @@ class RetrofitAccountsServiceTest : BaseRetrofitTest() {
     @Test
     fun `test verifyCredentials with successful response`() = runTest {
         mockWebServer.enqueue(
-                MockResponse()
-                        .setResponseCode(200)
-                        .setBody(
-                                """
+            MockResponse()
+                .setResponseCode(200)
+                .setBody(
+                    """
                                     {
                                         "id": "198964",
                                         "acct": "xizzhu_acct",
@@ -58,28 +58,28 @@ class RetrofitAccountsServiceTest : BaseRetrofitTest() {
                                         "avatar": "https://xizzhu.me/images/logo.png"
                                     }
                                 """.trimIndent()
-                        )
+                )
         )
 
         assertEquals(
-                User(
-                        id = "198964",
-                        instanceUrl = "xizzhu.me",
-                        username = "xizzhu_username",
-                        displayName = "Keep Speech Free",
-                        avatarUrl = "https://xizzhu.me/images/logo.png",
-                ),
-                retrofitAccountsService.verifyCredentials("xizzhu.me", "user_token")
+            User(
+                id = "198964",
+                instanceUrl = "xizzhu.me",
+                username = "xizzhu_username",
+                displayName = "Keep Speech Free",
+                avatarUrl = "https://xizzhu.me/images/logo.png",
+            ),
+            retrofitAccountsService.verifyCredentials("xizzhu.me", "user_token")
         )
     }
 
     @Test
     fun `test verifyCredentials with successful response and acct from another instance`() = runTest {
         mockWebServer.enqueue(
-                MockResponse()
-                        .setResponseCode(200)
-                        .setBody(
-                                """
+            MockResponse()
+                .setResponseCode(200)
+                .setBody(
+                    """
                                     {
                                         "id": "198964",
                                         "acct": "xizzhu@another",
@@ -88,18 +88,18 @@ class RetrofitAccountsServiceTest : BaseRetrofitTest() {
                                         "avatar": "https://xizzhu.me/images/logo.png"
                                     }
                                 """.trimIndent()
-                        )
+                )
         )
 
         assertEquals(
-                User(
-                        id = "198964",
-                        instanceUrl = "another",
-                        username = "xizzhu",
-                        displayName = "Keep Speech Free",
-                        avatarUrl = "https://xizzhu.me/images/logo.png",
-                ),
-                retrofitAccountsService.verifyCredentials("xizzhu.me", "user_token")
+            User(
+                id = "198964",
+                instanceUrl = "another",
+                username = "xizzhu",
+                displayName = "Keep Speech Free",
+                avatarUrl = "https://xizzhu.me/images/logo.png",
+            ),
+            retrofitAccountsService.verifyCredentials("xizzhu.me", "user_token")
         )
     }
 

@@ -28,7 +28,7 @@ import me.xizzhu.android.rubridens.core.repository.model.ApplicationCredential
 
 internal class RoomApplicationCredentialCache(private val appDatabase: AppDatabase) : ApplicationCredentialCache {
     override suspend fun readByInstanceUrl(instanceUrl: String): ApplicationCredential? =
-            appDatabase.applicationCredentialDao().readByInstanceUrl(instanceUrl)?.toApplicationCredential()
+        appDatabase.applicationCredentialDao().readByInstanceUrl(instanceUrl)?.toApplicationCredential()
 
     override suspend fun save(applicationCredential: ApplicationCredential) {
         appDatabase.applicationCredentialDao().save(ApplicationCredentialEntity(applicationCredential))
@@ -46,11 +46,11 @@ internal interface ApplicationCredentialDao {
 
 @Entity(tableName = ApplicationCredentialEntity.TABLE_NAME)
 internal class ApplicationCredentialEntity(
-        @PrimaryKey @ColumnInfo(name = COLUMN_NAME_INSTANCE_URL) val instanceUrl: String,
-        @ColumnInfo(name = COLUMN_NAME_CLIENT_ID) val clientId: String,
-        @ColumnInfo(name = COLUMN_NAME_CLIENT_SECRET) val clientSecret: String,
-        @ColumnInfo(name = COLUMN_NAME_ACCESS_TOKEN) val accessToken: String,
-        @ColumnInfo(name = COLUMN_NAME_VAPID_KEY) val vapidKey: String,
+    @PrimaryKey @ColumnInfo(name = COLUMN_NAME_INSTANCE_URL) val instanceUrl: String,
+    @ColumnInfo(name = COLUMN_NAME_CLIENT_ID) val clientId: String,
+    @ColumnInfo(name = COLUMN_NAME_CLIENT_SECRET) val clientSecret: String,
+    @ColumnInfo(name = COLUMN_NAME_ACCESS_TOKEN) val accessToken: String,
+    @ColumnInfo(name = COLUMN_NAME_VAPID_KEY) val vapidKey: String,
 ) {
     companion object {
         const val TABLE_NAME = "application_credential"
@@ -62,18 +62,18 @@ internal class ApplicationCredentialEntity(
     }
 
     constructor(applicationCredential: ApplicationCredential) : this(
-            instanceUrl = applicationCredential.instanceUrl,
-            clientId = applicationCredential.clientId,
-            clientSecret = applicationCredential.clientSecret,
-            accessToken = applicationCredential.accessToken,
-            vapidKey = applicationCredential.vapidKey,
+        instanceUrl = applicationCredential.instanceUrl,
+        clientId = applicationCredential.clientId,
+        clientSecret = applicationCredential.clientSecret,
+        accessToken = applicationCredential.accessToken,
+        vapidKey = applicationCredential.vapidKey,
     )
 
     fun toApplicationCredential(): ApplicationCredential = ApplicationCredential(
-            instanceUrl = instanceUrl,
-            clientId = clientId,
-            clientSecret = clientSecret,
-            accessToken = accessToken,
-            vapidKey = vapidKey,
+        instanceUrl = instanceUrl,
+        clientId = clientId,
+        clientSecret = clientSecret,
+        accessToken = accessToken,
+        vapidKey = vapidKey,
     )
 }

@@ -45,17 +45,17 @@ val repositoryModule = module {
     single { Moshi.Builder().build() }
     single {
         OkHttpClient.Builder()
-                .connectTimeout(30, TimeUnit.SECONDS)
-                .readTimeout(30, TimeUnit.SECONDS)
-                .writeTimeout(30, TimeUnit.SECONDS)
-                .build()
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
+            .writeTimeout(30, TimeUnit.SECONDS)
+            .build()
     }
     factory { (instanceUrl: String) ->
         Retrofit.Builder()
-                .client(get())
-                .addConverterFactory(MoshiConverterFactory.create(get()))
-                .baseUrl("https://$instanceUrl")
-                .build()
+            .client(get())
+            .addConverterFactory(MoshiConverterFactory.create(get()))
+            .baseUrl("https://$instanceUrl")
+            .build()
     }
     single<AccountsService> { RetrofitAccountsService() }
     single<AppsService> { RetrofitAppsService() }
