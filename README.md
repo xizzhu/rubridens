@@ -1,4 +1,5 @@
 [![Build Status](https://img.shields.io/github/workflow/status/xizzhu/rubridens/Android%20CI/master?color=blue)](https://github.com/xizzhu/rubridens/actions)
+[![Code Coverage](https://img.shields.io/codecov/c/github/xizzhu/rubridens/master?color=blue)](https://app.codecov.io/gh/xizzhu/rubridens)
 ![Languages](https://img.shields.io/badge/languages-Kotlin-blue.svg?longCache=true&style=flat)
 [![API](https://img.shields.io/badge/API-21%2B-blue.svg?style=flat)](https://developer.android.com/about/versions/android-5.0.html)
 [![Apache License](https://img.shields.io/badge/license-Apache%20License%202.0-blue.svg?style=flat)](https://www.apache.org/licenses/LICENSE-2.0)
