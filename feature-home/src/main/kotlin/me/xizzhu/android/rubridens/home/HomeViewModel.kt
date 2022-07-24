@@ -17,8 +17,11 @@
 package me.xizzhu.android.rubridens.home
 
 import me.xizzhu.android.rubridens.core.mvvm.BaseViewModel
+import me.xizzhu.android.rubridens.core.repository.AuthRepository
 
-class HomeViewModel() : BaseViewModel<HomeViewModel.ViewAction, HomeViewModel.ViewState>(
+class HomeViewModel(
+    private val authRepository: AuthRepository,
+) : BaseViewModel<HomeViewModel.ViewAction, HomeViewModel.ViewState>(
     initialViewState = ViewState(
         loading = false,
     )
@@ -26,4 +29,12 @@ class HomeViewModel() : BaseViewModel<HomeViewModel.ViewAction, HomeViewModel.Vi
     sealed class ViewAction
 
     data class ViewState(val loading: Boolean)
+
+    fun loadLatest() {
+        emitViewState { currentViewState ->
+            currentViewState.copy(
+                loading = true,
+            )
+        }
+    }
 }

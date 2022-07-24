@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import org.gradle.api.JavaVersion
 
 object Configurations {
@@ -56,6 +54,8 @@ object Versions {
 
         object View {
             const val constraintLayout = "2.1.4"
+            const val recyclerView = "1.2.1"
+            const val swipeRefreshLayout = "1.1.0"
         }
 
         object Test {
@@ -111,6 +111,8 @@ object Dependencies {
 
         object View {
             const val constraintLayout = "androidx.constraintlayout:constraintlayout:${Versions.AndroidX.View.constraintLayout}"
+            const val recyclerView = "androidx.recyclerview:recyclerview:${Versions.AndroidX.View.recyclerView}"
+            const val swipeRefreshLayout = "androidx.swiperefreshlayout:swiperefreshlayout:${Versions.AndroidX.View.swipeRefreshLayout}"
         }
 
         object Test {

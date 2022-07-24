@@ -14,14 +14,16 @@
  * limitations under the License.
  */
 
-package me.xizzhu.android.rubridens.core.repository.local
+package me.xizzhu.android.rubridens.core.view.feed
 
-import me.xizzhu.android.rubridens.core.repository.model.UserCredential
+import android.content.Context
+import android.util.AttributeSet
+import androidx.recyclerview.widget.RecyclerView
 
-internal interface UserCredentialCache {
-    suspend fun hasCredential(): Boolean
+class FeedRecyclerView : RecyclerView {
+    constructor(context: Context) : super(context)
 
-    suspend fun read(): List<UserCredential>
+    constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
 
-    suspend fun save(userCredential: UserCredential)
+    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
 }

@@ -28,6 +28,10 @@ import me.xizzhu.android.rubridens.core.repository.model.UserCredential
 internal class RoomUserCredentialCache(private val appDatabase: AppDatabase) : UserCredentialCache {
     override suspend fun hasCredential(): Boolean = appDatabase.userCredentialDao().count() > 0
 
+    override suspend fun read(): List<UserCredential> {
+        TODO("Not yet implemented")
+    }
+
     override suspend fun save(userCredential: UserCredential) {
         appDatabase.userCredentialDao().save(UserCredentialEntity(userCredential))
     }

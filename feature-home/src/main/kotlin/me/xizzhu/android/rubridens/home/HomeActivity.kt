@@ -32,10 +32,14 @@ class HomeActivity : BaseActivity<HomeViewModel.ViewAction, HomeViewModel.ViewSt
     override val viewModel: HomeViewModel by viewModel()
 
     override fun onViewCreated() = with(viewBinding) {
+        swipeRefresher.setOnRefreshListener { viewModel.loadLatest() }
+
+        viewModel.loadLatest()
     }
 
     override fun onViewAction(viewAction: HomeViewModel.ViewAction) = Unit
 
     override fun onViewState(viewState: HomeViewModel.ViewState) = with(viewBinding) {
+        swipeRefresher.isRefreshing = viewState.loading
     }
 }

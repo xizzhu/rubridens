@@ -89,6 +89,7 @@ dependencies {
 
     implementation(Dependencies.AndroidX.activity)
     implementation(Dependencies.AndroidX.View.constraintLayout)
+    implementation(Dependencies.AndroidX.View.swipeRefreshLayout)
 
     implementation(Dependencies.Koin.core)
 
