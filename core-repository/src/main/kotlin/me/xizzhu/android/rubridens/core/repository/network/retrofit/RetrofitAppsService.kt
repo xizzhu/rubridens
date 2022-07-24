@@ -21,7 +21,6 @@ import com.squareup.moshi.JsonClass
 import me.xizzhu.android.rubridens.core.repository.model.ApplicationCredential
 import me.xizzhu.android.rubridens.core.repository.model.OAuthScope
 import me.xizzhu.android.rubridens.core.repository.network.AppsService
-import retrofit2.create
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.POST
@@ -44,13 +43,14 @@ internal class RetrofitAppsService : AppsService {
             throw IllegalArgumentException("redirectUris is empty")
         }
 
-        return RetrofitFactory.get(instanceUrl).create<MastodonAppsService>()
-                .create(
-                        clientName = clientName,
-                        redirectUris = redirectUris,
-                        scopes = scopes.toMastodonString(),
-                        website = website
-                ).toApplicationCredential(instanceUrl)
+        return request<MastodonAppsService, MastodonApplication>(instanceUrl) {
+            create(
+                    clientName = clientName,
+                    redirectUris = redirectUris,
+                    scopes = scopes.toMastodonString(),
+                    website = website
+            )
+        }.toApplicationCredential(instanceUrl)
     }
 }
 
@@ -73,9 +73,8 @@ internal interface MastodonAppsService {
  */
 @JsonClass(generateAdapter = true)
 internal class MastodonApplication(
-        @Json(name = "id") val id: String = "",
-        @Json(name = "client_id") val clientId: String = "",
-        @Json(name = "client_secret") val clientSecret: String = "",
+        @Json(name = "client_id") val clientId: String,
+        @Json(name = "client_secret") val clientSecret: String,
         @Json(name = "vapid_key") val vapidKey: String = "",
 ) {
     fun toApplicationCredential(instanceUrl: String): ApplicationCredential = ApplicationCredential(

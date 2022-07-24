@@ -24,7 +24,6 @@ import me.xizzhu.android.rubridens.core.repository.model.OAuthToken
 import me.xizzhu.android.rubridens.core.repository.network.OAuthService
 import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
-import retrofit2.create
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.POST
@@ -77,15 +76,16 @@ internal class RetrofitOAuthService : OAuthService {
             throw IllegalArgumentException("code is empty but grantType is 'OAuthGrantType.AUTHORIZATION_CODE'")
         }
 
-        return RetrofitFactory.get(instanceUrl).create<MastodonOAuthService>()
-                .createToken(
-                        grantType = grantType.toMastodonString(),
-                        clientId = clientId,
-                        clientSecret = clientSecret,
-                        redirectUri = redirectUri,
-                        scopes = scopes.toMastodonString(),
-                        code = code
-                ).toOAuthToken()
+        return request<MastodonOAuthService, MastodonOAuthToken>(instanceUrl) {
+            createToken(
+                    grantType = grantType.toMastodonString(),
+                    clientId = clientId,
+                    clientSecret = clientSecret,
+                    redirectUri = redirectUri,
+                    scopes = scopes.toMastodonString(),
+                    code = code
+            )
+        }.toOAuthToken()
     }
 }
 

@@ -20,7 +20,6 @@ import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import me.xizzhu.android.rubridens.core.repository.model.User
 import me.xizzhu.android.rubridens.core.repository.network.AccountsService
-import retrofit2.create
 import retrofit2.http.GET
 import retrofit2.http.Header
 
@@ -32,10 +31,10 @@ internal class RetrofitAccountsService : AccountsService {
         if (userOAuthToken.isEmpty()) {
             throw IllegalArgumentException("userOAuthToken is empty")
         }
-        return RetrofitFactory.get(instanceUrl)
-                .create<MastodonAccountsService>()
-                .verifyCredentials(createAuthHeader(userOAuthToken))
-                .toUser(instanceUrl)
+
+        return request<MastodonAccountsService, MastodonAccount>(instanceUrl) {
+            verifyCredentials(createAuthHeader(userOAuthToken))
+        }.toUser(instanceUrl)
     }
 }
 

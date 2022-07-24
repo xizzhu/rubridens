@@ -131,7 +131,10 @@ object Dependencies {
             const val codegen = "com.squareup.moshi:moshi-kotlin-codegen:${Versions.Retrofit.moshi}"
         }
 
-        const val okhttp = "com.squareup.okhttp3:okhttp:${Versions.Retrofit.okhttp}"
+        object OkHttp {
+            const val okhttp = "com.squareup.okhttp3:okhttp:${Versions.Retrofit.okhttp}"
+            const val mockWebServer = "com.squareup.okhttp3:mockwebserver:${Versions.Retrofit.okhttp}"
+        }
 
         object Retrofit {
             const val core = "com.squareup.retrofit2:retrofit:${Versions.Retrofit.retrofit}"

@@ -91,11 +91,13 @@ dependencies {
 
     implementation(Dependencies.Retrofit.Moshi.core)
     ksp(Dependencies.Retrofit.Moshi.codegen)
-    implementation(Dependencies.Retrofit.okhttp)
+    implementation(Dependencies.Retrofit.OkHttp.okhttp)
     implementation(Dependencies.Retrofit.Retrofit.core)
     implementation(Dependencies.Retrofit.Retrofit.moshi)
 
     testImplementation(Dependencies.Kotlin.test)
     testImplementation(Dependencies.Kotlin.coroutinesTest)
     testImplementation(Dependencies.mockk)
+    testImplementation(Dependencies.Koin.test)
+    testImplementation(Dependencies.Retrofit.OkHttp.mockWebServer)
 }

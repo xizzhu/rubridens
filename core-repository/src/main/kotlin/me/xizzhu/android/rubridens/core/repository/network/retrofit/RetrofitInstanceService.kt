@@ -20,7 +20,6 @@ import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import me.xizzhu.android.rubridens.core.repository.model.Instance
 import me.xizzhu.android.rubridens.core.repository.network.InstanceService
-import retrofit2.create
 import retrofit2.http.GET
 
 internal class RetrofitInstanceService : InstanceService {
@@ -29,7 +28,7 @@ internal class RetrofitInstanceService : InstanceService {
             throw IllegalArgumentException("instanceUrl is empty")
         }
 
-        return RetrofitFactory.get(instanceUrl).create<MastodonInstanceService>().fetch().toInstance()
+        return request<MastodonInstanceService, MastodonInstance>(instanceUrl) { fetch() }.toInstance()
     }
 }
 
