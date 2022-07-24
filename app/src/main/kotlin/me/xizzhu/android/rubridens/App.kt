@@ -16,4 +16,19 @@
 
 package me.xizzhu.android.rubridens
 
-class App : BaseApp()
+import org.koin.android.ext.koin.androidContext
+import org.koin.core.context.startKoin
+
+class App : BaseApp() {
+    override fun onCreate() {
+        super.onCreate()
+        initializeKoin()
+    }
+
+    private fun initializeKoin() {
+        startKoin {
+            androidContext(this@App)
+            modules(appModules)
+        }
+    }
+}

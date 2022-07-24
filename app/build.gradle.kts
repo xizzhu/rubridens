@@ -20,7 +20,6 @@ plugins {
     id("com.android.application")
     id("kotlin-android")
 }
-apply(plugin = "kover")
 
 android {
     compileOptions {
@@ -92,16 +91,6 @@ android {
 
         unitTests.all { test ->
             test.maxParallelForks = Runtime.getRuntime().availableProcessors() / 2
-
-            test.extensions.configure(kotlinx.kover.api.KoverTaskExtension::class) {
-                isDisabled = test.name != "testDebugUnitTest"
-                includes = listOf("me.xizzhu.android.rubridens.*")
-                excludes = listOf(
-                        "me.xizzhu.android.rubridens.BuildConfig",
-                        "me.xizzhu.android.rubridens.databinding.*",
-                        "me.xizzhu.android.rubridens.*_*",
-                )
-            }
         }
     }
 
@@ -122,18 +111,26 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
 }
 
 dependencies {
+    implementation(project(":core-repository"))
+    implementation(project(":feature-auth"))
+    implementation(project(":feature-home"))
+
     implementation(Dependencies.Kotlin.coroutines)
 
     implementation(Dependencies.AndroidX.activity)
     implementation(Dependencies.AndroidX.annotation)
     implementation(Dependencies.AndroidX.appCompat)
-    implementation(Dependencies.AndroidX.fragment)
+    implementation(Dependencies.AndroidX.Lifecycle.common)
+
+    implementation(Dependencies.Koin.core)
 
     implementation(Dependencies.materialComponent)
 
     testImplementation(Dependencies.Kotlin.test)
     testImplementation(Dependencies.Kotlin.coroutinesTest)
     testImplementation(Dependencies.AndroidX.Test.core)
+    testImplementation(Dependencies.Koin.test)
     testImplementation(Dependencies.mockk)
     testImplementation(Dependencies.robolectric)
+    testImplementation(Dependencies.Retrofit.Retrofit.core)
 }

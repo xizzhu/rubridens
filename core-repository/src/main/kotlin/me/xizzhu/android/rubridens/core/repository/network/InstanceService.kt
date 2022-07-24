@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package me.xizzhu.android.rubridens
+package me.xizzhu.android.rubridens.core.repository.network
 
-import androidx.activity.ComponentActivity
+import me.xizzhu.android.rubridens.core.repository.model.Instance
 
-class MainActivity : ComponentActivity() {
+internal interface InstanceService {
+    suspend fun fetch(instanceUrl: String): Instance
 }

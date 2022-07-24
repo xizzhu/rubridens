@@ -50,14 +50,28 @@ object Versions {
         const val activity = "1.5.0"
         const val annotation = "1.4.0"
         const val appCompat = "1.4.2"
-        const val fragment = "1.5.0"
+        const val core = "1.8.0"
+        const val lifecycle = "2.5.0"
+        const val room = "2.4.2"
+
+        object View {
+            const val constraintLayout = "2.1.4"
+        }
 
         object Test {
             const val core = "1.4.0"
         }
     }
 
+    const val koin = "3.2.0"
+    const val ksp = "1.7.10-1.0.6"
     const val materialComponent = "1.6.1"
+
+    object Retrofit {
+        const val moshi = "1.13.0"
+        const val okhttp = "4.10.0"
+        const val retrofit = "2.9.0"
+    }
 
     const val mockk = "1.12.4"
     const val robolectric = "4.8.1"
@@ -83,14 +97,50 @@ object Dependencies {
         const val activity = "androidx.activity:activity-ktx:${Versions.AndroidX.activity}"
         const val annotation = "androidx.annotation:annotation:${Versions.AndroidX.annotation}"
         const val appCompat = "androidx.appcompat:appcompat:${Versions.AndroidX.appCompat}"
-        const val fragment = "androidx.fragment:fragment-ktx:${Versions.AndroidX.fragment}"
+        const val core = "androidx.core:core-ktx:${Versions.AndroidX.core}"
+
+        object Lifecycle {
+            const val common = "androidx.lifecycle:lifecycle-common-java8:${Versions.AndroidX.lifecycle}"
+            const val viewModel = "androidx.lifecycle:lifecycle-viewmodel-ktx:${Versions.AndroidX.lifecycle}"
+        }
+
+        object Room {
+            const val compiler = "androidx.room:room-compiler:${Versions.AndroidX.room}"
+            const val runtime = "androidx.room:room-ktx:${Versions.AndroidX.room}"
+        }
+
+        object View {
+            const val constraintLayout = "androidx.constraintlayout:constraintlayout:${Versions.AndroidX.View.constraintLayout}"
+        }
 
         object Test {
             const val core = "androidx.test:core:${Versions.AndroidX.Test.core}"
         }
     }
 
+    object Koin {
+        const val core = "io.insert-koin:koin-android:${Versions.koin}"
+        const val test = "io.insert-koin:koin-test:${Versions.koin}"
+    }
+
     const val materialComponent = "com.google.android.material:material:${Versions.materialComponent}"
+
+    object Retrofit {
+        object Moshi {
+            const val core = "com.squareup.moshi:moshi:${Versions.Retrofit.moshi}"
+            const val codegen = "com.squareup.moshi:moshi-kotlin-codegen:${Versions.Retrofit.moshi}"
+        }
+
+        object OkHttp {
+            const val okhttp = "com.squareup.okhttp3:okhttp:${Versions.Retrofit.okhttp}"
+            const val mockWebServer = "com.squareup.okhttp3:mockwebserver:${Versions.Retrofit.okhttp}"
+        }
+
+        object Retrofit {
+            const val core = "com.squareup.retrofit2:retrofit:${Versions.Retrofit.retrofit}"
+            const val moshi = "com.squareup.retrofit2:converter-moshi:${Versions.Retrofit.retrofit}"
+        }
+    }
 
     const val mockk = "io.mockk:mockk:${Versions.mockk}"
     const val robolectric = "org.robolectric:robolectric:${Versions.robolectric}"
