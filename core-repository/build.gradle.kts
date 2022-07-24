@@ -35,6 +35,11 @@ android {
     defaultConfig {
         minSdk = Versions.Sdk.min
         targetSdk = Versions.Sdk.target
+
+        ksp {
+            arg("room.schemaLocation", "$projectDir/src/schemas")
+            arg("room.incremental", "true")
+        }
     }
 
     buildFeatures {
@@ -97,7 +102,9 @@ dependencies {
 
     testImplementation(Dependencies.Kotlin.test)
     testImplementation(Dependencies.Kotlin.coroutinesTest)
-    testImplementation(Dependencies.mockk)
+    testImplementation(Dependencies.AndroidX.Test.core)
     testImplementation(Dependencies.Koin.test)
     testImplementation(Dependencies.Retrofit.OkHttp.mockWebServer)
+    testImplementation(Dependencies.mockk)
+    testImplementation(Dependencies.robolectric)
 }
