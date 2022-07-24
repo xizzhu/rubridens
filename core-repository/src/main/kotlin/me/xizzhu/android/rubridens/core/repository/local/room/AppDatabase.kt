@@ -31,4 +31,3 @@ internal abstract class AppDatabase : RoomDatabase() {
 
     abstract fun userCredentialDao(): UserCredentialDao
 }
-

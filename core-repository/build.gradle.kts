@@ -102,7 +102,9 @@ dependencies {
 
     testImplementation(Dependencies.Kotlin.test)
     testImplementation(Dependencies.Kotlin.coroutinesTest)
-    testImplementation(Dependencies.mockk)
+    testImplementation(Dependencies.AndroidX.Test.core)
     testImplementation(Dependencies.Koin.test)
     testImplementation(Dependencies.Retrofit.OkHttp.mockWebServer)
+    testImplementation(Dependencies.mockk)
+    testImplementation(Dependencies.robolectric)
 }

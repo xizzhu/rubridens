@@ -34,7 +34,7 @@ object Versions {
         const val buildTools = "33.0.0"
         const val compile = 33
         const val min = 21
-        const val target = 33
+        const val target = 32
     }
 
     val java = JavaVersion.VERSION_11
