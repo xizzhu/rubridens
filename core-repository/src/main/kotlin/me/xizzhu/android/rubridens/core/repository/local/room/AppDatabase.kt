@@ -24,7 +24,7 @@ import androidx.room.RoomDatabase
             ApplicationCredentialEntity::class,
             UserCredentialEntity::class
         ],
-        version = 1
+        version = 1,
 )
 internal abstract class AppDatabase : RoomDatabase() {
     abstract fun applicationCredentialDao(): ApplicationCredentialDao

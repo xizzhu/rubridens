@@ -35,6 +35,11 @@ android {
     defaultConfig {
         minSdk = Versions.Sdk.min
         targetSdk = Versions.Sdk.target
+
+        ksp {
+            arg("room.schemaLocation", "$projectDir/src/schemas")
+            arg("room.incremental", "true")
+        }
     }
 
     buildFeatures {
