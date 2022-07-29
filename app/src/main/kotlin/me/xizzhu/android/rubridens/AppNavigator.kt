@@ -14,9 +14,19 @@
  * limitations under the License.
  */
 
-include(":core-infra")
-include(":core-repository")
-include(":core-view")
-include(":feature-auth")
-include(":feature-home")
-include(":app")
+package me.xizzhu.android.rubridens
+
+import android.app.Activity
+import me.xizzhu.android.rubridens.auth.AuthActivity
+import me.xizzhu.android.rubridens.core.infra.Navigator
+import me.xizzhu.android.rubridens.home.HomeActivity
+
+class AppNavigator : Navigator {
+    override fun goToAuthentication(activity: Activity) {
+        activity.startActivity(AuthActivity.newStartIntent(activity))
+    }
+
+    override fun goToHome(activity: Activity) {
+        activity.startActivity(HomeActivity.newStartIntent(activity))
+    }
+}

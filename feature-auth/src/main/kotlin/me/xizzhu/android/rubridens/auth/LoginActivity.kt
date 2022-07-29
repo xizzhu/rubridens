@@ -20,7 +20,7 @@ import android.content.Context
 import android.content.Intent
 import android.view.View
 import me.xizzhu.android.rubridens.auth.databinding.ActivityLoginBinding
-import me.xizzhu.android.rubridens.core.mvvm.BaseActivity
+import me.xizzhu.android.rubridens.core.infra.BaseActivity
 import me.xizzhu.android.rubridens.core.view.fadeOut
 import org.koin.androidx.viewmodel.ext.android.viewModel
 

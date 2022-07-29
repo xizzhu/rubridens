@@ -22,6 +22,7 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import kotlin.test.BeforeTest
 import kotlin.test.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
@@ -36,12 +37,13 @@ internal class RoomUserCredentialCacheTest : BaseRoomTest() {
     }
 
     @Test
-    fun `test hasCredential from empty database`() = runTest {
+    fun `test read from empty database`() = runTest {
         assertFalse(roomUserCredentialCache.hasCredential())
+        assertTrue(roomUserCredentialCache.read().isEmpty())
     }
 
     @Test
-    fun `test save then hasCredential`() = runTest {
+    fun `test save then read`() = runTest {
         roomUserCredentialCache.save(UserCredential(
             instanceUrl = "xizzhu.me",
             username = "username",
@@ -49,5 +51,43 @@ internal class RoomUserCredentialCacheTest : BaseRoomTest() {
         ))
 
         assertTrue(roomUserCredentialCache.hasCredential())
+        assertEquals(
+            listOf(
+                UserCredential(
+                    instanceUrl = "xizzhu.me",
+                    username = "username",
+                    accessToken = "access_token",
+                )
+            ),
+            roomUserCredentialCache.read()
+        )
+
+        roomUserCredentialCache.save(UserCredential(
+            instanceUrl = "xizzhu.me",
+            username = "username",
+            accessToken = "access_token_2",
+        ))
+        roomUserCredentialCache.save(UserCredential(
+            instanceUrl = "xizzhu.me",
+            username = "another_username",
+            accessToken = "another_access_token",
+        ))
+
+        assertTrue(roomUserCredentialCache.hasCredential())
+        assertEquals(
+            listOf(
+                UserCredential(
+                    instanceUrl = "xizzhu.me",
+                    username = "username",
+                    accessToken = "access_token_2",
+                ),
+                UserCredential(
+                    instanceUrl = "xizzhu.me",
+                    username = "another_username",
+                    accessToken = "another_access_token",
+                )
+            ),
+            roomUserCredentialCache.read()
+        )
     }
 }

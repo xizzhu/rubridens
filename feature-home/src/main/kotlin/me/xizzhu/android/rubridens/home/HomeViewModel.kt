@@ -16,8 +16,11 @@
 
 package me.xizzhu.android.rubridens.home
 
-import me.xizzhu.android.rubridens.core.mvvm.BaseViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
+import me.xizzhu.android.rubridens.core.infra.BaseViewModel
 import me.xizzhu.android.rubridens.core.repository.AuthRepository
+import me.xizzhu.android.rubridens.core.repository.model.UserCredential
 
 class HomeViewModel(
     private val authRepository: AuthRepository,
@@ -26,7 +29,9 @@ class HomeViewModel(
         loading = false,
     )
 ) {
-    sealed class ViewAction
+    sealed class ViewAction {
+        object RequestUserCredential : ViewAction()
+    }
 
     data class ViewState(val loading: Boolean)
 
@@ -36,5 +41,23 @@ class HomeViewModel(
                 loading = true,
             )
         }
+
+        viewModelScope.launch {
+            val userCredential = getUserCredential() ?: return@launch
+        }
+    }
+
+    private suspend fun getUserCredential(): UserCredential? {
+        // TODO Supports multiple accounts
+        val userCredential = authRepository.readUserCredentials().firstOrNull()
+        if (userCredential == null) {
+            emitViewAction(ViewAction.RequestUserCredential)
+            emitViewState { currentViewState ->
+                currentViewState.copy(
+                    loading = false,
+                )
+            }
+        }
+        return userCredential
     }
 }

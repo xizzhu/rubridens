@@ -17,8 +17,14 @@
 package me.xizzhu.android.rubridens
 
 import me.xizzhu.android.rubridens.auth.authModule
+import me.xizzhu.android.rubridens.core.infra.Navigator
 import me.xizzhu.android.rubridens.core.repository.repositoryModule
 import me.xizzhu.android.rubridens.home.homeModule
+import org.koin.dsl.module
+
+private val appModule = module {
+    single<Navigator> { AppNavigator() }
+}
 
 val appModules = listOf(
     // core modules
@@ -27,4 +33,7 @@ val appModules = listOf(
     // feature modules
     authModule,
     homeModule,
+
+    // app module
+    appModule,
 )

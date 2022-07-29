@@ -18,7 +18,7 @@ package me.xizzhu.android.rubridens.auth
 
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-import me.xizzhu.android.rubridens.core.mvvm.BaseViewModel
+import me.xizzhu.android.rubridens.core.infra.BaseViewModel
 import me.xizzhu.android.rubridens.core.repository.AuthRepository
 
 class LoginViewModel(

@@ -14,9 +14,12 @@
  * limitations under the License.
  */
 
-include(":core-infra")
-include(":core-repository")
-include(":core-view")
-include(":feature-auth")
-include(":feature-home")
-include(":app")
+package me.xizzhu.android.rubridens.core.infra
+
+import android.app.Activity
+
+interface Navigator {
+    fun goToAuthentication(activity: Activity)
+
+    fun goToHome(activity: Activity)
+}

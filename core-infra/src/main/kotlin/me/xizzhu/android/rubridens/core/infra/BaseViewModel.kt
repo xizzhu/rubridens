@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package me.xizzhu.android.rubridens.core.mvvm
+package me.xizzhu.android.rubridens.core.infra
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
