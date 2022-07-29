@@ -14,11 +14,18 @@
  * limitations under the License.
  */
 
-package me.xizzhu.android.rubridens.home
+package me.xizzhu.android.rubridens.core.repository.network
 
-import org.koin.androidx.viewmodel.dsl.viewModel
-import org.koin.dsl.module
+import me.xizzhu.android.rubridens.core.repository.model.Status
 
-val homeModule = module {
-    viewModel { HomeViewModel(get(), get()) }
+internal interface TimelinesService {
+    suspend fun fetchHome(
+        instanceUrl: String,
+        userOAuthToken: String,
+        sinceId: String = "",
+        maxId: String = "",
+        minId: String = "",
+        limit: Int = 20,
+        localOnly: Boolean = true
+    ): List<Status>
 }

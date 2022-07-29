@@ -20,10 +20,12 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import me.xizzhu.android.rubridens.core.infra.BaseViewModel
 import me.xizzhu.android.rubridens.core.repository.AuthRepository
+import me.xizzhu.android.rubridens.core.repository.StatusRepository
 import me.xizzhu.android.rubridens.core.repository.model.UserCredential
 
 class HomeViewModel(
     private val authRepository: AuthRepository,
+    private val statusRepository: StatusRepository,
 ) : BaseViewModel<HomeViewModel.ViewAction, HomeViewModel.ViewState>(
     initialViewState = ViewState(
         loading = false,
@@ -44,6 +46,8 @@ class HomeViewModel(
 
         viewModelScope.launch {
             val userCredential = getUserCredential() ?: return@launch
+            statusRepository.loadLatest(userCredential)
+                .forEach { println("--> $it") }
         }
     }
 
