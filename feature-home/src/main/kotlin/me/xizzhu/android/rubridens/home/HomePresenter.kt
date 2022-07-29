@@ -21,14 +21,16 @@ import android.text.format.DateUtils
 import me.xizzhu.android.rubridens.core.repository.model.Status
 import me.xizzhu.android.rubridens.core.repository.model.User
 import me.xizzhu.android.rubridens.core.view.feed.FeedItem
+import me.xizzhu.android.rubridens.core.view.feed.FeedStatusFooterItem
 import me.xizzhu.android.rubridens.core.view.feed.FeedStatusHeaderItem
 import kotlin.math.min
 
 class HomePresenter(private val application: Application) {
     fun buildFeedItems(statuses: List<Status>): List<FeedItem<*>> {
-        val items = ArrayList<FeedItem<*>>(statuses.size)
+        val items = ArrayList<FeedItem<*>>(statuses.size * 2)
         statuses.forEach { status ->
             items.add(status.toFeedStatusHeaderItem())
+            items.add(status.toFeedStatusFooterItem())
         }
         return items
     }
@@ -41,6 +43,23 @@ class HomePresenter(private val application: Application) {
         rebloggedBy = reblogger?.formatDisplayName()?.let { application.resources.getString(R.string.feed_text_reblogged_by, it) },
         subtitle = "${formatSenderUsername()} • ${formatRelativeTimestamp()}",
     )
+
+    private fun Status.toFeedStatusFooterItem(): FeedStatusFooterItem = FeedStatusFooterItem(
+        statusInstanceUrl = instanceUrl,
+        statusId = id,
+        replies = repliesCount.formatCount(),
+        reblogs = reblogsCount.formatCount(),
+        reblogged = reblogged,
+        favorites = favoritesCount.formatCount(),
+        favorited = favorited,
+    )
+
+    private fun Int.formatCount(): String = when {
+        this >= 1_000_000 -> "${this / 1_000_000}M+"
+        this >= 1_000 -> "${this / 1_000}K+"
+        this <= 0 -> ""
+        else -> toString()
+    }
 
     private fun User.formatDisplayName(): String = displayName.takeIf { it.isNotEmpty() } ?: username
 

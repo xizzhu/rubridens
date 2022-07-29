@@ -46,7 +46,7 @@ abstract class FeedItem<T : FeedItem<T>>(@ViewType val viewType: Int, open val s
         internal fun createViewHolder(inflater: LayoutInflater, parent: ViewGroup, @ViewType viewType: Int): FeedItemViewHolder<FeedItem<*>, *> =
             when (viewType) {
                 TYPE_STATUS_HEADER -> FeedStatusHeaderItemViewHolder(inflater, parent)
-                TYPE_STATUS_FOOTER -> TODO()
+                TYPE_STATUS_FOOTER -> FeedStatusFooterItemViewHolder(inflater, parent)
                 else -> throw IllegalStateException("Unsupported view type: $viewType")
             } as FeedItemViewHolder<FeedItem<*>, *>
     }
