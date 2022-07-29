@@ -45,5 +45,6 @@ class HomeActivity : BaseActivity<HomeViewModel.ViewAction, HomeViewModel.ViewSt
 
     override fun onViewState(viewState: HomeViewModel.ViewState) = with(viewBinding) {
         swipeRefresher.isRefreshing = viewState.loading
+        feed.setItems(viewState.items)
     }
 }

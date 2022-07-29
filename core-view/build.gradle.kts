@@ -81,6 +81,11 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
 }
 
 dependencies {
+    implementation(Dependencies.Kotlin.coroutines)
+
+    implementation(Dependencies.AndroidX.core)
     implementation(Dependencies.AndroidX.View.constraintLayout)
     implementation(Dependencies.AndroidX.View.recyclerView)
+
+    implementation(Dependencies.materialComponent)
 }

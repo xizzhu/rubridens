@@ -22,32 +22,41 @@ import me.xizzhu.android.rubridens.core.infra.BaseViewModel
 import me.xizzhu.android.rubridens.core.repository.AuthRepository
 import me.xizzhu.android.rubridens.core.repository.StatusRepository
 import me.xizzhu.android.rubridens.core.repository.model.UserCredential
+import me.xizzhu.android.rubridens.core.view.feed.FeedItem
 
 class HomeViewModel(
+    private val homePresenter: HomePresenter,
     private val authRepository: AuthRepository,
     private val statusRepository: StatusRepository,
 ) : BaseViewModel<HomeViewModel.ViewAction, HomeViewModel.ViewState>(
     initialViewState = ViewState(
         loading = false,
+        items = emptyList(),
     )
 ) {
     sealed class ViewAction {
         object RequestUserCredential : ViewAction()
     }
 
-    data class ViewState(val loading: Boolean)
+    data class ViewState(val loading: Boolean, val items: List<FeedItem<*>>)
 
     fun loadLatest() {
         emitViewState { currentViewState ->
             currentViewState.copy(
                 loading = true,
+                items = emptyList(),
             )
         }
 
         viewModelScope.launch {
             val userCredential = getUserCredential() ?: return@launch
-            statusRepository.loadLatest(userCredential)
-                .forEach { println("--> $it") }
+            val latest = statusRepository.loadLatest(userCredential)
+            emitViewState { currentViewState ->
+                currentViewState.copy(
+                    loading = false,
+                    items = homePresenter.buildFeedItems(latest)
+                )
+            }
         }
     }
 
@@ -59,6 +68,7 @@ class HomeViewModel(
             emitViewState { currentViewState ->
                 currentViewState.copy(
                     loading = false,
+                    items = emptyList(),
                 )
             }
         }

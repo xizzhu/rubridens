@@ -86,6 +86,7 @@ dependencies {
     implementation(project(":core-view"))
 
     implementation(Dependencies.Kotlin.coroutines)
+    implementation(Dependencies.Kotlin.datetime)
 
     implementation(Dependencies.AndroidX.activity)
     implementation(Dependencies.AndroidX.View.constraintLayout)
