@@ -14,18 +14,12 @@
  * limitations under the License.
  */
 
-package me.xizzhu.android.rubridens.core.repository.model
+package me.xizzhu.android.rubridens.core.model
 
-data class User(
-    val id: String,
+data class ApplicationCredential(
     val instanceUrl: String,
-    val username: String,
-    val displayName: String,
-    val avatarUrl: String,
-)
-
-data class UserCredential(
-    val instanceUrl: String,
-    val username: String,
-    val accessToken: String
+    val clientId: String,
+    val clientSecret: String,
+    val accessToken: String,
+    val vapidKey: String,
 )

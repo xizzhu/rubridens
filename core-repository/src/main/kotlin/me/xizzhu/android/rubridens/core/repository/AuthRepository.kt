@@ -16,11 +16,11 @@
 
 package me.xizzhu.android.rubridens.core.repository
 
+import me.xizzhu.android.rubridens.core.model.ApplicationCredential
+import me.xizzhu.android.rubridens.core.model.OAuthGrantType
+import me.xizzhu.android.rubridens.core.model.UserCredential
 import me.xizzhu.android.rubridens.core.repository.local.ApplicationCredentialCache
 import me.xizzhu.android.rubridens.core.repository.local.UserCredentialCache
-import me.xizzhu.android.rubridens.core.repository.model.ApplicationCredential
-import me.xizzhu.android.rubridens.core.repository.model.OAuthGrantType
-import me.xizzhu.android.rubridens.core.repository.model.UserCredential
 import me.xizzhu.android.rubridens.core.repository.network.AccountsService
 import me.xizzhu.android.rubridens.core.repository.network.AppsService
 import me.xizzhu.android.rubridens.core.repository.network.OAuthService

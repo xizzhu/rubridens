@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package me.xizzhu.android.rubridens.core.repository.model
+package me.xizzhu.android.rubridens.core.model
 
 data class Instance(
     val title: String,

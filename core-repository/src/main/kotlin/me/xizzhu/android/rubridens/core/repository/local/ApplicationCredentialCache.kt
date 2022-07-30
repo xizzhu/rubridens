@@ -16,7 +16,7 @@
 
 package me.xizzhu.android.rubridens.core.repository.local
 
-import me.xizzhu.android.rubridens.core.repository.model.ApplicationCredential
+import me.xizzhu.android.rubridens.core.model.ApplicationCredential
 
 internal interface ApplicationCredentialCache {
     suspend fun readByInstanceUrl(instanceUrl: String): ApplicationCredential?

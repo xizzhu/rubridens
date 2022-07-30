@@ -19,8 +19,8 @@ package me.xizzhu.android.rubridens.home
 import android.app.Application
 import android.text.format.DateUtils
 import androidx.core.text.HtmlCompat
-import me.xizzhu.android.rubridens.core.repository.model.Status
-import me.xizzhu.android.rubridens.core.repository.model.User
+import me.xizzhu.android.rubridens.core.model.Status
+import me.xizzhu.android.rubridens.core.model.User
 import me.xizzhu.android.rubridens.core.view.feed.FeedItem
 import me.xizzhu.android.rubridens.core.view.feed.FeedStatusFooterItem
 import me.xizzhu.android.rubridens.core.view.feed.FeedStatusHeaderItem
@@ -30,11 +30,11 @@ import kotlin.math.min
 class HomePresenter(private val application: Application) {
     fun buildFeedItems(
         statuses: List<Status>,
-        openStatus: (statusId: String) -> Unit,
-        replyToStatus: (statusId: String) -> Unit,
-        reblogStatus: (statusId: String) -> Unit,
-        favoriteStatus: (statusId: String) -> Unit,
-        openUser: (userId: String) -> Unit,
+        openStatus: (status: Status) -> Unit,
+        replyToStatus: (status: Status) -> Unit,
+        reblogStatus: (status: Status) -> Unit,
+        favoriteStatus: (status: Status) -> Unit,
+        openUser: (user: User) -> Unit,
     ): List<FeedItem<*>> {
         val items = ArrayList<FeedItem<*>>(statuses.size * 3)
         statuses.forEach { status ->
@@ -46,11 +46,11 @@ class HomePresenter(private val application: Application) {
     }
 
     private fun Status.toFeedStatusHeaderItem(
-        openStatus: (statusId: String) -> Unit,
-        openUser: (userId: String) -> Unit,
+        openStatus: (status: Status) -> Unit,
+        openUser: (user: User) -> Unit,
     ): FeedStatusHeaderItem = FeedStatusHeaderItem(
-        statusId = createUniqueStatusId(this),
-        bloggerId = createUniqueUserId(sender),
+        status = this,
+        blogger = sender,
         bloggerDisplayName = sender.formatDisplayName(),
         bloggerProfileImageUrl = sender.avatarUrl,
         rebloggedBy = reblogger?.formatDisplayName()?.let { application.resources.getString(R.string.feed_text_reblogged_by, it) },
@@ -59,19 +59,19 @@ class HomePresenter(private val application: Application) {
         openBlogger = openUser,
     )
 
-    private fun Status.toFeedStatusTextItem(openStatus: (statusId: String) -> Unit): FeedStatusTextItem = FeedStatusTextItem(
-        statusId = createUniqueStatusId(this),
+    private fun Status.toFeedStatusTextItem(openStatus: (status: Status) -> Unit): FeedStatusTextItem = FeedStatusTextItem(
+        status = this,
         text = formatTextContent(),
         openStatus = openStatus,
     )
 
     private fun Status.toFeedStatusFooterItem(
-        openStatus: (statusId: String) -> Unit,
-        replyToStatus: (statusId: String) -> Unit,
-        reblogStatus: (statusId: String) -> Unit,
-        favoriteStatus: (statusId: String) -> Unit,
+        openStatus: (status: Status) -> Unit,
+        replyToStatus: (status: Status) -> Unit,
+        reblogStatus: (status: Status) -> Unit,
+        favoriteStatus: (status: Status) -> Unit,
     ): FeedStatusFooterItem = FeedStatusFooterItem(
-        statusId = createUniqueStatusId(this),
+        status = this,
         replies = repliesCount.formatCount(),
         reblogs = reblogsCount.formatCount(),
         reblogged = reblogged,
@@ -102,8 +102,4 @@ class HomePresenter(private val application: Application) {
         DateUtils.getRelativeTimeSpanString(min(created.toEpochMilliseconds(), System.currentTimeMillis())) ?: ""
 
     private fun Status.formatTextContent(): CharSequence = HtmlCompat.fromHtml(content, 0).trim().toString()
-
-    fun createUniqueStatusId(status: Status): String = "${status.instanceUrl}:${status.id}"
-
-    fun createUniqueUserId(user: User): String = "${user.instanceUrl}:${user.id}"
 }

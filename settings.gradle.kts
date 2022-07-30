@@ -15,6 +15,7 @@
  */
 
 include(":core-infra")
+include(":core-model")
 include(":core-repository")
 include(":core-view")
 include(":feature-auth")

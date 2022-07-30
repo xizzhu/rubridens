@@ -17,9 +17,9 @@
 package me.xizzhu.android.rubridens.core.repository.network.retrofit
 
 import kotlinx.coroutines.test.runTest
-import me.xizzhu.android.rubridens.core.repository.model.OAuthGrantType
-import me.xizzhu.android.rubridens.core.repository.model.OAuthScope
-import me.xizzhu.android.rubridens.core.repository.model.OAuthToken
+import me.xizzhu.android.rubridens.core.model.OAuthGrantType
+import me.xizzhu.android.rubridens.core.model.OAuthScope
+import me.xizzhu.android.rubridens.core.model.OAuthToken
 import me.xizzhu.android.rubridens.core.repository.network.NetworkException
 import okhttp3.mockwebserver.MockResponse
 import kotlin.test.BeforeTest

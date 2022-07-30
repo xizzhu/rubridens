@@ -18,10 +18,10 @@ package me.xizzhu.android.rubridens.core.repository.network.retrofit
 
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Instant
-import me.xizzhu.android.rubridens.core.repository.model.Card
-import me.xizzhu.android.rubridens.core.repository.model.Media
-import me.xizzhu.android.rubridens.core.repository.model.Status
-import me.xizzhu.android.rubridens.core.repository.model.User
+import me.xizzhu.android.rubridens.core.model.Card
+import me.xizzhu.android.rubridens.core.model.Media
+import me.xizzhu.android.rubridens.core.model.Status
+import me.xizzhu.android.rubridens.core.model.User
 import me.xizzhu.android.rubridens.core.repository.network.NetworkException
 import okhttp3.mockwebserver.MockResponse
 import kotlin.test.BeforeTest

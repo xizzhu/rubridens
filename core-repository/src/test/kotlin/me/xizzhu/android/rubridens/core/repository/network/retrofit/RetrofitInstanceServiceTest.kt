@@ -17,7 +17,7 @@
 package me.xizzhu.android.rubridens.core.repository.network.retrofit
 
 import kotlinx.coroutines.test.runTest
-import me.xizzhu.android.rubridens.core.repository.model.Instance
+import me.xizzhu.android.rubridens.core.model.Instance
 import me.xizzhu.android.rubridens.core.repository.network.NetworkException
 import okhttp3.mockwebserver.MockResponse
 import kotlin.test.BeforeTest

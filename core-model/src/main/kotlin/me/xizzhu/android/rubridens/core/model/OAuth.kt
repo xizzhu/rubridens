@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package me.xizzhu.android.rubridens.core.repository.model
+package me.xizzhu.android.rubridens.core.model
 
 enum class OAuthScope {
     READ,
     WRITE,
     FOLLOW,
-    PUSH
+    PUSH,
 }
 
 enum class OAuthGrantType {
     AUTHORIZATION_CODE,
-    CLIENT_CREDENTIALS
+    CLIENT_CREDENTIALS,
 }
 
 data class OAuthToken(

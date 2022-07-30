@@ -18,8 +18,8 @@ package me.xizzhu.android.rubridens.core.repository.network.retrofit
 
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
-import me.xizzhu.android.rubridens.core.repository.model.ApplicationCredential
-import me.xizzhu.android.rubridens.core.repository.model.OAuthScope
+import me.xizzhu.android.rubridens.core.model.ApplicationCredential
+import me.xizzhu.android.rubridens.core.model.OAuthScope
 import me.xizzhu.android.rubridens.core.repository.network.AppsService
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded

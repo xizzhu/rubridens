@@ -18,18 +18,19 @@ package me.xizzhu.android.rubridens.core.view.feed
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import me.xizzhu.android.rubridens.core.model.Status
 import me.xizzhu.android.rubridens.core.view.databinding.ItemFeedStatusTextBinding
 
 data class FeedStatusTextItem(
-    override val statusId: String,
+    override val status: Status,
     val text: CharSequence,
-    val openStatus: (statusId: String) -> Unit,
-) : FeedItem<FeedStatusTextItem>(TYPE_STATUS_TEXT, statusId)
+    val openStatus: (status: Status) -> Unit,
+) : FeedItem<FeedStatusTextItem>(TYPE_STATUS_TEXT, status)
 
 internal class FeedStatusTextItemViewHolder(inflater: LayoutInflater, parent: ViewGroup)
     : FeedItemViewHolder<FeedStatusTextItem, ItemFeedStatusTextBinding>(ItemFeedStatusTextBinding.inflate(inflater, parent, false)) {
     init {
-        viewBinding.root.setOnClickListener { item?.let { it.openStatus(it.statusId) } }
+        viewBinding.root.setOnClickListener { item?.let { it.openStatus(it.status) } }
     }
 
     override fun bind(item: FeedStatusTextItem, payloads: List<Any>) = with(viewBinding) {

@@ -30,11 +30,11 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import me.xizzhu.android.rubridens.core.model.Status
+import me.xizzhu.android.rubridens.core.model.User
+import me.xizzhu.android.rubridens.core.model.UserCredential
 import me.xizzhu.android.rubridens.core.repository.AuthRepository
 import me.xizzhu.android.rubridens.core.repository.StatusRepository
-import me.xizzhu.android.rubridens.core.repository.model.Status
-import me.xizzhu.android.rubridens.core.repository.model.User
-import me.xizzhu.android.rubridens.core.repository.model.UserCredential
 import me.xizzhu.android.rubridens.core.view.feed.FeedStatusHeaderItem
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
@@ -93,8 +93,8 @@ class HomeViewModelTest {
         val user = mockk<User>()
         val status = mockk<Status>().apply { every { sender } returns user }
         val feedStatusHeaderItem = FeedStatusHeaderItem(
-            statusId = "xizzhu.me:12345",
-            bloggerId = "xizzhu.me:67890",
+            status = status,
+            blogger = user,
             bloggerDisplayName = "Random Display Name",
             bloggerProfileImageUrl = "https://xizzhu.me/avatar1.jpg",
             rebloggedBy = null,

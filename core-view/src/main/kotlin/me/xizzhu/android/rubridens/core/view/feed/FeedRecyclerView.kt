@@ -30,8 +30,9 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.asExecutor
+import me.xizzhu.android.rubridens.core.model.Status
 
-abstract class FeedItem<T : FeedItem<T>>(@ViewType val viewType: Int, open val statusId: String) {
+abstract class FeedItem<T : FeedItem<T>>(@ViewType val viewType: Int, open val status: Status) {
     companion object {
         const val TYPE_STATUS_HEADER = 1
         const val TYPE_STATUS_FOOTER = 2
@@ -53,7 +54,8 @@ abstract class FeedItem<T : FeedItem<T>>(@ViewType val viewType: Int, open val s
             } as FeedItemViewHolder<FeedItem<*>, *>
     }
 
-    internal fun isSameItem(other: FeedItem<*>): Boolean = viewType == other.viewType && statusId == other.statusId
+    internal fun isSameItem(other: FeedItem<*>): Boolean =
+        viewType == other.viewType && status.instanceUrl == other.status.instanceUrl && status.id == other.status.id
 
     internal fun isContentTheSame(other: FeedItem<*>): Boolean = this == other
 

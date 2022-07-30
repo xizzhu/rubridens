@@ -17,9 +17,15 @@
 package me.xizzhu.android.rubridens.core.infra
 
 import android.app.Activity
+import me.xizzhu.android.rubridens.core.model.Status
+import me.xizzhu.android.rubridens.core.model.User
 
 interface Navigator {
     fun goToAuthentication(activity: Activity)
 
     fun goToHome(activity: Activity)
+
+    fun goToStatus(activity: Activity, status: Status)
+
+    fun gotoUser(activity: Activity, user: User)
 }

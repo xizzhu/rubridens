@@ -16,7 +16,7 @@
 
 package me.xizzhu.android.rubridens.core.repository.network
 
-import me.xizzhu.android.rubridens.core.repository.model.Status
+import me.xizzhu.android.rubridens.core.model.Status
 
 internal interface TimelinesService {
     suspend fun fetchHome(

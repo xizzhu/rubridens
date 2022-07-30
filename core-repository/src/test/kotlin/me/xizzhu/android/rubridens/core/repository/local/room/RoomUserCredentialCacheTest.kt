@@ -17,7 +17,7 @@
 package me.xizzhu.android.rubridens.core.repository.local.room
 
 import kotlinx.coroutines.test.runTest
-import me.xizzhu.android.rubridens.core.repository.model.UserCredential
+import me.xizzhu.android.rubridens.core.model.UserCredential
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import kotlin.test.BeforeTest

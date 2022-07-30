@@ -18,14 +18,12 @@ package me.xizzhu.android.rubridens.home
 
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import me.xizzhu.android.rubridens.core.infra.BaseViewModel
+import me.xizzhu.android.rubridens.core.model.Status
+import me.xizzhu.android.rubridens.core.model.User
+import me.xizzhu.android.rubridens.core.model.UserCredential
 import me.xizzhu.android.rubridens.core.repository.AuthRepository
 import me.xizzhu.android.rubridens.core.repository.StatusRepository
-import me.xizzhu.android.rubridens.core.repository.model.Status
-import me.xizzhu.android.rubridens.core.repository.model.User
-import me.xizzhu.android.rubridens.core.repository.model.UserCredential
 import me.xizzhu.android.rubridens.core.view.feed.FeedItem
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -52,10 +50,6 @@ class HomeViewModel(
 
     private val loading = AtomicBoolean(false)
 
-    private val statusesMutex = Mutex()
-    private val statuses = hashMapOf<String, Status>()
-    private val users = hashMapOf<String, User>()
-
     fun loadLatest() = load {
         emitViewState { currentViewState ->
             currentViewState.copy(
@@ -65,16 +59,7 @@ class HomeViewModel(
         }
 
         val userCredential = getUserCredential() ?: return@load
-        val latest = statusRepository.loadLatest(userCredential)
-        statusesMutex.withLock {
-            statuses.clear()
-            users.clear()
-            latest.forEach { status ->
-                statuses[homePresenter.createUniqueStatusId(status)] = status
-                users[homePresenter.createUniqueUserId(status.sender)] = status.sender
-            }
-        }
-        val items = buildFeedItems(latest)
+        val items = buildFeedItems(statusRepository.loadLatest(userCredential))
         emitViewState { currentViewState ->
             currentViewState.copy(
                 loading = false,
@@ -116,38 +101,23 @@ class HomeViewModel(
         openUser = ::openUser,
     )
 
-    private fun openStatus(uniqueStatusId: String) {
-        viewModelScope.launch {
-            val status = statusesMutex.withLock { statuses[uniqueStatusId] } ?: return@launch
-            emitViewAction(ViewAction.OpenStatus(status))
-        }
+    private fun openStatus(status: Status) {
+        emitViewAction(ViewAction.OpenStatus(status))
     }
 
-    private fun replyToStatus(uniqueStatusId: String) {
-        viewModelScope.launch {
-            val status = statusesMutex.withLock { statuses[uniqueStatusId] } ?: return@launch
-            emitViewAction(ViewAction.ReplyToStatus(status))
-        }
+    private fun replyToStatus(status: Status) {
+        emitViewAction(ViewAction.ReplyToStatus(status))
     }
 
-    private fun reblogStatus(uniqueStatusId: String) {
-        viewModelScope.launch {
-            val status = statusesMutex.withLock { statuses[uniqueStatusId] } ?: return@launch
-            emitViewAction(ViewAction.ReblogStatus(status))
-        }
+    private fun reblogStatus(status: Status) {
+        emitViewAction(ViewAction.ReblogStatus(status))
     }
 
-    private fun favoriteStatus(uniqueStatusId: String) {
-        viewModelScope.launch {
-            val status = statusesMutex.withLock { statuses[uniqueStatusId] } ?: return@launch
-            emitViewAction(ViewAction.FavoriteStatus(status))
-        }
+    private fun favoriteStatus(status: Status) {
+        emitViewAction(ViewAction.FavoriteStatus(status))
     }
 
-    private fun openUser(uniqueUserId: String) {
-        viewModelScope.launch {
-            val user = statusesMutex.withLock { users[uniqueUserId] } ?: return@launch
-            emitViewAction(ViewAction.OpenUser(user))
-        }
+    private fun openUser(user: User) {
+        emitViewAction(ViewAction.OpenUser(user))
     }
 }

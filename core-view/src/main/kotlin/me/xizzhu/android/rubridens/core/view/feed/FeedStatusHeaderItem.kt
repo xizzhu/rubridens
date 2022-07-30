@@ -23,31 +23,33 @@ import android.view.ViewGroup
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.view.isVisible
+import me.xizzhu.android.rubridens.core.model.Status
+import me.xizzhu.android.rubridens.core.model.User
 import me.xizzhu.android.rubridens.core.view.R
 import me.xizzhu.android.rubridens.core.view.databinding.ItemFeedStatusHeaderBinding
 import me.xizzhu.android.rubridens.core.view.load
 
 data class FeedStatusHeaderItem(
-    override val statusId: String,
-    val bloggerId: String,
+    override val status: Status,
+    val blogger: User,
     val bloggerDisplayName: String,
     val bloggerProfileImageUrl: String,
     val rebloggedBy: String?,
     val subtitle: String,
-    val openStatus: (statusId: String) -> Unit,
-    val openBlogger: (bloggerId: String) -> Unit,
-) : FeedItem<FeedStatusHeaderItem>(TYPE_STATUS_HEADER, statusId)
+    val openStatus: (status: Status) -> Unit,
+    val openBlogger: (blogger: User) -> Unit,
+) : FeedItem<FeedStatusHeaderItem>(TYPE_STATUS_HEADER, status)
 
 internal class FeedStatusHeaderItemViewHolder(inflater: LayoutInflater, parent: ViewGroup)
     : FeedItemViewHolder<FeedStatusHeaderItem, ItemFeedStatusHeaderBinding>(ItemFeedStatusHeaderBinding.inflate(inflater, parent, false)) {
     init {
-        viewBinding.root.setOnClickListener { item?.let { it.openStatus(it.statusId) } }
+        viewBinding.root.setOnClickListener { item?.let { it.openStatus(it.status) } }
 
         val reblog = DrawableCompat.wrap(ResourcesCompat.getDrawable(itemView.resources, R.drawable.ic_reblog_16, null)!!)
             .apply { DrawableCompat.setTint(this, Color.GRAY) }
         viewBinding.rebloggedBy.setCompoundDrawablesRelativeWithIntrinsicBounds(reblog, null, null, null)
 
-        val openUserListener = View.OnClickListener { item?.let { it.openBlogger(it.bloggerId) } }
+        val openUserListener = View.OnClickListener { item?.let { it.openBlogger(it.blogger) } }
         viewBinding.profileImage.setOnClickListener(openUserListener)
         viewBinding.displayName.setOnClickListener(openUserListener)
     }

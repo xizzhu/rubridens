@@ -18,9 +18,9 @@ package me.xizzhu.android.rubridens.core.repository.network.retrofit
 
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
-import me.xizzhu.android.rubridens.core.repository.model.OAuthGrantType
-import me.xizzhu.android.rubridens.core.repository.model.OAuthScope
-import me.xizzhu.android.rubridens.core.repository.model.OAuthToken
+import me.xizzhu.android.rubridens.core.model.OAuthGrantType
+import me.xizzhu.android.rubridens.core.model.OAuthScope
+import me.xizzhu.android.rubridens.core.model.OAuthToken
 import me.xizzhu.android.rubridens.core.repository.network.OAuthService
 import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull

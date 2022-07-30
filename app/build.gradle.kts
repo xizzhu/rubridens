@@ -112,6 +112,7 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
 
 dependencies {
     implementation(project(":core-infra"))
+    implementation(project(":core-model"))
     implementation(project(":core-repository"))
     implementation(project(":feature-auth"))
     implementation(project(":feature-home"))

@@ -16,9 +16,9 @@
 
 package me.xizzhu.android.rubridens.core.repository.network
 
-import me.xizzhu.android.rubridens.core.repository.model.OAuthGrantType
-import me.xizzhu.android.rubridens.core.repository.model.OAuthScope
-import me.xizzhu.android.rubridens.core.repository.model.OAuthToken
+import me.xizzhu.android.rubridens.core.model.OAuthGrantType
+import me.xizzhu.android.rubridens.core.model.OAuthScope
+import me.xizzhu.android.rubridens.core.model.OAuthToken
 
 internal interface OAuthService {
     fun getLoginUrl(

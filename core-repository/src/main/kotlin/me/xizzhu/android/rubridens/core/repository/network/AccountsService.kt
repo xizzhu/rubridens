@@ -16,7 +16,7 @@
 
 package me.xizzhu.android.rubridens.core.repository.network
 
-import me.xizzhu.android.rubridens.core.repository.model.User
+import me.xizzhu.android.rubridens.core.model.User
 
 internal interface AccountsService {
     suspend fun verifyCredentials(instanceUrl: String, userOAuthToken: String): User
