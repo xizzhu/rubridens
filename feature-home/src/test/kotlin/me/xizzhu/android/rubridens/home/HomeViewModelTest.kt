@@ -19,7 +19,9 @@ package me.xizzhu.android.rubridens.home
 import io.mockk.MockKAnnotations
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
@@ -29,6 +31,10 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import me.xizzhu.android.rubridens.core.repository.AuthRepository
+import me.xizzhu.android.rubridens.core.repository.StatusRepository
+import me.xizzhu.android.rubridens.core.repository.model.Status
+import me.xizzhu.android.rubridens.core.repository.model.UserCredential
+import me.xizzhu.android.rubridens.core.view.feed.FeedStatusHeaderItem
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -38,7 +44,13 @@ class HomeViewModelTest {
     private val testDispatcher = UnconfinedTestDispatcher()
 
     @MockK
+    private lateinit var homePresenter: HomePresenter
+
+    @MockK
     private lateinit var authRepository: AuthRepository
+
+    @MockK
+    private lateinit var statusRepository: StatusRepository
 
     private lateinit var homeViewModel: HomeViewModel
 
@@ -47,7 +59,7 @@ class HomeViewModelTest {
         Dispatchers.setMain(testDispatcher)
         MockKAnnotations.init(this, relaxed = true)
 
-        homeViewModel = HomeViewModel(authRepository)
+        homeViewModel = HomeViewModel(homePresenter, authRepository, statusRepository)
     }
 
     @AfterTest
@@ -58,7 +70,7 @@ class HomeViewModelTest {
 
     @Test
     fun `test initial view state`() = runTest {
-        assertEquals(HomeViewModel.ViewState(loading = false), homeViewModel.viewState().first())
+        assertEquals(HomeViewModel.ViewState(loading = false, items = emptyList()), homeViewModel.viewState().first())
     }
 
     @Test
@@ -71,6 +83,20 @@ class HomeViewModelTest {
         homeViewModel.loadLatest()
 
         assertEquals(HomeViewModel.ViewAction.RequestUserCredential, viewAction.await())
-        assertEquals(HomeViewModel.ViewState(loading = false), homeViewModel.viewState().first())
+        assertEquals(HomeViewModel.ViewState(loading = false, items = emptyList()), homeViewModel.viewState().first())
+    }
+
+    @Test
+    fun `test loadLatest`() = runTest {
+        val userCredential = mockk<UserCredential>()
+        val status = mockk<Status>()
+        val feedStatusHeaderItem = mockk<FeedStatusHeaderItem>()
+        coEvery { authRepository.readUserCredentials() } returns listOf(userCredential)
+        coEvery { statusRepository.loadLatest(userCredential) } returns listOf(status)
+        every { homePresenter.buildFeedItems(listOf(status)) } returns listOf(feedStatusHeaderItem)
+
+        homeViewModel.loadLatest()
+
+        assertEquals(HomeViewModel.ViewState(loading = false, items = listOf(feedStatusHeaderItem)), homeViewModel.viewState().first())
     }
 }
