@@ -23,6 +23,7 @@ import me.xizzhu.android.rubridens.core.repository.model.Status
 import me.xizzhu.android.rubridens.core.repository.model.User
 import me.xizzhu.android.rubridens.core.view.feed.FeedStatusFooterItem
 import me.xizzhu.android.rubridens.core.view.feed.FeedStatusHeaderItem
+import me.xizzhu.android.rubridens.core.view.feed.FeedStatusTextItem
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import kotlin.test.BeforeTest
@@ -55,6 +56,11 @@ class HomePresenterTest {
                     bloggerProfileImageUrl = "https://xizzhu.me/avatar1.jpg",
                     rebloggedBy = null,
                     subtitle = "@random_username • Nov 5, 2021",
+                ),
+                FeedStatusTextItem(
+                    statusInstanceUrl = "xizzhu.me",
+                    statusId = "12345",
+                    text = "Let's Go Brandon!"
                 ),
                 FeedStatusFooterItem(
                     statusInstanceUrl = "xizzhu.me",
@@ -117,6 +123,11 @@ class HomePresenterTest {
                     rebloggedBy = null,
                     subtitle = "@random_username • Nov 5, 2021",
                 ),
+                FeedStatusTextItem(
+                    statusInstanceUrl = "xizzhu.me",
+                    statusId = "12345",
+                    text = "Let's Go Brandon!"
+                ),
                 FeedStatusFooterItem(
                     statusInstanceUrl = "xizzhu.me",
                     statusId = "12345",
@@ -133,6 +144,11 @@ class HomePresenterTest {
                     bloggerProfileImageUrl = "",
                     rebloggedBy = "random_username boosted",
                     subtitle = "@random_username_2@another_instance • Nov 5, 2021",
+                ),
+                FeedStatusTextItem(
+                    statusInstanceUrl = "xizzhu.me",
+                    statusId = "54321",
+                    text = "FJB!"
                 ),
                 FeedStatusFooterItem(
                     statusInstanceUrl = "xizzhu.me",
