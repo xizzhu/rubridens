@@ -24,6 +24,7 @@ import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.view.isVisible
 import me.xizzhu.android.rubridens.core.view.R
 import me.xizzhu.android.rubridens.core.view.databinding.ItemFeedStatusHeaderBinding
+import me.xizzhu.android.rubridens.core.view.load
 
 data class FeedStatusHeaderItem(
     override val statusInstanceUrl: String,
@@ -50,6 +51,7 @@ internal class FeedStatusHeaderItemViewHolder(inflater: LayoutInflater, parent: 
             rebloggedBy.isVisible = true
         }
 
+        profileImage.load(item.bloggerProfileImageUrl, R.drawable.img_person_placeholder)
         displayName.text = item.bloggerDisplayName
         subtitle.text = item.subtitle
     }

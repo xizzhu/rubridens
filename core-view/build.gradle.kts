@@ -17,6 +17,7 @@
 plugins {
     id("com.android.library")
     id("kotlin-android")
+    kotlin("kapt")
 }
 
 android {
@@ -86,6 +87,12 @@ dependencies {
     implementation(Dependencies.AndroidX.core)
     implementation(Dependencies.AndroidX.View.constraintLayout)
     implementation(Dependencies.AndroidX.View.recyclerView)
+
+    kapt(Dependencies.Glide.compiler)
+    implementation(Dependencies.Glide.glide)
+    implementation(Dependencies.Glide.okhttpIntegration)
+
+    implementation(Dependencies.Koin.core)
 
     implementation(Dependencies.materialComponent)
 }

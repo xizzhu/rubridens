@@ -64,6 +64,7 @@ object Versions {
         }
     }
 
+    const val glide = "4.13.2"
     const val koin = "3.2.0"
     const val ksp = "1.7.10-1.0.6"
     const val materialComponent = "1.6.1"
@@ -120,6 +121,12 @@ object Dependencies {
         object Test {
             const val core = "androidx.test:core:${Versions.AndroidX.Test.core}"
         }
+    }
+
+    object Glide {
+        const val compiler = "com.github.bumptech.glide:compiler:${Versions.glide}"
+        const val glide = "com.github.bumptech.glide:glide:${Versions.glide}"
+        const val okhttpIntegration = "com.github.bumptech.glide:okhttp3-integration:${Versions.glide}"
     }
 
     object Koin {
