@@ -21,5 +21,7 @@ import me.xizzhu.android.rubridens.core.repository.model.UserCredential
 internal interface UserCredentialCache {
     suspend fun hasCredential(): Boolean
 
+    suspend fun read(): List<UserCredential>
+
     suspend fun save(userCredential: UserCredential)
 }

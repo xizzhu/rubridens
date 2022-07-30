@@ -81,7 +81,7 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
 }
 
 dependencies {
-    implementation(project(":core-mvvm"))
+    implementation(project(":core-infra"))
     implementation(project(":core-repository"))
     implementation(project(":core-view"))
 

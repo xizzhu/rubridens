@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package me.xizzhu.android.rubridens.core.mvvm
+package me.xizzhu.android.rubridens.core.infra
 
 import android.os.Bundle
 import androidx.annotation.CallSuper
@@ -23,8 +23,10 @@ import androidx.lifecycle.lifecycleScope
 import androidx.viewbinding.ViewBinding
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import org.koin.android.ext.android.inject
 
 abstract class BaseActivity<ViewAction, ViewState, VB : ViewBinding, VM : BaseViewModel<ViewAction, ViewState>> : AppCompatActivity() {
+    protected val navigator: Navigator by inject()
     protected abstract val viewBinding: VB
     protected abstract val viewModel: VM
 

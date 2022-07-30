@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import org.gradle.api.JavaVersion
 
 object Configurations {
@@ -43,6 +41,7 @@ object Versions {
         val jvmTarget = java.toString()
         const val core = "1.7.10"
         const val coroutines = "1.6.4"
+        const val datetime = "0.4.0"
         const val kover = "0.5.1"
     }
 
@@ -56,6 +55,8 @@ object Versions {
 
         object View {
             const val constraintLayout = "2.1.4"
+            const val recyclerView = "1.2.1"
+            const val swipeRefreshLayout = "1.1.0"
         }
 
         object Test {
@@ -63,6 +64,7 @@ object Versions {
         }
     }
 
+    const val glide = "4.13.2"
     const val koin = "3.2.0"
     const val ksp = "1.7.10-1.0.6"
     const val materialComponent = "1.6.1"
@@ -85,6 +87,7 @@ object Dependencies {
     object Kotlin {
         const val classpath = "org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.Kotlin.core}"
         const val coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-android:${Versions.Kotlin.coroutines}"
+        const val datetime = "org.jetbrains.kotlinx:kotlinx-datetime:${Versions.Kotlin.datetime}"
         const val test = "org.jetbrains.kotlin:kotlin-test-junit:${Versions.Kotlin.core}"
         const val coroutinesTest = "org.jetbrains.kotlinx:kotlinx-coroutines-test:${Versions.Kotlin.coroutines}"
 
@@ -111,11 +114,19 @@ object Dependencies {
 
         object View {
             const val constraintLayout = "androidx.constraintlayout:constraintlayout:${Versions.AndroidX.View.constraintLayout}"
+            const val recyclerView = "androidx.recyclerview:recyclerview:${Versions.AndroidX.View.recyclerView}"
+            const val swipeRefreshLayout = "androidx.swiperefreshlayout:swiperefreshlayout:${Versions.AndroidX.View.swipeRefreshLayout}"
         }
 
         object Test {
             const val core = "androidx.test:core:${Versions.AndroidX.Test.core}"
         }
+    }
+
+    object Glide {
+        const val compiler = "com.github.bumptech.glide:compiler:${Versions.glide}"
+        const val glide = "com.github.bumptech.glide:glide:${Versions.glide}"
+        const val okhttpIntegration = "com.github.bumptech.glide:okhttp3-integration:${Versions.glide}"
     }
 
     object Koin {

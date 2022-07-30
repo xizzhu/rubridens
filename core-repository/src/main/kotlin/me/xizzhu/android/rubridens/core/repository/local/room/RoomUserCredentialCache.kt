@@ -28,6 +28,8 @@ import me.xizzhu.android.rubridens.core.repository.model.UserCredential
 internal class RoomUserCredentialCache(private val appDatabase: AppDatabase) : UserCredentialCache {
     override suspend fun hasCredential(): Boolean = appDatabase.userCredentialDao().count() > 0
 
+    override suspend fun read(): List<UserCredential> = appDatabase.userCredentialDao().read().map { it.toUserCredential() }
+
     override suspend fun save(userCredential: UserCredential) {
         appDatabase.userCredentialDao().save(UserCredentialEntity(userCredential))
     }
@@ -37,6 +39,9 @@ internal class RoomUserCredentialCache(private val appDatabase: AppDatabase) : U
 internal interface UserCredentialDao {
     @Query("SELECT COUNT(*) FROM ${UserCredentialEntity.TABLE_NAME}")
     suspend fun count(): Int
+
+    @Query("SELECT * FROM ${UserCredentialEntity.TABLE_NAME}")
+    suspend fun read(): List<UserCredentialEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun save(userCredential: UserCredentialEntity)
@@ -62,5 +67,11 @@ internal class UserCredentialEntity(
         instanceUrl = userCredential.instanceUrl,
         username = userCredential.username,
         accessToken = userCredential.accessToken,
+    )
+
+    fun toUserCredential(): UserCredential = UserCredential(
+        instanceUrl = instanceUrl,
+        username = username,
+        accessToken = accessToken,
     )
 }

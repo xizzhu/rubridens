@@ -16,14 +16,62 @@
 
 package me.xizzhu.android.rubridens.home
 
-import me.xizzhu.android.rubridens.core.mvvm.BaseViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
+import me.xizzhu.android.rubridens.core.infra.BaseViewModel
+import me.xizzhu.android.rubridens.core.repository.AuthRepository
+import me.xizzhu.android.rubridens.core.repository.StatusRepository
+import me.xizzhu.android.rubridens.core.repository.model.UserCredential
+import me.xizzhu.android.rubridens.core.view.feed.FeedItem
 
-class HomeViewModel() : BaseViewModel<HomeViewModel.ViewAction, HomeViewModel.ViewState>(
+class HomeViewModel(
+    private val homePresenter: HomePresenter,
+    private val authRepository: AuthRepository,
+    private val statusRepository: StatusRepository,
+) : BaseViewModel<HomeViewModel.ViewAction, HomeViewModel.ViewState>(
     initialViewState = ViewState(
         loading = false,
+        items = emptyList(),
     )
 ) {
-    sealed class ViewAction
+    sealed class ViewAction {
+        object RequestUserCredential : ViewAction()
+    }
 
-    data class ViewState(val loading: Boolean)
+    data class ViewState(val loading: Boolean, val items: List<FeedItem<*>>)
+
+    fun loadLatest() {
+        emitViewState { currentViewState ->
+            currentViewState.copy(
+                loading = true,
+                items = emptyList(),
+            )
+        }
+
+        viewModelScope.launch {
+            val userCredential = getUserCredential() ?: return@launch
+            val latest = statusRepository.loadLatest(userCredential)
+            emitViewState { currentViewState ->
+                currentViewState.copy(
+                    loading = false,
+                    items = homePresenter.buildFeedItems(latest)
+                )
+            }
+        }
+    }
+
+    private suspend fun getUserCredential(): UserCredential? {
+        // TODO Supports multiple accounts
+        val userCredential = authRepository.readUserCredentials().firstOrNull()
+        if (userCredential == null) {
+            emitViewAction(ViewAction.RequestUserCredential)
+            emitViewState { currentViewState ->
+                currentViewState.copy(
+                    loading = false,
+                    items = emptyList(),
+                )
+            }
+        }
+        return userCredential
+    }
 }

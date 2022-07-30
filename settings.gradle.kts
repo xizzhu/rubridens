@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-include(":core-mvvm")
+include(":core-infra")
 include(":core-repository")
 include(":core-view")
 include(":feature-auth")

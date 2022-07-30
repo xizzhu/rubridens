@@ -24,7 +24,7 @@ import android.view.inputmethod.EditorInfo
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.isVisible
 import me.xizzhu.android.rubridens.auth.databinding.ActivityAuthBinding
-import me.xizzhu.android.rubridens.core.mvvm.BaseActivity
+import me.xizzhu.android.rubridens.core.infra.BaseActivity
 import me.xizzhu.android.rubridens.core.view.fadeOut
 import me.xizzhu.android.rubridens.core.view.hideKeyboard
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -32,12 +32,8 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 class AuthActivity : BaseActivity<AuthViewModel.ViewAction, AuthViewModel.ViewState, ActivityAuthBinding, AuthViewModel>() {
     companion object {
         internal const val KEY_LOGIN_SUCCESSFUL = "AuthActivity.KEY_LOGIN_SUCCESSFUL"
-        private const val KEY_INTENT_TO_START_ON_SUCCESS = "AuthActivity.KEY_INTENT_TO_START_ON_SUCCESS"
 
-        fun newStartIntent(context: Context, intentToStartOnSuccess: Intent?): Intent =
-            Intent(context, AuthActivity::class.java).apply {
-                intentToStartOnSuccess?.let { putExtra(KEY_INTENT_TO_START_ON_SUCCESS, it) }
-            }
+        fun newStartIntent(context: Context): Intent = Intent(context, AuthActivity::class.java)
     }
 
     private val loginResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -82,9 +78,7 @@ class AuthActivity : BaseActivity<AuthViewModel.ViewAction, AuthViewModel.ViewSt
             loginResultLauncher.launch(LoginActivity.newStartIntent(this, viewAction.instanceUrl))
         }
         AuthViewModel.ViewAction.PopBack -> {
-            intent.getParcelableExtra<Intent>(KEY_INTENT_TO_START_ON_SUCCESS)?.let { intentToStartOnSuccess ->
-                startActivity(intentToStartOnSuccess)
-            }
+            navigator.goToHome(this)
             finish()
         }
     }

@@ -35,6 +35,8 @@ interface AuthRepository {
     suspend fun createUserToken(instanceUrl: String, authCode: String): UserCredential
 
     suspend fun hasUserCredential(): Boolean
+
+    suspend fun readUserCredentials(): List<UserCredential>
 }
 
 internal class AuthRepositoryImpl(
@@ -95,4 +97,6 @@ internal class AuthRepositoryImpl(
     }
 
     override suspend fun hasUserCredential(): Boolean = userCredentialCache.hasCredential()
+
+    override suspend fun readUserCredentials(): List<UserCredential> = userCredentialCache.read()
 }

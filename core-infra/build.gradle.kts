@@ -87,4 +87,6 @@ dependencies {
     implementation(Dependencies.AndroidX.appCompat)
     implementation(Dependencies.AndroidX.core)
     implementation(Dependencies.AndroidX.Lifecycle.viewModel)
+
+    implementation(Dependencies.Koin.core)
 }

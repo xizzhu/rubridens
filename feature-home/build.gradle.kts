@@ -81,14 +81,16 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
 }
 
 dependencies {
-    implementation(project(":core-mvvm"))
+    implementation(project(":core-infra"))
     implementation(project(":core-repository"))
     implementation(project(":core-view"))
 
     implementation(Dependencies.Kotlin.coroutines)
+    implementation(Dependencies.Kotlin.datetime)
 
     implementation(Dependencies.AndroidX.activity)
     implementation(Dependencies.AndroidX.View.constraintLayout)
+    implementation(Dependencies.AndroidX.View.swipeRefreshLayout)
 
     implementation(Dependencies.Koin.core)
 
@@ -98,4 +100,5 @@ dependencies {
     testImplementation(Dependencies.Kotlin.coroutinesTest)
     testImplementation(Dependencies.AndroidX.Test.core)
     testImplementation(Dependencies.mockk)
+    testImplementation(Dependencies.robolectric)
 }

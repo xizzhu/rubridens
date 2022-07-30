@@ -88,6 +88,7 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
 
 dependencies {
     implementation(Dependencies.Kotlin.coroutines)
+    implementation(Dependencies.Kotlin.datetime)
 
     ksp(Dependencies.AndroidX.Room.compiler)
     implementation(Dependencies.AndroidX.Room.runtime)

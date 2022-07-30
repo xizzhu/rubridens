@@ -18,7 +18,7 @@ package me.xizzhu.android.rubridens.home
 
 import android.content.Context
 import android.content.Intent
-import me.xizzhu.android.rubridens.core.mvvm.BaseActivity
+import me.xizzhu.android.rubridens.core.infra.BaseActivity
 import me.xizzhu.android.rubridens.home.databinding.ActivityHomeBinding
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -32,10 +32,19 @@ class HomeActivity : BaseActivity<HomeViewModel.ViewAction, HomeViewModel.ViewSt
     override val viewModel: HomeViewModel by viewModel()
 
     override fun onViewCreated() = with(viewBinding) {
+        swipeRefresher.setOnRefreshListener { viewModel.loadLatest() }
+
+        viewModel.loadLatest()
     }
 
-    override fun onViewAction(viewAction: HomeViewModel.ViewAction) = Unit
+    override fun onViewAction(viewAction: HomeViewModel.ViewAction) = when (viewAction) {
+        HomeViewModel.ViewAction.RequestUserCredential -> {
+            navigator.goToAuthentication(this)
+        }
+    }
 
     override fun onViewState(viewState: HomeViewModel.ViewState) = with(viewBinding) {
+        swipeRefresher.isRefreshing = viewState.loading
+        feed.setItems(viewState.items)
     }
 }
