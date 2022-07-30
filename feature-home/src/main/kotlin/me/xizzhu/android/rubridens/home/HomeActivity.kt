@@ -38,6 +38,21 @@ class HomeActivity : BaseActivity<HomeViewModel.ViewAction, HomeViewModel.ViewSt
     }
 
     override fun onViewAction(viewAction: HomeViewModel.ViewAction) = when (viewAction) {
+        is HomeViewModel.ViewAction.OpenStatus -> {
+            // TODO
+        }
+        is HomeViewModel.ViewAction.FavoriteStatus -> {
+            // TODO
+        }
+        is HomeViewModel.ViewAction.ReblogStatus -> {
+            // TODO
+        }
+        is HomeViewModel.ViewAction.ReplyToStatus -> {
+            // TODO
+        }
+        is HomeViewModel.ViewAction.OpenUser -> {
+            // TODO
+        }
         HomeViewModel.ViewAction.RequestUserCredential -> {
             navigator.goToAuthentication(this)
         }

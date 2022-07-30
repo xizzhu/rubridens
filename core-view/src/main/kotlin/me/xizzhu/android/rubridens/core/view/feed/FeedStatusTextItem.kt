@@ -21,13 +21,17 @@ import android.view.ViewGroup
 import me.xizzhu.android.rubridens.core.view.databinding.ItemFeedStatusTextBinding
 
 data class FeedStatusTextItem(
-    override val statusInstanceUrl: String,
     override val statusId: String,
     val text: CharSequence,
-) : FeedItem<FeedStatusTextItem>(TYPE_STATUS_TEXT, statusInstanceUrl, statusId)
+    val openStatus: (statusId: String) -> Unit,
+) : FeedItem<FeedStatusTextItem>(TYPE_STATUS_TEXT, statusId)
 
 internal class FeedStatusTextItemViewHolder(inflater: LayoutInflater, parent: ViewGroup)
     : FeedItemViewHolder<FeedStatusTextItem, ItemFeedStatusTextBinding>(ItemFeedStatusTextBinding.inflate(inflater, parent, false)) {
+    init {
+        viewBinding.root.setOnClickListener { item?.let { it.openStatus(it.statusId) } }
+    }
+
     override fun bind(item: FeedStatusTextItem, payloads: List<Any>) = with(viewBinding) {
         text.text = item.text
     }

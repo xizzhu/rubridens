@@ -26,19 +26,27 @@ import me.xizzhu.android.rubridens.core.view.R
 import me.xizzhu.android.rubridens.core.view.databinding.ItemFeedStatusFooterBinding
 
 data class FeedStatusFooterItem(
-    override val statusInstanceUrl: String,
     override val statusId: String,
     val replies: String,
     val reblogs: String,
     val reblogged: Boolean,
     val favorites: String,
     val favorited: Boolean,
-) : FeedItem<FeedStatusFooterItem>(TYPE_STATUS_FOOTER, statusInstanceUrl, statusId)
+    val openStatus: (statusId: String) -> Unit,
+    val replyToStatus: (statusId: String) -> Unit,
+    val reblogStatus: (statusId: String) -> Unit,
+    val favoriteStatus: (statusId: String) -> Unit,
+) : FeedItem<FeedStatusFooterItem>(TYPE_STATUS_FOOTER, statusId)
 
 internal class FeedStatusFooterItemViewHolder(inflater: LayoutInflater, parent: ViewGroup)
     : FeedItemViewHolder<FeedStatusFooterItem, ItemFeedStatusFooterBinding>(ItemFeedStatusFooterBinding.inflate(inflater, parent, false)) {
     init {
+        viewBinding.root.setOnClickListener { item?.let { it.openStatus(it.statusId) } }
+
         setDrawable(viewBinding.replies, R.drawable.ic_reply_24, false)
+        viewBinding.replies.setOnClickListener { item?.let { it.replyToStatus(it.statusId) } }
+        viewBinding.reblogs.setOnClickListener { item?.let { it.reblogStatus(it.statusId) } }
+        viewBinding.favorites.setOnClickListener { item?.let { it.favoriteStatus(it.statusId) } }
     }
 
     override fun bind(item: FeedStatusFooterItem, payloads: List<Any>) = with(viewBinding) {

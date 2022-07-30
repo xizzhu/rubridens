@@ -18,6 +18,7 @@ package me.xizzhu.android.rubridens.core.view.feed
 
 import android.graphics.Color
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.DrawableCompat
@@ -27,20 +28,28 @@ import me.xizzhu.android.rubridens.core.view.databinding.ItemFeedStatusHeaderBin
 import me.xizzhu.android.rubridens.core.view.load
 
 data class FeedStatusHeaderItem(
-    override val statusInstanceUrl: String,
     override val statusId: String,
+    val bloggerId: String,
     val bloggerDisplayName: String,
     val bloggerProfileImageUrl: String,
     val rebloggedBy: String?,
     val subtitle: String,
-) : FeedItem<FeedStatusHeaderItem>(TYPE_STATUS_HEADER, statusInstanceUrl, statusId)
+    val openStatus: (statusId: String) -> Unit,
+    val openBlogger: (bloggerId: String) -> Unit,
+) : FeedItem<FeedStatusHeaderItem>(TYPE_STATUS_HEADER, statusId)
 
 internal class FeedStatusHeaderItemViewHolder(inflater: LayoutInflater, parent: ViewGroup)
     : FeedItemViewHolder<FeedStatusHeaderItem, ItemFeedStatusHeaderBinding>(ItemFeedStatusHeaderBinding.inflate(inflater, parent, false)) {
     init {
+        viewBinding.root.setOnClickListener { item?.let { it.openStatus(it.statusId) } }
+
         val reblog = DrawableCompat.wrap(ResourcesCompat.getDrawable(itemView.resources, R.drawable.ic_reblog_16, null)!!)
             .apply { DrawableCompat.setTint(this, Color.GRAY) }
         viewBinding.rebloggedBy.setCompoundDrawablesRelativeWithIntrinsicBounds(reblog, null, null, null)
+
+        val openUserListener = View.OnClickListener { item?.let { it.openBlogger(it.bloggerId) } }
+        viewBinding.profileImage.setOnClickListener(openUserListener)
+        viewBinding.displayName.setOnClickListener(openUserListener)
     }
 
     override fun bind(item: FeedStatusHeaderItem, payloads: List<Any>) = with(viewBinding) {
