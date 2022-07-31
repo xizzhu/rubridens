@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <me.xizzhu.android.rubridens.core.view.feed.widget.FeedStatusImageView
+        android:id="@+id/image"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginStart="80dp"
+        android:layout_marginTop="@dimen/padding"
+        android:layout_marginEnd="@dimen/padding"
+        tools:background="@color/primary" />
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/play"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_gravity="center"
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="@dimen/padding"
+        android:layout_marginEnd="@dimen/padding_small"
+        android:src="@drawable/ic_play_64"
+        android:visibility="gone"
+        tools:visibility="visible" />
+</FrameLayout>

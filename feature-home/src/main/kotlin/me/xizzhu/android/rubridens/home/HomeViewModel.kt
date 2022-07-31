@@ -19,6 +19,7 @@ package me.xizzhu.android.rubridens.home
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import me.xizzhu.android.rubridens.core.infra.BaseViewModel
+import me.xizzhu.android.rubridens.core.model.Media
 import me.xizzhu.android.rubridens.core.model.Status
 import me.xizzhu.android.rubridens.core.model.User
 import me.xizzhu.android.rubridens.core.model.UserCredential
@@ -99,6 +100,7 @@ class HomeViewModel(
         reblogStatus = ::reblogStatus,
         favoriteStatus = ::favoriteStatus,
         openUser = ::openUser,
+        openMedia = ::openMedia,
     )
 
     private fun openStatus(status: Status) {
@@ -120,4 +122,6 @@ class HomeViewModel(
     private fun openUser(user: User) {
         emitViewAction(ViewAction.OpenUser(user))
     }
+
+    private fun openMedia(media: Media) {}
 }
