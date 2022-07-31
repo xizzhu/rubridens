@@ -17,8 +17,6 @@
 package me.xizzhu.android.rubridens.home
 
 import android.app.Application
-import android.text.format.DateUtils
-import androidx.core.text.HtmlCompat
 import me.xizzhu.android.rubridens.core.model.Media
 import me.xizzhu.android.rubridens.core.model.Status
 import me.xizzhu.android.rubridens.core.model.User
@@ -28,7 +26,11 @@ import me.xizzhu.android.rubridens.core.view.feed.FeedStatusFooterItem
 import me.xizzhu.android.rubridens.core.view.feed.FeedStatusHeaderItem
 import me.xizzhu.android.rubridens.core.view.feed.FeedStatusMediaItem
 import me.xizzhu.android.rubridens.core.view.feed.FeedStatusTextItem
-import kotlin.math.min
+import me.xizzhu.android.rubridens.core.view.formatCount
+import me.xizzhu.android.rubridens.core.view.formatDisplayName
+import me.xizzhu.android.rubridens.core.view.formatRelativeTimestamp
+import me.xizzhu.android.rubridens.core.view.formatSenderUsername
+import me.xizzhu.android.rubridens.core.view.formatTextContent
 
 class HomePresenter(private val application: Application) {
     fun buildFeedItems(
@@ -102,24 +104,4 @@ class HomePresenter(private val application: Application) {
         reblogStatus = reblogStatus,
         favoriteStatus = favoriteStatus,
     )
-
-    private fun Int.formatCount(): String = when {
-        this >= 1_000_000 -> "${this / 1_000_000}M+"
-        this >= 1_000 -> "${this / 1_000}K+"
-        this <= 0 -> ""
-        else -> toString()
-    }
-
-    private fun User.formatDisplayName(): String = displayName.takeIf { it.isNotEmpty() } ?: username
-
-    private fun Status.formatSenderUsername(): String = if (instanceUrl == sender.instanceUrl) {
-        "@${sender.username}"
-    } else {
-        "@${sender.username}@${sender.instanceUrl}"
-    }
-
-    private fun Status.formatRelativeTimestamp(): CharSequence =
-        DateUtils.getRelativeTimeSpanString(min(created.toEpochMilliseconds(), System.currentTimeMillis())) ?: ""
-
-    private fun Status.formatTextContent(): CharSequence = HtmlCompat.fromHtml(content, 0).trim().toString()
 }

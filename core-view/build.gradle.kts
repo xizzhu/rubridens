@@ -85,6 +85,7 @@ dependencies {
     implementation(project(":core-model"))
 
     implementation(Dependencies.Kotlin.coroutines)
+    implementation(Dependencies.Kotlin.datetime)
 
     implementation(Dependencies.AndroidX.core)
     implementation(Dependencies.AndroidX.View.constraintLayout)
@@ -97,4 +98,8 @@ dependencies {
     implementation(Dependencies.Koin.core)
 
     implementation(Dependencies.materialComponent)
+
+    testImplementation(Dependencies.Kotlin.test)
+    testImplementation(Dependencies.AndroidX.Test.core)
+    testImplementation(Dependencies.robolectric)
 }
