@@ -109,7 +109,7 @@ internal abstract class FeedItemViewHolder<I : FeedItem<*>, VB : ViewBinding>(pr
 }
 
 private class FeedItemAdapter(context: Context) : ListAdapter<FeedItem<*>, FeedItemViewHolder<FeedItem<*>, *>>(
-    AsyncDifferConfig.Builder(FeedItemDiffCallback()).setBackgroundThreadExecutor(Dispatchers.Default.asExecutor()).build()
+    AsyncDifferConfig.Builder(FeedItemDiffCallback()).setBackgroundThreadExecutor(Dispatchers.Default.limitedParallelism(1).asExecutor()).build()
 ) {
     private val inflater = LayoutInflater.from(context)
 
