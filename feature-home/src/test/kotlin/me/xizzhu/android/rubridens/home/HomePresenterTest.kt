@@ -55,7 +55,7 @@ class HomePresenterTest {
     private val testMedia1 = Media(
         type = Media.Type.IMAGE,
         url = "https://xizzhu.me/media1.jpg",
-        previewUrl = "https://xizzhu.me/media_preview1.jpg",
+        previewUrl = "",
         blurHash = "",
     )
     private val testStatus1 = Status(
@@ -163,7 +163,7 @@ class HomePresenterTest {
                 FeedStatusMediaItem(
                     status = testStatus1,
                     media = testMedia1,
-                    imageUrl = "https://xizzhu.me/media_preview1.jpg",
+                    imageUrl = "https://xizzhu.me/media1.jpg",
                     placeholder = null,
                     isPlayable = false,
                     openStatus = openStatus,
@@ -217,7 +217,7 @@ class HomePresenterTest {
                 FeedStatusMediaItem(
                     status = testStatus1,
                     media = testMedia1,
-                    imageUrl = "https://xizzhu.me/media_preview1.jpg",
+                    imageUrl = "https://xizzhu.me/media1.jpg",
                     placeholder = null,
                     isPlayable = false,
                     openStatus = openStatus,
