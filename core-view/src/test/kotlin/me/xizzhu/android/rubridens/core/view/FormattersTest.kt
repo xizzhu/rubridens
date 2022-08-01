@@ -16,13 +16,20 @@
 
 package me.xizzhu.android.rubridens.core.view
 
+import android.text.SpannableStringBuilder
+import android.text.style.ClickableSpan
+import androidx.core.text.getSpans
+import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.datetime.Instant
+import me.xizzhu.android.rubridens.core.model.Mention
 import me.xizzhu.android.rubridens.core.model.Status
 import me.xizzhu.android.rubridens.core.model.User
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 @RunWith(RobolectricTestRunner::class)
 class FormattersTest {
@@ -83,6 +90,33 @@ class FormattersTest {
         reblogged = false,
         favorited = false,
     )
+    private val testStatus3 = Status(
+        id = "status_3",
+        instanceUrl = "xizzhu.me",
+        uri = "https://xizzhu.me/",
+        created = Instant.parse("2021-11-05T11:22:33.444Z"),
+        sender = testUser2,
+        reblogger = null,
+        rebloggedInstanceUrl = "xizzhu.me",
+        inReplyToStatusId = null,
+        inReplyToAccountId = null,
+        content = "<p>Link to my website is https://xizzhu.me/. This is a #tag, and this is not a tag. This is a mention to @random_username, but random_username is not a mention.</p>",
+        tags = listOf("tag"),
+        mentions = listOf(
+            Mention(
+                userInstanceUrl = "xizzhu.me",
+                userId = "user_1",
+                username = "random_username",
+            )
+        ),
+        media = emptyList(),
+        card = null,
+        repliesCount = 0,
+        reblogsCount = 0,
+        favoritesCount = 0,
+        reblogged = false,
+        favorited = false,
+    )
 
     @Test
     fun `test formatCount`() {
@@ -110,7 +144,60 @@ class FormattersTest {
 
     @Test
     fun `test formatTextContent`() {
-        assertEquals("Let's Go Brandon!", testStatus1.formatTextContent())
-        assertEquals("FJB!", testStatus2.formatTextContent())
+        val openTag: (String) -> Unit = mockk(relaxed = true)
+        val openUrl: (String) -> Unit = mockk(relaxed = true)
+        val openUser: (User) -> Unit = mockk(relaxed = true)
+        assertEquals(
+            "Let's Go Brandon!",
+            testStatus1.formatTextContent(
+                openUrl = openUrl,
+                openTag = openTag,
+                openUser = openUser,
+            ).toString()
+        )
+        assertEquals(
+            "FJB!",
+            testStatus2.formatTextContent(
+                openUrl = openUrl,
+                openTag = openTag,
+                openUser = openUser,
+            ).toString()
+        )
+    }
+
+    @Test
+    fun `test formatTextContent with rich content`() {
+        val openTag: (String) -> Unit = mockk(relaxed = true)
+        val openUrl: (String) -> Unit = mockk(relaxed = true)
+        val openUser: (User) -> Unit = mockk(relaxed = true)
+
+        val actual = testStatus3.formatTextContent(
+            openUrl = openUrl,
+            openTag = openTag,
+            openUser = openUser,
+        )
+        assertEquals("Link to my website is https://xizzhu.me/. This is a #tag, and this is not a tag. This is a mention to @random_username, but random_username is not a mention.", actual.toString())
+
+        assertTrue(actual is SpannableStringBuilder)
+        assertEquals(3, actual.getSpans<Any>().size)
+
+        actual.getSpans<ClickableSpan>(start = 22, end = 39)[0].onClick(mockk(relaxed = true))
+        verify(exactly = 1) { openUrl("https://xizzhu.me") }
+
+        actual.getSpans<ClickableSpan>(start = 52, end = 55)[0].onClick(mockk(relaxed = true))
+        verify(exactly = 1) { openTag("tag") }
+
+        actual.getSpans<ClickableSpan>(start = 102, end = 117)[0].onClick(mockk(relaxed = true))
+        verify(exactly = 1) {
+            openUser(
+                User(
+                    id = "user_1",
+                    username = "random_username",
+                    instanceUrl = "xizzhu.me",
+                    displayName = "",
+                    avatarUrl = ""
+                )
+            )
+        }
     }
 }

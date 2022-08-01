@@ -101,6 +101,7 @@ class HomeViewModel(
         favoriteStatus = ::favoriteStatus,
         openUser = ::openUser,
         openMedia = ::openMedia,
+        openTag = ::openTag,
         openUrl = ::openUrl,
     )
 
@@ -125,6 +126,10 @@ class HomeViewModel(
     }
 
     private fun openMedia(media: Media) {
+        // TODO
+    }
+
+    private fun openTag(tag: String) {
         // TODO
     }
 

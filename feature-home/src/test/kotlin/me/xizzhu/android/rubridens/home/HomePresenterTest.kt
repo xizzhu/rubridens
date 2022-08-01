@@ -42,6 +42,7 @@ class HomePresenterTest {
     private val favoriteStatus = { _: Status -> }
     private val openUser = { _: User -> }
     private val openMedia = { _: Media -> }
+    private val openTag = { _: String -> }
     private val openUrl = { _: String -> }
     private lateinit var homePresenter: HomePresenter
 
@@ -138,7 +139,7 @@ class HomePresenterTest {
 
     @Test
     fun `test buildFeedItems with empty list`() {
-        assertTrue(homePresenter.buildFeedItems(emptyList(), openStatus, replyToStatus, reblogStatus, favoriteStatus, openUser, openMedia, openUrl).isEmpty())
+        assertTrue(homePresenter.buildFeedItems(emptyList(), openStatus, replyToStatus, reblogStatus, favoriteStatus, openUser, openMedia, openTag, openUrl).isEmpty())
     }
 
     @Test
@@ -157,8 +158,10 @@ class HomePresenterTest {
                 ),
                 FeedStatusTextItem(
                     status = testStatus1,
-                    text = "Let's Go Brandon!",
                     openStatus = openStatus,
+                    openUrl = openUrl,
+                    openTag = openTag,
+                    openUser = openUser,
                 ),
                 FeedStatusMediaItem(
                     status = testStatus1,
@@ -190,6 +193,7 @@ class HomePresenterTest {
                 favoriteStatus = favoriteStatus,
                 openUser = openUser,
                 openMedia = openMedia,
+                openTag = openTag,
                 openUrl = openUrl,
             )
         )
@@ -211,8 +215,10 @@ class HomePresenterTest {
                 ),
                 FeedStatusTextItem(
                     status = testStatus1,
-                    text = "Let's Go Brandon!",
                     openStatus = openStatus,
+                    openUrl = openUrl,
+                    openTag = openTag,
+                    openUser = openUser,
                 ),
                 FeedStatusMediaItem(
                     status = testStatus1,
@@ -247,8 +253,10 @@ class HomePresenterTest {
                 ),
                 FeedStatusTextItem(
                     status = testStatus2,
-                    text = "FJB!",
                     openStatus = openStatus,
+                    openUrl = openUrl,
+                    openTag = openTag,
+                    openUser = openUser,
                 ),
                 FeedStatusMediaItem(
                     status = testStatus2,
@@ -291,6 +299,7 @@ class HomePresenterTest {
                 favoriteStatus = favoriteStatus,
                 openUser = openUser,
                 openMedia = openMedia,
+                openTag = openTag,
                 openUrl = openUrl,
             )
         )

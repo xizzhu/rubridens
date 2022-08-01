@@ -31,7 +31,6 @@ import me.xizzhu.android.rubridens.core.view.formatCount
 import me.xizzhu.android.rubridens.core.view.formatDisplayName
 import me.xizzhu.android.rubridens.core.view.formatRelativeTimestamp
 import me.xizzhu.android.rubridens.core.view.formatSenderUsername
-import me.xizzhu.android.rubridens.core.view.formatTextContent
 
 class HomePresenter(private val application: Application) {
     fun buildFeedItems(
@@ -42,12 +41,13 @@ class HomePresenter(private val application: Application) {
         favoriteStatus: (status: Status) -> Unit,
         openUser: (user: User) -> Unit,
         openMedia: (media: Media) -> Unit,
+        openTag: (tag: String) -> Unit,
         openUrl: (url: String) -> Unit,
     ): List<FeedItem<*>> {
         val items = ArrayList<FeedItem<*>>(statuses.size * 5)
         statuses.forEach { status ->
             items.add(status.toFeedStatusHeaderItem(openStatus = openStatus, openUser = openUser))
-            items.add(status.toFeedStatusTextItem(openStatus = openStatus))
+            items.add(status.toFeedStatusTextItem(openStatus = openStatus, openUrl = openUrl, openTag = openTag, openUser = openUser))
             status.toFeedStatusMediaItem(openStatus = openStatus, openMedia = openMedia)?.let { items.add(it) }
             status.toFeedStatusCardItem(openStatus = openStatus, openUrl = openUrl)?.let { items.add(it) }
             items.add(status.toFeedStatusFooterItem(openStatus = openStatus, replyToStatus = replyToStatus, reblogStatus = reblogStatus, favoriteStatus = favoriteStatus))
@@ -69,10 +69,17 @@ class HomePresenter(private val application: Application) {
         openBlogger = openUser,
     )
 
-    private fun Status.toFeedStatusTextItem(openStatus: (status: Status) -> Unit): FeedStatusTextItem = FeedStatusTextItem(
+    private fun Status.toFeedStatusTextItem(
+        openStatus: (status: Status) -> Unit,
+        openUrl: (url: String) -> Unit,
+        openTag: (tag: String) -> Unit,
+        openUser: (user: User) -> Unit,
+    ): FeedStatusTextItem = FeedStatusTextItem(
         status = this,
-        text = formatTextContent(),
         openStatus = openStatus,
+        openUrl = openUrl,
+        openTag = openTag,
+        openUser = openUser,
     )
 
     private fun Status.toFeedStatusMediaItem(openStatus: (status: Status) -> Unit, openMedia: (media: Media) -> Unit): FeedStatusMediaItem? =
