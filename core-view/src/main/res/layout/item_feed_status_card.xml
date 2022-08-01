@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <me.xizzhu.android.rubridens.core.view.feed.widget.FeedStatusImageView
+        android:id="@+id/image"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginStart="80dp"
+        android:layout_marginTop="@dimen/padding"
+        android:layout_marginEnd="@dimen/padding"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:layout_width="0dp"
+        android:layout_height="1px"
+        android:background="@color/gray"
+        app:layout_constraintEnd_toEndOf="@id/image"
+        app:layout_constraintStart_toStartOf="@id/image"
+        app:layout_constraintTop_toBottomOf="@id/image" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/title"
+        style="@style/TextAppearance.Material3.TitleMedium"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/padding_small"
+        android:layout_marginTop="@dimen/padding_small"
+        android:layout_marginEnd="@dimen/padding_small"
+        android:ellipsize="end"
+        android:lines="1"
+        app:layout_constraintEnd_toEndOf="@id/image"
+        app:layout_constraintStart_toStartOf="@id/image"
+        app:layout_constraintTop_toBottomOf="@id/image"
+        tools:text="President Biden Tells Governors: \u0022There Is No Federal Solution\u0022 To Covid" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/description"
+        style="@style/TextAppearance.Material3.BodyMedium"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/padding_small"
+        android:layout_marginEnd="@dimen/padding_small"
+        android:ellipsize="end"
+        android:maxLines="4"
+        app:layout_constraintEnd_toEndOf="@id/image"
+        app:layout_constraintStart_toStartOf="@id/image"
+        app:layout_constraintTop_toBottomOf="@id/title"
+        tools:text="President Biden and the White House Covid-19 task force said during a conference call with the National Governors Association that states would have to \u0022solve\u0022 the pandemic \u0022at the state level.\u0022" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/author"
+        style="@style/TextAppearance.Material3.LabelMedium"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/padding_small"
+        android:layout_marginEnd="@dimen/padding_small"
+        android:ellipsize="end"
+        android:lines="1"
+        android:paddingBottom="@dimen/padding_small"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/image"
+        app:layout_constraintStart_toStartOf="@id/image"
+        app:layout_constraintTop_toBottomOf="@id/description"
+        tools:text="RealClearPolitics" />
+
+    <View
+        android:id="@+id/card"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@drawable/background_border"
+        app:layout_constraintBottom_toBottomOf="@id/author"
+        app:layout_constraintEnd_toEndOf="@id/image"
+        app:layout_constraintStart_toStartOf="@id/image"
+        app:layout_constraintTop_toTopOf="@id/image" />
+</androidx.constraintlayout.widget.ConstraintLayout>

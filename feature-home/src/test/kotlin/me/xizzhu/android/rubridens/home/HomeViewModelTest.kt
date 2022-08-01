@@ -104,7 +104,7 @@ class HomeViewModelTest {
         )
         coEvery { authRepository.readUserCredentials() } returns listOf(userCredential)
         coEvery { statusRepository.loadLatest(userCredential) } returns listOf(status)
-        every { homePresenter.buildFeedItems(listOf(status), any(), any(), any(), any(), any(), any()) } returns listOf(feedStatusHeaderItem)
+        every { homePresenter.buildFeedItems(listOf(status), any(), any(), any(), any(), any(), any(), any()) } returns listOf(feedStatusHeaderItem)
 
         homeViewModel.loadLatest()
 

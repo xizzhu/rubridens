@@ -38,9 +38,10 @@ abstract class FeedItem<T : FeedItem<T>>(@ViewType val viewType: Int, open val s
         const val TYPE_STATUS_FOOTER = 2
         const val TYPE_STATUS_TEXT = 3
         const val TYPE_STATUS_MEDIA = 4
+        const val TYPE_STATUS_CARD = 5
 
         @IntDef(
-            TYPE_STATUS_HEADER, TYPE_STATUS_FOOTER, TYPE_STATUS_TEXT, TYPE_STATUS_MEDIA
+            TYPE_STATUS_HEADER, TYPE_STATUS_FOOTER, TYPE_STATUS_TEXT, TYPE_STATUS_MEDIA, TYPE_STATUS_CARD
         )
         @Retention(AnnotationRetention.SOURCE)
         annotation class ViewType
@@ -52,6 +53,7 @@ abstract class FeedItem<T : FeedItem<T>>(@ViewType val viewType: Int, open val s
                 TYPE_STATUS_FOOTER -> FeedStatusFooterItemViewHolder(inflater, parent)
                 TYPE_STATUS_TEXT -> FeedStatusTextItemViewHolder(inflater, parent)
                 TYPE_STATUS_MEDIA -> FeedStatusMediaItemViewHolder(inflater, parent)
+                TYPE_STATUS_CARD -> FeedStatusCardItemViewHolder(inflater, parent)
                 else -> throw IllegalStateException("Unsupported view type: $viewType")
             } as FeedItemViewHolder<FeedItem<*>, *>
     }

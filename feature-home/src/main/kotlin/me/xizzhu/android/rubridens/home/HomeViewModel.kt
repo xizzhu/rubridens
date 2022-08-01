@@ -101,6 +101,7 @@ class HomeViewModel(
         favoriteStatus = ::favoriteStatus,
         openUser = ::openUser,
         openMedia = ::openMedia,
+        openUrl = ::openUrl,
     )
 
     private fun openStatus(status: Status) {
@@ -123,5 +124,11 @@ class HomeViewModel(
         emitViewAction(ViewAction.OpenUser(user))
     }
 
-    private fun openMedia(media: Media) {}
+    private fun openMedia(media: Media) {
+        // TODO
+    }
+
+    private fun openUrl(url: String) {
+        // TODO
+    }
 }

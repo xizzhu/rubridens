@@ -18,9 +18,11 @@ package me.xizzhu.android.rubridens.home
 
 import androidx.test.core.app.ApplicationProvider
 import kotlinx.datetime.Instant
+import me.xizzhu.android.rubridens.core.model.Card
 import me.xizzhu.android.rubridens.core.model.Media
 import me.xizzhu.android.rubridens.core.model.Status
 import me.xizzhu.android.rubridens.core.model.User
+import me.xizzhu.android.rubridens.core.view.feed.FeedStatusCardItem
 import me.xizzhu.android.rubridens.core.view.feed.FeedStatusFooterItem
 import me.xizzhu.android.rubridens.core.view.feed.FeedStatusHeaderItem
 import me.xizzhu.android.rubridens.core.view.feed.FeedStatusMediaItem
@@ -40,6 +42,7 @@ class HomePresenterTest {
     private val favoriteStatus = { _: Status -> }
     private val openUser = { _: User -> }
     private val openMedia = { _: Media -> }
+    private val openUrl = { _: String -> }
     private lateinit var homePresenter: HomePresenter
 
     private val testUser1 = User(
@@ -95,7 +98,16 @@ class HomePresenterTest {
         type = Media.Type.VIDEO,
         url = "https://xizzhu.me/media2.mp4",
         previewUrl = "https://xizzhu.me/media_preview2.jpg",
-        blurHash = ""
+        blurHash = "",
+    )
+    private val testCard2 = Card(
+        type = Card.Type.LINK,
+        url = "https://xizzhu.me/",
+        title = "card_title",
+        description = "card_description",
+        author = "card_author",
+        previewUrl = "https://xizzhu.me/media_preview2.jpg",
+        blurHash = "",
     )
     private val testStatus2 = Status(
         id = "54321",
@@ -111,7 +123,7 @@ class HomePresenterTest {
         tags = emptyList(),
         mentions = emptyList(),
         media = listOf(testMedia2),
-        card = null,
+        card = testCard2,
         repliesCount = 1234,
         reblogsCount = 0,
         favoritesCount = 7654321,
@@ -126,7 +138,7 @@ class HomePresenterTest {
 
     @Test
     fun `test buildFeedItems with empty list`() {
-        assertTrue(homePresenter.buildFeedItems(emptyList(), openStatus, replyToStatus, reblogStatus, favoriteStatus, openUser, openMedia).isEmpty())
+        assertTrue(homePresenter.buildFeedItems(emptyList(), openStatus, replyToStatus, reblogStatus, favoriteStatus, openUser, openMedia, openUrl).isEmpty())
     }
 
     @Test
@@ -178,6 +190,7 @@ class HomePresenterTest {
                 favoriteStatus = favoriteStatus,
                 openUser = openUser,
                 openMedia = openMedia,
+                openUrl = openUrl,
             )
         )
     }
@@ -246,6 +259,17 @@ class HomePresenterTest {
                     openStatus = openStatus,
                     openMedia = openMedia,
                 ),
+                FeedStatusCardItem(
+                    status = testStatus2,
+                    title = "card_title",
+                    description = "card_description",
+                    author = "card_author",
+                    imageUrl = "https://xizzhu.me/media_preview2.jpg",
+                    placeholder = null,
+                    url = "https://xizzhu.me/",
+                    openStatus = openStatus,
+                    openUrl = openUrl,
+                ),
                 FeedStatusFooterItem(
                     status = testStatus2,
                     replies = "1K+",
@@ -267,6 +291,7 @@ class HomePresenterTest {
                 favoriteStatus = favoriteStatus,
                 openUser = openUser,
                 openMedia = openMedia,
+                openUrl = openUrl,
             )
         )
     }

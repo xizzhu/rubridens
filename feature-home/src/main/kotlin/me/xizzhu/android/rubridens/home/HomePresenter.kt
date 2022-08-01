@@ -22,6 +22,7 @@ import me.xizzhu.android.rubridens.core.model.Status
 import me.xizzhu.android.rubridens.core.model.User
 import me.xizzhu.android.rubridens.core.view.BlurHashDecoder
 import me.xizzhu.android.rubridens.core.view.feed.FeedItem
+import me.xizzhu.android.rubridens.core.view.feed.FeedStatusCardItem
 import me.xizzhu.android.rubridens.core.view.feed.FeedStatusFooterItem
 import me.xizzhu.android.rubridens.core.view.feed.FeedStatusHeaderItem
 import me.xizzhu.android.rubridens.core.view.feed.FeedStatusMediaItem
@@ -41,12 +42,14 @@ class HomePresenter(private val application: Application) {
         favoriteStatus: (status: Status) -> Unit,
         openUser: (user: User) -> Unit,
         openMedia: (media: Media) -> Unit,
+        openUrl: (url: String) -> Unit,
     ): List<FeedItem<*>> {
-        val items = ArrayList<FeedItem<*>>(statuses.size * 4)
+        val items = ArrayList<FeedItem<*>>(statuses.size * 5)
         statuses.forEach { status ->
             items.add(status.toFeedStatusHeaderItem(openStatus = openStatus, openUser = openUser))
             items.add(status.toFeedStatusTextItem(openStatus = openStatus))
             status.toFeedStatusMediaItem(openStatus = openStatus, openMedia = openMedia)?.let { items.add(it) }
+            status.toFeedStatusCardItem(openStatus = openStatus, openUrl = openUrl)?.let { items.add(it) }
             items.add(status.toFeedStatusFooterItem(openStatus = openStatus, replyToStatus = replyToStatus, reblogStatus = reblogStatus, favoriteStatus = favoriteStatus))
         }
         return items
@@ -86,6 +89,20 @@ class HomePresenter(private val application: Application) {
                 openMedia = openMedia,
             )
         }
+
+    private fun Status.toFeedStatusCardItem(openStatus: (status: Status) -> Unit, openUrl: (url: String) -> Unit): FeedStatusCardItem? = card?.let { card ->
+        FeedStatusCardItem(
+            status = this,
+            title = card.title,
+            description = card.description,
+            author = card.author,
+            imageUrl = card.previewUrl,
+            placeholder = BlurHashDecoder.decode(card.blurHash, 16, 16),
+            url = card.url,
+            openStatus = openStatus,
+            openUrl = openUrl,
+        )
+    }
 
     private fun Status.toFeedStatusFooterItem(
         openStatus: (status: Status) -> Unit,
