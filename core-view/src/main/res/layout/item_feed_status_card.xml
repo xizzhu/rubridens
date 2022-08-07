@@ -71,7 +71,7 @@
         android:id="@+id/card"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:background="@drawable/background_border"
+        android:background="@drawable/bg_border"
         app:layout_constraintBottom_toBottomOf="@id/author"
         app:layout_constraintEnd_toEndOf="@id/image"
         app:layout_constraintStart_toStartOf="@id/image"
