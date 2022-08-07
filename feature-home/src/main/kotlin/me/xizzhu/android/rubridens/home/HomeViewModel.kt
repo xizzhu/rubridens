@@ -39,11 +39,14 @@ class HomeViewModel(
     )
 ) {
     sealed class ViewAction {
-        class OpenStatus(val status: Status) : ViewAction()
-        class ReplyToStatus(val status: Status) : ViewAction()
-        class ReblogStatus(val status: Status) : ViewAction()
-        class FavoriteStatus(val status: Status) : ViewAction()
-        class OpenUser(val user: User) : ViewAction()
+        data class OpenStatus(val status: Status) : ViewAction()
+        data class ReplyToStatus(val status: Status) : ViewAction()
+        data class ReblogStatus(val status: Status) : ViewAction()
+        data class FavoriteStatus(val status: Status) : ViewAction()
+        data class OpenUser(val user: User) : ViewAction()
+        data class OpenMedia(val media: Media) : ViewAction()
+        data class OpenTag(val tag: String) : ViewAction()
+        data class OpenUrl(val url: String) : ViewAction()
         object RequestUserCredential : ViewAction()
     }
 
@@ -126,14 +129,14 @@ class HomeViewModel(
     }
 
     private fun openMedia(media: Media) {
-        // TODO
+        emitViewAction(ViewAction.OpenMedia(media))
     }
 
     private fun openTag(tag: String) {
-        // TODO
+        emitViewAction(ViewAction.OpenTag(tag))
     }
 
     private fun openUrl(url: String) {
-        // TODO
+        emitViewAction(ViewAction.OpenUrl(url))
     }
 }

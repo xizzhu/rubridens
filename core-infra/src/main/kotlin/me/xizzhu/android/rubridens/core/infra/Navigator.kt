@@ -17,6 +17,7 @@
 package me.xizzhu.android.rubridens.core.infra
 
 import android.app.Activity
+import me.xizzhu.android.rubridens.core.model.Media
 import me.xizzhu.android.rubridens.core.model.Status
 import me.xizzhu.android.rubridens.core.model.User
 
@@ -25,7 +26,13 @@ interface Navigator {
 
     fun goToHome(activity: Activity)
 
+    fun gotoMedia(activity: Activity, media: Media)
+
     fun goToStatus(activity: Activity, status: Status)
+
+    fun goToTag(activity: Activity, tag: String)
+
+    fun gotoUrl(activity: Activity, url: String)
 
     fun gotoUser(activity: Activity, user: User)
 }

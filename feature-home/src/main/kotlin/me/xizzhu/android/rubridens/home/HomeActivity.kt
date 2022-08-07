@@ -53,6 +53,15 @@ class HomeActivity : BaseActivity<HomeViewModel.ViewAction, HomeViewModel.ViewSt
         is HomeViewModel.ViewAction.OpenUser -> {
             navigator.gotoUser(this, viewAction.user)
         }
+        is HomeViewModel.ViewAction.OpenMedia -> {
+            navigator.gotoMedia(this, viewAction.media)
+        }
+        is HomeViewModel.ViewAction.OpenTag -> {
+            navigator.goToTag(this, viewAction.tag)
+        }
+        is HomeViewModel.ViewAction.OpenUrl -> {
+            navigator.gotoUrl(this, viewAction.url)
+        }
         HomeViewModel.ViewAction.RequestUserCredential -> {
             navigator.goToAuthentication(this)
             finish()
