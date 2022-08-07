@@ -27,6 +27,7 @@ import me.xizzhu.android.rubridens.core.view.feed.FeedStatusFooterItem
 import me.xizzhu.android.rubridens.core.view.feed.FeedStatusHeaderItem
 import me.xizzhu.android.rubridens.core.view.feed.FeedStatusMediaItem
 import me.xizzhu.android.rubridens.core.view.feed.FeedStatusTextItem
+import me.xizzhu.android.rubridens.core.view.feed.FeedStatusThreadItem
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import kotlin.test.BeforeTest
@@ -118,8 +119,8 @@ class HomePresenterTest {
         sender = testUser2,
         reblogger = testUser3,
         rebloggedInstanceUrl = "xizzhu.me",
-        inReplyToStatusId = null,
-        inReplyToAccountId = null,
+        inReplyToStatusId = testStatus1.id,
+        inReplyToAccountId = testStatus1.sender.id,
         content = "FJB!",
         tags = emptyList(),
         mentions = emptyList(),
@@ -277,6 +278,10 @@ class HomePresenterTest {
                     url = "https://xizzhu.me/",
                     openStatus = openStatus,
                     openUrl = openUrl,
+                ),
+                FeedStatusThreadItem(
+                    status = testStatus2,
+                    openStatus = openStatus,
                 ),
                 FeedStatusFooterItem(
                     status = testStatus2,

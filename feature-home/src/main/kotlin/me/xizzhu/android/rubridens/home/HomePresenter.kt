@@ -27,6 +27,7 @@ import me.xizzhu.android.rubridens.core.view.feed.FeedStatusFooterItem
 import me.xizzhu.android.rubridens.core.view.feed.FeedStatusHeaderItem
 import me.xizzhu.android.rubridens.core.view.feed.FeedStatusMediaItem
 import me.xizzhu.android.rubridens.core.view.feed.FeedStatusTextItem
+import me.xizzhu.android.rubridens.core.view.feed.FeedStatusThreadItem
 import me.xizzhu.android.rubridens.core.view.formatCount
 import me.xizzhu.android.rubridens.core.view.formatDisplayName
 import me.xizzhu.android.rubridens.core.view.formatRelativeTimestamp
@@ -44,12 +45,13 @@ class HomePresenter(private val application: Application) {
         openTag: (tag: String) -> Unit,
         openUrl: (url: String) -> Unit,
     ): List<FeedItem<*>> {
-        val items = ArrayList<FeedItem<*>>(statuses.size * 5)
+        val items = ArrayList<FeedItem<*>>(statuses.size * 6)
         statuses.forEach { status ->
             items.add(status.toFeedStatusHeaderItem(openStatus = openStatus, openUser = openUser))
             items.add(status.toFeedStatusTextItem(openStatus = openStatus, openUrl = openUrl, openTag = openTag, openUser = openUser))
             status.toFeedStatusMediaItem(openStatus = openStatus, openMedia = openMedia)?.let { items.add(it) }
             status.toFeedStatusCardItem(openStatus = openStatus, openUrl = openUrl)?.let { items.add(it) }
+            status.toFeedStatusThreadItem(openStatus = openStatus)?.let { items.add(it) }
             items.add(status.toFeedStatusFooterItem(openStatus = openStatus, replyToStatus = replyToStatus, reblogStatus = reblogStatus, favoriteStatus = favoriteStatus))
         }
         return items
@@ -110,6 +112,13 @@ class HomePresenter(private val application: Application) {
             openUrl = openUrl,
         )
     }
+
+    private fun Status.toFeedStatusThreadItem(openStatus: (status: Status) -> Unit): FeedStatusThreadItem? =
+        if (inReplyToStatusId.isNullOrEmpty() || inReplyToAccountId.isNullOrEmpty()) {
+            null
+        } else {
+            FeedStatusThreadItem(status = this, openStatus = openStatus)
+        }
 
     private fun Status.toFeedStatusFooterItem(
         openStatus: (status: Status) -> Unit,
