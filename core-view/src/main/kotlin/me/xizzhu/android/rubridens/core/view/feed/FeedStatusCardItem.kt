@@ -20,9 +20,11 @@ import android.graphics.Bitmap
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import me.xizzhu.android.rubridens.core.model.Status
+import me.xizzhu.android.rubridens.core.view.ImageLoadingCancellable
 import me.xizzhu.android.rubridens.core.view.R
+import me.xizzhu.android.rubridens.core.view.cancelImageLoading
 import me.xizzhu.android.rubridens.core.view.databinding.ItemFeedStatusCardBinding
-import me.xizzhu.android.rubridens.core.view.load
+import me.xizzhu.android.rubridens.core.view.loadImage
 
 data class FeedStatusCardItem(
     override val status: Status,
@@ -37,16 +39,20 @@ data class FeedStatusCardItem(
 ) : FeedItem<FeedStatusCardItem>(TYPE_STATUS_CARD, status)
 
 internal class FeedStatusCardItemViewHolder(inflater: LayoutInflater, parent: ViewGroup)
-    : FeedItemViewHolder<FeedStatusCardItem, ItemFeedStatusCardBinding>(ItemFeedStatusCardBinding.inflate(inflater, parent, false)) {
+    : FeedItemViewHolder<FeedStatusCardItem, ItemFeedStatusCardBinding>(ItemFeedStatusCardBinding.inflate(inflater, parent, false)), ImageLoadingCancellable {
     init {
         viewBinding.root.setOnClickListener { item?.let { it.openStatus(it.status) } }
         viewBinding.card.setOnClickListener { item?.let { it.openUrl(it.url) } }
     }
 
     override fun bind(item: FeedStatusCardItem, payloads: List<Any>) = with(viewBinding) {
-        image.load(item.imageUrl, R.drawable.img_card_placeholder, item.placeholder)
+        image.loadImage(item.imageUrl, R.drawable.img_card_placeholder, item.placeholder)
         title.text = item.title
         description.text = item.description
         author.text = item.author
+    }
+
+    override fun cancelImageLoading() {
+        viewBinding.image.cancelImageLoading()
     }
 }

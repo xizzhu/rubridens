@@ -31,6 +31,7 @@ import androidx.viewbinding.ViewBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.asExecutor
 import me.xizzhu.android.rubridens.core.model.Status
+import me.xizzhu.android.rubridens.core.view.ImageLoadingCancellable
 
 abstract class FeedItem<T : FeedItem<T>>(@ViewType val viewType: Int, open val status: Status) {
     companion object {
@@ -125,6 +126,14 @@ private class FeedItemAdapter(context: Context) : ListAdapter<FeedItem<*>, FeedI
 
     override fun onBindViewHolder(holder: FeedItemViewHolder<FeedItem<*>, *>, position: Int, payloads: List<Any>) {
         holder.bindData(getItem(position), payloads)
+    }
+
+    override fun onViewRecycled(holder: FeedItemViewHolder<FeedItem<*>, *>) {
+        super.onViewRecycled(holder)
+
+        if (holder is ImageLoadingCancellable) {
+            holder.cancelImageLoading()
+        }
     }
 }
 

@@ -22,8 +22,10 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import me.xizzhu.android.rubridens.core.model.Media
 import me.xizzhu.android.rubridens.core.model.Status
+import me.xizzhu.android.rubridens.core.view.ImageLoadingCancellable
+import me.xizzhu.android.rubridens.core.view.cancelImageLoading
 import me.xizzhu.android.rubridens.core.view.databinding.ItemFeedStatusMediaBinding
-import me.xizzhu.android.rubridens.core.view.load
+import me.xizzhu.android.rubridens.core.view.loadImage
 
 data class FeedStatusMediaItem(
     override val status: Status,
@@ -36,14 +38,18 @@ data class FeedStatusMediaItem(
 ) : FeedItem<FeedStatusMediaItem>(TYPE_STATUS_MEDIA, status)
 
 internal class FeedStatusMediaItemViewHolder(inflater: LayoutInflater, parent: ViewGroup)
-    : FeedItemViewHolder<FeedStatusMediaItem, ItemFeedStatusMediaBinding>(ItemFeedStatusMediaBinding.inflate(inflater, parent, false)) {
+    : FeedItemViewHolder<FeedStatusMediaItem, ItemFeedStatusMediaBinding>(ItemFeedStatusMediaBinding.inflate(inflater, parent, false)), ImageLoadingCancellable {
     init {
         viewBinding.root.setOnClickListener { item?.let { it.openStatus(it.status) } }
         viewBinding.image.setOnClickListener { item?.let { it.openMedia(it.media) } }
     }
 
     override fun bind(item: FeedStatusMediaItem, payloads: List<Any>) = with(viewBinding) {
-        image.load(item.imageUrl, placeholder = item.placeholder)
+        image.loadImage(item.imageUrl, placeholder = item.placeholder)
         play.isVisible = item.isPlayable
+    }
+
+    override fun cancelImageLoading() {
+        viewBinding.image.cancelImageLoading()
     }
 }

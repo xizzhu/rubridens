@@ -25,9 +25,11 @@ import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.view.isVisible
 import me.xizzhu.android.rubridens.core.model.Status
 import me.xizzhu.android.rubridens.core.model.User
+import me.xizzhu.android.rubridens.core.view.ImageLoadingCancellable
 import me.xizzhu.android.rubridens.core.view.R
+import me.xizzhu.android.rubridens.core.view.cancelImageLoading
 import me.xizzhu.android.rubridens.core.view.databinding.ItemFeedStatusHeaderBinding
-import me.xizzhu.android.rubridens.core.view.load
+import me.xizzhu.android.rubridens.core.view.loadImage
 
 data class FeedStatusHeaderItem(
     override val status: Status,
@@ -41,7 +43,7 @@ data class FeedStatusHeaderItem(
 ) : FeedItem<FeedStatusHeaderItem>(TYPE_STATUS_HEADER, status)
 
 internal class FeedStatusHeaderItemViewHolder(inflater: LayoutInflater, parent: ViewGroup)
-    : FeedItemViewHolder<FeedStatusHeaderItem, ItemFeedStatusHeaderBinding>(ItemFeedStatusHeaderBinding.inflate(inflater, parent, false)) {
+    : FeedItemViewHolder<FeedStatusHeaderItem, ItemFeedStatusHeaderBinding>(ItemFeedStatusHeaderBinding.inflate(inflater, parent, false)), ImageLoadingCancellable {
     init {
         viewBinding.root.setOnClickListener { item?.let { it.openStatus(it.status) } }
 
@@ -62,8 +64,12 @@ internal class FeedStatusHeaderItemViewHolder(inflater: LayoutInflater, parent: 
             rebloggedBy.isVisible = true
         }
 
-        profileImage.load(item.bloggerProfileImageUrl, R.drawable.img_person_placeholder)
+        profileImage.loadImage(item.bloggerProfileImageUrl, R.drawable.img_person_placeholder)
         displayName.text = item.bloggerDisplayName
         subtitle.text = item.subtitle
+    }
+
+    override fun cancelImageLoading() {
+        viewBinding.profileImage.cancelImageLoading()
     }
 }

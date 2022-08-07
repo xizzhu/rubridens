@@ -43,7 +43,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.io.InputStream
 
-fun ImageView.load(url: String, @DrawableRes fallback: Int = 0, placeholder: Bitmap? = null) {
+fun ImageView.loadImage(url: String, @DrawableRes fallback: Int = 0, placeholder: Bitmap? = null) {
     if ((context as? Activity)?.isDestroyed == true) return
 
     if (url.isEmpty()) {
@@ -63,6 +63,14 @@ fun ImageView.load(url: String, @DrawableRes fallback: Int = 0, placeholder: Bit
     }
     requestBuilder.error(fallback)
         .into(this)
+}
+
+fun ImageView.cancelImageLoading() {
+    Glide.with(context).clear(this)
+}
+
+interface ImageLoadingCancellable {
+    fun cancelImageLoading()
 }
 
 @GlideModule
