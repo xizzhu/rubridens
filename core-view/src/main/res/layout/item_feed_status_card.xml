@@ -5,14 +5,15 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <me.xizzhu.android.rubridens.core.view.feed.widget.FeedStatusImageView
+    <me.xizzhu.android.rubridens.core.view.widget.AspectRatioImageView
         android:id="@+id/image"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginStart="80dp"
         android:layout_marginTop="@dimen/padding"
         android:layout_marginEnd="@dimen/padding"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:aspectRatio="16:9" />
 
     <View
         android:layout_width="0dp"

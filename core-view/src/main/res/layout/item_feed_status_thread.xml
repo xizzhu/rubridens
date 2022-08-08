@@ -3,7 +3,7 @@
     style="@style/TextAppearance.Material3.LabelLarge"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingStart="80dp"
-    android:paddingTop="@dimen/padding"
+    android:layout_marginStart="80dp"
+    android:layout_marginTop="@dimen/padding"
     android:text="@string/feed_item_text_show_thread"
     android:textColor="@color/primary" />

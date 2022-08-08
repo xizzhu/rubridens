@@ -55,7 +55,7 @@ fun ImageView.loadImage(url: String, @DrawableRes fallback: Int = 0, placeholder
         return
     }
 
-    val requestBuilder = Glide.with(context).load(url)
+    val requestBuilder = Glide.with(context).load(url).centerCrop()
     if (placeholder != null) {
         requestBuilder.placeholder(BitmapDrawable(resources, placeholder))
     } else if (fallback != 0) {

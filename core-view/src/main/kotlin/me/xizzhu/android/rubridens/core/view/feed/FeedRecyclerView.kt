@@ -33,20 +33,25 @@ import kotlinx.coroutines.asExecutor
 import me.xizzhu.android.rubridens.core.model.Status
 import me.xizzhu.android.rubridens.core.view.ImageLoadingCancellable
 
-abstract class FeedItem<T : FeedItem<T>>(@ViewType val viewType: Int, open val status: Status) {
+abstract class FeedItem<T : FeedItem<T>>(@ViewType internal val viewType: Int, open val status: Status) {
     companion object {
-        const val TYPE_STATUS_HEADER = 1
-        const val TYPE_STATUS_FOOTER = 2
-        const val TYPE_STATUS_TEXT = 3
-        const val TYPE_STATUS_MEDIA = 4
-        const val TYPE_STATUS_CARD = 5
-        const val TYPE_STATUS_THREAD = 6
+        internal const val TYPE_STATUS_HEADER = 1
+        internal const val TYPE_STATUS_FOOTER = 2
+        internal const val TYPE_STATUS_TEXT = 3
+        internal const val TYPE_STATUS_ONE_MEDIA = 4
+        internal const val TYPE_STATUS_TWO_MEDIA = 5
+        internal const val TYPE_STATUS_THREE_MEDIA = 6
+        internal const val TYPE_STATUS_FOUR_MEDIA = 7
+        internal const val TYPE_STATUS_CARD = 8
+        internal const val TYPE_STATUS_THREAD = 9
 
         @IntDef(
-            TYPE_STATUS_HEADER, TYPE_STATUS_FOOTER, TYPE_STATUS_TEXT, TYPE_STATUS_MEDIA, TYPE_STATUS_CARD, TYPE_STATUS_THREAD
+            TYPE_STATUS_HEADER, TYPE_STATUS_FOOTER, TYPE_STATUS_TEXT,
+            TYPE_STATUS_ONE_MEDIA, TYPE_STATUS_TWO_MEDIA, TYPE_STATUS_THREE_MEDIA, TYPE_STATUS_FOUR_MEDIA,
+            TYPE_STATUS_CARD, TYPE_STATUS_THREAD
         )
         @Retention(AnnotationRetention.SOURCE)
-        annotation class ViewType
+        internal annotation class ViewType
 
         @Suppress("UNCHECKED_CAST")
         internal fun createViewHolder(inflater: LayoutInflater, parent: ViewGroup, @ViewType viewType: Int): FeedItemViewHolder<FeedItem<*>, *> =
@@ -54,7 +59,10 @@ abstract class FeedItem<T : FeedItem<T>>(@ViewType val viewType: Int, open val s
                 TYPE_STATUS_HEADER -> FeedStatusHeaderItemViewHolder(inflater, parent)
                 TYPE_STATUS_FOOTER -> FeedStatusFooterItemViewHolder(inflater, parent)
                 TYPE_STATUS_TEXT -> FeedStatusTextItemViewHolder(inflater, parent)
-                TYPE_STATUS_MEDIA -> FeedStatusMediaItemViewHolder(inflater, parent)
+                TYPE_STATUS_ONE_MEDIA -> FeedStatusMediaItemViewHolder.create(inflater, parent, TYPE_STATUS_ONE_MEDIA)
+                TYPE_STATUS_TWO_MEDIA -> FeedStatusMediaItemViewHolder.create(inflater, parent, TYPE_STATUS_TWO_MEDIA)
+                TYPE_STATUS_THREE_MEDIA -> FeedStatusMediaItemViewHolder.create(inflater, parent, TYPE_STATUS_THREE_MEDIA)
+                TYPE_STATUS_FOUR_MEDIA -> FeedStatusMediaItemViewHolder.create(inflater, parent, TYPE_STATUS_FOUR_MEDIA)
                 TYPE_STATUS_CARD -> FeedStatusCardItemViewHolder(inflater, parent)
                 TYPE_STATUS_THREAD -> FeedStatusThreadViewHolder(inflater, parent)
                 else -> throw IllegalStateException("Unsupported view type: $viewType")

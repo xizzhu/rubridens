@@ -25,6 +25,7 @@ import me.xizzhu.android.rubridens.core.view.feed.FeedItem
 import me.xizzhu.android.rubridens.core.view.feed.FeedStatusCardItem
 import me.xizzhu.android.rubridens.core.view.feed.FeedStatusFooterItem
 import me.xizzhu.android.rubridens.core.view.feed.FeedStatusHeaderItem
+import me.xizzhu.android.rubridens.core.view.feed.FeedStatusMediaInfo
 import me.xizzhu.android.rubridens.core.view.feed.FeedStatusMediaItem
 import me.xizzhu.android.rubridens.core.view.feed.FeedStatusTextItem
 import me.xizzhu.android.rubridens.core.view.feed.FeedStatusThreadItem
@@ -84,16 +85,24 @@ class HomePresenter(private val application: Application) {
         openUser = openUser,
     )
 
-    private fun Status.toFeedStatusMediaItem(openStatus: (status: Status) -> Unit, openMedia: (media: Media) -> Unit): FeedStatusMediaItem? =
-        media.firstOrNull { media ->
-            media.type == Media.Type.IMAGE || media.type == Media.Type.GIF || media.type == Media.Type.VIDEO
-        }?.let { media ->
+    private fun Status.toFeedStatusMediaItem(openStatus: (status: Status) -> Unit, openMedia: (media: Media) -> Unit): FeedItem<*>? =
+        media.mapNotNull { media ->
+            if (media.type == Media.Type.IMAGE || media.type == Media.Type.GIF || media.type == Media.Type.VIDEO) {
+                FeedStatusMediaInfo(
+                    media = media,
+                    imageUrl = media.previewUrl.takeIf { it.isNotEmpty() } ?: media.url,
+                    placeholder = BlurHashDecoder.decode(media.blurHash, 32, 18),
+                    isPlayable = media.type == Media.Type.GIF || media.type == Media.Type.VIDEO,
+                )
+            } else {
+                null
+            }
+        }.takeIf { mediaInfoList ->
+            mediaInfoList.isNotEmpty()
+        }?.let { mediaInfoList ->
             FeedStatusMediaItem(
                 status = this,
-                media = media,
-                imageUrl = media.previewUrl.takeIf { it.isNotEmpty() } ?: media.url,
-                placeholder = BlurHashDecoder.decode(media.blurHash, 32, 18),
-                isPlayable = media.type == Media.Type.GIF || media.type == Media.Type.VIDEO,
+                mediaInfo = mediaInfoList,
                 openStatus = openStatus,
                 openMedia = openMedia,
             )

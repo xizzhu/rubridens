@@ -25,6 +25,7 @@ import me.xizzhu.android.rubridens.core.model.User
 import me.xizzhu.android.rubridens.core.view.feed.FeedStatusCardItem
 import me.xizzhu.android.rubridens.core.view.feed.FeedStatusFooterItem
 import me.xizzhu.android.rubridens.core.view.feed.FeedStatusHeaderItem
+import me.xizzhu.android.rubridens.core.view.feed.FeedStatusMediaInfo
 import me.xizzhu.android.rubridens.core.view.feed.FeedStatusMediaItem
 import me.xizzhu.android.rubridens.core.view.feed.FeedStatusTextItem
 import me.xizzhu.android.rubridens.core.view.feed.FeedStatusThreadItem
@@ -166,10 +167,14 @@ class HomePresenterTest {
                 ),
                 FeedStatusMediaItem(
                     status = testStatus1,
-                    media = testMedia1,
-                    imageUrl = "https://xizzhu.me/media1.jpg",
-                    placeholder = null,
-                    isPlayable = false,
+                    mediaInfo = listOf(
+                        FeedStatusMediaInfo(
+                            media = testMedia1,
+                            imageUrl = "https://xizzhu.me/media1.jpg",
+                            placeholder = null,
+                            isPlayable = false,
+                        ),
+                    ),
                     openStatus = openStatus,
                     openMedia = openMedia,
                 ),
@@ -223,10 +228,14 @@ class HomePresenterTest {
                 ),
                 FeedStatusMediaItem(
                     status = testStatus1,
-                    media = testMedia1,
-                    imageUrl = "https://xizzhu.me/media1.jpg",
-                    placeholder = null,
-                    isPlayable = false,
+                    mediaInfo = listOf(
+                        FeedStatusMediaInfo(
+                            media = testMedia1,
+                            imageUrl = "https://xizzhu.me/media1.jpg",
+                            placeholder = null,
+                            isPlayable = false,
+                        ),
+                    ),
                     openStatus = openStatus,
                     openMedia = openMedia,
                 ),
@@ -261,10 +270,14 @@ class HomePresenterTest {
                 ),
                 FeedStatusMediaItem(
                     status = testStatus2,
-                    media = testMedia2,
-                    imageUrl = "https://xizzhu.me/media_preview2.jpg",
-                    placeholder = null,
-                    isPlayable = true,
+                    mediaInfo = listOf(
+                        FeedStatusMediaInfo(
+                            media = testMedia2,
+                            imageUrl = "https://xizzhu.me/media_preview2.jpg",
+                            placeholder = null,
+                            isPlayable = true,
+                        ),
+                    ),
                     openStatus = openStatus,
                     openMedia = openMedia,
                 ),

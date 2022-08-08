@@ -39,6 +39,7 @@ import me.xizzhu.android.rubridens.core.repository.AuthRepository
 import me.xizzhu.android.rubridens.core.repository.StatusRepository
 import me.xizzhu.android.rubridens.core.view.feed.FeedStatusFooterItem
 import me.xizzhu.android.rubridens.core.view.feed.FeedStatusHeaderItem
+import me.xizzhu.android.rubridens.core.view.feed.FeedStatusMediaInfo
 import me.xizzhu.android.rubridens.core.view.feed.FeedStatusMediaItem
 import me.xizzhu.android.rubridens.core.view.feed.FeedStatusTextItem
 import kotlin.test.AfterTest
@@ -317,10 +318,14 @@ class HomeViewModelTest {
         } answers { answer ->
             item = FeedStatusMediaItem(
                 status = status,
-                media = media,
-                imageUrl = "",
-                placeholder = null,
-                isPlayable = false,
+                mediaInfo = listOf(
+                    FeedStatusMediaInfo(
+                        media = media,
+                        imageUrl = "",
+                        placeholder = null,
+                        isPlayable = false,
+                    ),
+                ),
                 openStatus = answer.invocation.args[1] as ((Status) -> Unit),
                 openMedia = answer.invocation.args[6] as ((Media) -> Unit),
             )
