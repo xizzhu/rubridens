@@ -103,6 +103,18 @@ class HomePresenterTest {
         previewUrl = "https://xizzhu.me/media_preview2.jpg",
         blurHash = "",
     )
+    private val testMedia3 = Media(
+        type = Media.Type.AUDIO,
+        url = "https://xizzhu.me/media3.mp3",
+        previewUrl = "",
+        blurHash = "",
+    )
+    private val testMedia4 = Media(
+        type = Media.Type.GIF,
+        url = "https://xizzhu.me/media4.gif",
+        previewUrl = "https://xizzhu.me/media_preview4.jpg",
+        blurHash = "",
+    )
     private val testCard2 = Card(
         type = Card.Type.LINK,
         url = "https://xizzhu.me/",
@@ -125,13 +137,35 @@ class HomePresenterTest {
         content = "FJB!",
         tags = emptyList(),
         mentions = emptyList(),
-        media = listOf(testMedia2),
+        media = listOf(testMedia2, testMedia3, testMedia4),
         card = testCard2,
         repliesCount = 1234,
         reblogsCount = 0,
         favoritesCount = 7654321,
         reblogged = false,
         favorited = true,
+    )
+
+    private val testStatus3 = Status(
+        id = "55555",
+        instanceUrl = "xizzhu.me",
+        uri = "https://xizzhu.me/",
+        created = Instant.parse("2016-11-08T11:22:33.444Z"),
+        sender = testUser1,
+        reblogger = null,
+        rebloggedInstanceUrl = null,
+        inReplyToStatusId = null,
+        inReplyToAccountId = null,
+        content = "History has been made!",
+        tags = emptyList(),
+        mentions = emptyList(),
+        media = emptyList(),
+        card = null,
+        repliesCount = 1,
+        reblogsCount = 2,
+        favoritesCount = 3,
+        reblogged = true,
+        favorited = false,
     )
 
     @BeforeTest
@@ -277,6 +311,12 @@ class HomePresenterTest {
                             placeholder = null,
                             isPlayable = true,
                         ),
+                        FeedStatusMediaInfo(
+                            media = testMedia4,
+                            imageUrl = "https://xizzhu.me/media_preview4.jpg",
+                            placeholder = null,
+                            isPlayable = true,
+                        ),
                     ),
                     openStatus = openStatus,
                     openMedia = openMedia,
@@ -308,9 +348,38 @@ class HomePresenterTest {
                     reblogStatus = reblogStatus,
                     favoriteStatus = favoriteStatus,
                 ),
+                FeedStatusHeaderItem(
+                    status = testStatus3,
+                    blogger = testUser1,
+                    bloggerDisplayName = "Random Display Name",
+                    bloggerProfileImageUrl = "https://xizzhu.me/avatar1.jpg",
+                    rebloggedBy = null,
+                    subtitle = "@random_username • Nov 8, 2016",
+                    openStatus = openStatus,
+                    openBlogger = openUser,
+                ),
+                FeedStatusTextItem(
+                    status = testStatus3,
+                    openStatus = openStatus,
+                    openUrl = openUrl,
+                    openTag = openTag,
+                    openUser = openUser,
+                ),
+                FeedStatusFooterItem(
+                    status = testStatus3,
+                    replies = "1",
+                    reblogs = "2",
+                    reblogged = true,
+                    favorites = "3",
+                    favorited = false,
+                    openStatus = openStatus,
+                    replyToStatus = replyToStatus,
+                    reblogStatus = reblogStatus,
+                    favoriteStatus = favoriteStatus,
+                ),
             ),
             homePresenter.buildFeedItems(
-                listOf(testStatus1, testStatus2),
+                listOf(testStatus1, testStatus2, testStatus3),
                 openStatus = openStatus,
                 replyToStatus = replyToStatus,
                 reblogStatus = reblogStatus,
