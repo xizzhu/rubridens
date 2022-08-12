@@ -3,5 +3,7 @@
 
     <string name="home_title">Home</string>
 
-    <string name="feed_text_reblogged_by">%1$s boosted</string>
+    <string name="home_text_status_reblogged_by">%1$s boosted</string>
+
+    <string name="home_error_network_failure">Network unavailable ≧ω≦</string>
 </resources>

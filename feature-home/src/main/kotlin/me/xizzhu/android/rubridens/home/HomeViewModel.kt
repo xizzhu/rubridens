@@ -29,6 +29,7 @@ import me.xizzhu.android.rubridens.core.model.User
 import me.xizzhu.android.rubridens.core.model.UserCredential
 import me.xizzhu.android.rubridens.core.repository.AuthRepository
 import me.xizzhu.android.rubridens.core.repository.StatusRepository
+import me.xizzhu.android.rubridens.core.repository.network.NetworkException
 import me.xizzhu.android.rubridens.core.view.feed.FeedItem
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -52,6 +53,7 @@ class HomeViewModel(
         data class OpenTag(val tag: String) : ViewAction()
         data class OpenUrl(val url: String) : ViewAction()
         object RequestUserCredential : ViewAction()
+        object ShowNetworkError : ViewAction()
     }
 
     data class ViewState(val loading: Boolean, val items: List<FeedItem<*>>)
@@ -92,8 +94,10 @@ class HomeViewModel(
                     )
                 }
             }
-            .catch {
-                // TODO
+            .catch { e ->
+                if (e is NetworkException.Other) {
+                    emitViewAction(ViewAction.ShowNetworkError)
+                }
             }
             .collect()
     }

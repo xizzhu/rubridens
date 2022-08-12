@@ -19,6 +19,7 @@ package me.xizzhu.android.rubridens.home
 import android.content.Context
 import android.content.Intent
 import me.xizzhu.android.rubridens.core.infra.BaseActivity
+import me.xizzhu.android.rubridens.core.view.toast
 import me.xizzhu.android.rubridens.home.databinding.ActivityHomeBinding
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -65,6 +66,9 @@ class HomeActivity : BaseActivity<HomeViewModel.ViewAction, HomeViewModel.ViewSt
         HomeViewModel.ViewAction.RequestUserCredential -> {
             navigator.goToAuthentication(this)
             finish()
+        }
+        HomeViewModel.ViewAction.ShowNetworkError -> {
+            toast(R.string.home_error_network_failure)
         }
     }
 

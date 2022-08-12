@@ -82,7 +82,7 @@ internal class HomePresenter(
         blogger = sender,
         bloggerDisplayName = sender.formatDisplayName(),
         bloggerProfileImageUrl = sender.avatarUrl,
-        rebloggedBy = reblogger?.formatDisplayName()?.let { application.resources.getString(R.string.feed_text_reblogged_by, it) },
+        rebloggedBy = reblogger?.formatDisplayName()?.let { application.resources.getString(R.string.home_text_status_reblogged_by, it) },
         subtitle = "${formatSenderUsername()} • ${formatRelativeTimestamp()}",
         openStatus = openStatus,
         openBlogger = openUser,
