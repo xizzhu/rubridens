@@ -17,6 +17,8 @@
 package me.xizzhu.android.rubridens.home
 
 import android.app.Application
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import me.xizzhu.android.rubridens.core.model.Media
 import me.xizzhu.android.rubridens.core.model.Status
 import me.xizzhu.android.rubridens.core.model.User
@@ -34,18 +36,31 @@ import me.xizzhu.android.rubridens.core.view.formatDisplayName
 import me.xizzhu.android.rubridens.core.view.formatRelativeTimestamp
 import me.xizzhu.android.rubridens.core.view.formatSenderUsername
 
-class HomePresenter(private val application: Application) {
-    fun buildFeedItems(
-        statuses: List<Status>,
-        openStatus: (status: Status) -> Unit,
-        replyToStatus: (status: Status) -> Unit,
-        reblogStatus: (status: Status) -> Unit,
-        favoriteStatus: (status: Status) -> Unit,
-        openUser: (user: User) -> Unit,
-        openMedia: (media: Media) -> Unit,
-        openTag: (tag: String) -> Unit,
-        openUrl: (url: String) -> Unit,
-    ): List<FeedItem<*>> {
+internal class HomePresenter(
+    private val application: Application,
+    private val openStatus: (status: Status) -> Unit,
+    private val replyToStatus: (status: Status) -> Unit,
+    private val reblogStatus: (status: Status) -> Unit,
+    private val favoriteStatus: (status: Status) -> Unit,
+    private val openUser: (user: User) -> Unit,
+    private val openMedia: (media: Media) -> Unit,
+    private val openTag: (tag: String) -> Unit,
+    private val openUrl: (url: String) -> Unit,
+) {
+    private val dispatcher = Dispatchers.Default.limitedParallelism(1)
+
+    // The items are sorted by timestamp in ascending order.
+    private val feedItems = ArrayList<FeedItem<*>>()
+
+    suspend fun feedItems(): List<FeedItem<*>> = withContext(dispatcher) {
+        feedItems.toList()
+    }
+
+    suspend fun clear() = withContext(dispatcher) {
+        feedItems.clear()
+    }
+
+    suspend fun replace(statuses: List<Status>): Unit = withContext(dispatcher) {
         val items = ArrayList<FeedItem<*>>(statuses.size * 6)
         statuses.forEach { status ->
             items.add(status.toFeedStatusHeaderItem(openStatus = openStatus, openUser = openUser))
@@ -55,7 +70,8 @@ class HomePresenter(private val application: Application) {
             status.toFeedStatusThreadItem(openStatus = openStatus)?.let { items.add(it) }
             items.add(status.toFeedStatusFooterItem(openStatus = openStatus, replyToStatus = replyToStatus, reblogStatus = reblogStatus, favoriteStatus = favoriteStatus))
         }
-        return items
+        feedItems.clear()
+        feedItems.addAll(items)
     }
 
     private fun Status.toFeedStatusHeaderItem(

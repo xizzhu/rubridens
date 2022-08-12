@@ -16,7 +16,11 @@
 
 package me.xizzhu.android.rubridens.home
 
+import android.app.Application
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import me.xizzhu.android.rubridens.core.infra.BaseViewModel
 import me.xizzhu.android.rubridens.core.model.Media
@@ -29,7 +33,7 @@ import me.xizzhu.android.rubridens.core.view.feed.FeedItem
 import java.util.concurrent.atomic.AtomicBoolean
 
 class HomeViewModel(
-    private val homePresenter: HomePresenter,
+    application: Application,
     private val authRepository: AuthRepository,
     private val statusRepository: StatusRepository,
 ) : BaseViewModel<HomeViewModel.ViewAction, HomeViewModel.ViewState>(
@@ -54,7 +58,20 @@ class HomeViewModel(
 
     private val loading = AtomicBoolean(false)
 
+    private val homePresenter = HomePresenter(
+        application = application,
+        openStatus = ::openStatus,
+        replyToStatus = ::replyToStatus,
+        reblogStatus = ::reblogStatus,
+        favoriteStatus = ::favoriteStatus,
+        openUser = ::openUser,
+        openMedia = ::openMedia,
+        openTag = ::openTag,
+        openUrl = ::openUrl,
+    )
+
     fun loadLatest() = load {
+        homePresenter.clear()
         emitViewState { currentViewState ->
             currentViewState.copy(
                 loading = true,
@@ -63,13 +80,22 @@ class HomeViewModel(
         }
 
         val userCredential = getUserCredential() ?: return@load
-        val items = buildFeedItems(statusRepository.loadLatest(userCredential))
-        emitViewState { currentViewState ->
-            currentViewState.copy(
-                loading = false,
-                items = items,
-            )
-        }
+        statusRepository.loadLatest(userCredential)
+            .onEach { statuses ->
+                homePresenter.replace(statuses)
+
+                val items = homePresenter.feedItems()
+                emitViewState { currentViewState ->
+                    currentViewState.copy(
+                        loading = false,
+                        items = items,
+                    )
+                }
+            }
+            .catch {
+                // TODO
+            }
+            .collect()
     }
 
     private inline fun load(crossinline block: suspend () -> Unit) {
@@ -86,6 +112,8 @@ class HomeViewModel(
         val userCredential = authRepository.readUserCredentials().firstOrNull()
         if (userCredential == null) {
             emitViewAction(ViewAction.RequestUserCredential)
+
+            homePresenter.clear()
             emitViewState { currentViewState ->
                 currentViewState.copy(
                     loading = false,
@@ -95,18 +123,6 @@ class HomeViewModel(
         }
         return userCredential
     }
-
-    private fun buildFeedItems(statuses: List<Status>): List<FeedItem<*>> = homePresenter.buildFeedItems(
-        statuses = statuses,
-        openStatus = ::openStatus,
-        replyToStatus = ::replyToStatus,
-        reblogStatus = ::reblogStatus,
-        favoriteStatus = ::favoriteStatus,
-        openUser = ::openUser,
-        openMedia = ::openMedia,
-        openTag = ::openTag,
-        openUrl = ::openUrl,
-    )
 
     private fun openStatus(status: Status) {
         emitViewAction(ViewAction.OpenStatus(status))

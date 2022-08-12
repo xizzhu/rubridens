@@ -17,6 +17,7 @@
 package me.xizzhu.android.rubridens.home
 
 import androidx.test.core.app.ApplicationProvider
+import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Instant
 import me.xizzhu.android.rubridens.core.model.Card
 import me.xizzhu.android.rubridens.core.model.EntityKey
@@ -165,16 +166,23 @@ class HomePresenterTest {
 
     @BeforeTest
     fun setup() {
-        homePresenter = HomePresenter(ApplicationProvider.getApplicationContext())
+        homePresenter = HomePresenter(ApplicationProvider.getApplicationContext(), openStatus, replyToStatus, reblogStatus, favoriteStatus, openUser, openMedia, openTag, openUrl)
     }
 
     @Test
-    fun `test buildFeedItems with empty list`() {
-        assertTrue(homePresenter.buildFeedItems(emptyList(), openStatus, replyToStatus, reblogStatus, favoriteStatus, openUser, openMedia, openTag, openUrl).isEmpty())
+    fun `test initial state`() = runTest {
+        assertTrue(homePresenter.feedItems().isEmpty())
     }
 
     @Test
-    fun `test buildFeedItems with single item`() {
+    fun `test replace with empty list`() = runTest {
+        homePresenter.replace(emptyList())
+        assertTrue(homePresenter.feedItems().isEmpty())
+    }
+
+    @Test
+    fun `test replace with single item`() = runTest {
+        homePresenter.replace(listOf(testStatus1))
         assertEquals(
             listOf(
                 FeedStatusHeaderItem(
@@ -220,22 +228,13 @@ class HomePresenterTest {
                     favoriteStatus = favoriteStatus,
                 ),
             ),
-            homePresenter.buildFeedItems(
-                listOf(testStatus1),
-                openStatus = openStatus,
-                replyToStatus = replyToStatus,
-                reblogStatus = reblogStatus,
-                favoriteStatus = favoriteStatus,
-                openUser = openUser,
-                openMedia = openMedia,
-                openTag = openTag,
-                openUrl = openUrl,
-            )
+            homePresenter.feedItems()
         )
     }
 
     @Test
-    fun `test buildFeedItems with multiple items`() {
+    fun `test replace with multiple items`() = runTest {
+        homePresenter.replace(listOf(testStatus1, testStatus2, testStatus3))
         assertEquals(
             listOf(
                 FeedStatusHeaderItem(
@@ -373,17 +372,7 @@ class HomePresenterTest {
                     favoriteStatus = favoriteStatus,
                 ),
             ),
-            homePresenter.buildFeedItems(
-                listOf(testStatus1, testStatus2, testStatus3),
-                openStatus = openStatus,
-                replyToStatus = replyToStatus,
-                reblogStatus = reblogStatus,
-                favoriteStatus = favoriteStatus,
-                openUser = openUser,
-                openMedia = openMedia,
-                openTag = openTag,
-                openUrl = openUrl,
-            )
+            homePresenter.feedItems()
         )
     }
 }
