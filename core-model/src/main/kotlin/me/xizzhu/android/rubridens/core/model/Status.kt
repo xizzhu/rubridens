@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package me.xizzhu.android.rubridens.core.repository.model
+package me.xizzhu.android.rubridens.core.model
 
 import kotlinx.datetime.Instant
 
@@ -28,7 +28,10 @@ data class Card(
     val blurHash: String,
 ) {
     enum class Type {
-        LINK, IMAGE, VIDEO, RICH
+        LINK,
+        IMAGE,
+        VIDEO,
+        RICH,
     }
 }
 
@@ -39,7 +42,10 @@ data class Media(
     val blurHash: String,
 ) {
     enum class Type {
-        IMAGE, GIF, VIDEO, AUDIO
+        IMAGE,
+        GIF,
+        VIDEO,
+        AUDIO,
     }
 }
 

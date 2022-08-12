@@ -19,11 +19,11 @@ package me.xizzhu.android.rubridens.core.repository.network.retrofit
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import kotlinx.datetime.Instant
-import me.xizzhu.android.rubridens.core.repository.model.Card
-import me.xizzhu.android.rubridens.core.repository.model.Media
-import me.xizzhu.android.rubridens.core.repository.model.Mention
-import me.xizzhu.android.rubridens.core.repository.model.Status
-import me.xizzhu.android.rubridens.core.repository.model.User
+import me.xizzhu.android.rubridens.core.model.Card
+import me.xizzhu.android.rubridens.core.model.Media
+import me.xizzhu.android.rubridens.core.model.Mention
+import me.xizzhu.android.rubridens.core.model.Status
+import me.xizzhu.android.rubridens.core.model.User
 import me.xizzhu.android.rubridens.core.repository.network.TimelinesService
 import retrofit2.http.GET
 import retrofit2.http.Header

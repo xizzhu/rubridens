@@ -16,7 +16,7 @@
 
 package me.xizzhu.android.rubridens.core.repository
 
-import me.xizzhu.android.rubridens.core.repository.model.Instance
+import me.xizzhu.android.rubridens.core.model.Instance
 import me.xizzhu.android.rubridens.core.repository.network.InstanceService
 
 interface InstanceRepository {

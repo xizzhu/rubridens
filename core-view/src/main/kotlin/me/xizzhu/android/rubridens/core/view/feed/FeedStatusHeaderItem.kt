@@ -18,29 +18,42 @@ package me.xizzhu.android.rubridens.core.view.feed
 
 import android.graphics.Color
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.view.isVisible
+import me.xizzhu.android.rubridens.core.model.Status
+import me.xizzhu.android.rubridens.core.model.User
+import me.xizzhu.android.rubridens.core.view.ImageLoadingCancellable
 import me.xizzhu.android.rubridens.core.view.R
+import me.xizzhu.android.rubridens.core.view.cancelImageLoading
 import me.xizzhu.android.rubridens.core.view.databinding.ItemFeedStatusHeaderBinding
-import me.xizzhu.android.rubridens.core.view.load
+import me.xizzhu.android.rubridens.core.view.loadImage
 
 data class FeedStatusHeaderItem(
-    override val statusInstanceUrl: String,
-    override val statusId: String,
+    override val status: Status,
+    val blogger: User,
     val bloggerDisplayName: String,
     val bloggerProfileImageUrl: String,
     val rebloggedBy: String?,
     val subtitle: String,
-) : FeedItem<FeedStatusHeaderItem>(TYPE_STATUS_HEADER, statusInstanceUrl, statusId)
+    val openStatus: (status: Status) -> Unit,
+    val openBlogger: (blogger: User) -> Unit,
+) : FeedItem<FeedStatusHeaderItem>(TYPE_STATUS_HEADER, status)
 
 internal class FeedStatusHeaderItemViewHolder(inflater: LayoutInflater, parent: ViewGroup)
-    : FeedItemViewHolder<FeedStatusHeaderItem, ItemFeedStatusHeaderBinding>(ItemFeedStatusHeaderBinding.inflate(inflater, parent, false)) {
+    : FeedItemViewHolder<FeedStatusHeaderItem, ItemFeedStatusHeaderBinding>(ItemFeedStatusHeaderBinding.inflate(inflater, parent, false)), ImageLoadingCancellable {
     init {
+        viewBinding.root.setOnClickListener { item?.let { it.openStatus(it.status) } }
+
         val reblog = DrawableCompat.wrap(ResourcesCompat.getDrawable(itemView.resources, R.drawable.ic_reblog_16, null)!!)
             .apply { DrawableCompat.setTint(this, Color.GRAY) }
         viewBinding.rebloggedBy.setCompoundDrawablesRelativeWithIntrinsicBounds(reblog, null, null, null)
+
+        val openUserListener = View.OnClickListener { item?.let { it.openBlogger(it.blogger) } }
+        viewBinding.profileImage.setOnClickListener(openUserListener)
+        viewBinding.displayName.setOnClickListener(openUserListener)
     }
 
     override fun bind(item: FeedStatusHeaderItem, payloads: List<Any>) = with(viewBinding) {
@@ -51,8 +64,12 @@ internal class FeedStatusHeaderItemViewHolder(inflater: LayoutInflater, parent: 
             rebloggedBy.isVisible = true
         }
 
-        profileImage.load(item.bloggerProfileImageUrl, R.drawable.img_person_placeholder)
+        profileImage.loadImage(item.bloggerProfileImageUrl, R.drawable.img_person_placeholder)
         displayName.text = item.bloggerDisplayName
         subtitle.text = item.subtitle
+    }
+
+    override fun cancelImageLoading() {
+        viewBinding.profileImage.cancelImageLoading()
     }
 }

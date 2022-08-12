@@ -16,7 +16,7 @@
 
 package me.xizzhu.android.rubridens.core.repository.network
 
-import me.xizzhu.android.rubridens.core.repository.model.Instance
+import me.xizzhu.android.rubridens.core.model.Instance
 
 internal interface InstanceService {
     suspend fun fetch(instanceUrl: String): Instance

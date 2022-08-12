@@ -17,69 +17,133 @@
 package me.xizzhu.android.rubridens.home
 
 import android.app.Application
-import android.text.format.DateUtils
-import androidx.core.text.HtmlCompat
-import me.xizzhu.android.rubridens.core.repository.model.Status
-import me.xizzhu.android.rubridens.core.repository.model.User
+import me.xizzhu.android.rubridens.core.model.Media
+import me.xizzhu.android.rubridens.core.model.Status
+import me.xizzhu.android.rubridens.core.model.User
+import me.xizzhu.android.rubridens.core.view.BlurHashDecoder
 import me.xizzhu.android.rubridens.core.view.feed.FeedItem
+import me.xizzhu.android.rubridens.core.view.feed.FeedStatusCardItem
 import me.xizzhu.android.rubridens.core.view.feed.FeedStatusFooterItem
 import me.xizzhu.android.rubridens.core.view.feed.FeedStatusHeaderItem
+import me.xizzhu.android.rubridens.core.view.feed.FeedStatusMediaInfo
+import me.xizzhu.android.rubridens.core.view.feed.FeedStatusMediaItem
 import me.xizzhu.android.rubridens.core.view.feed.FeedStatusTextItem
-import kotlin.math.min
+import me.xizzhu.android.rubridens.core.view.feed.FeedStatusThreadItem
+import me.xizzhu.android.rubridens.core.view.formatCount
+import me.xizzhu.android.rubridens.core.view.formatDisplayName
+import me.xizzhu.android.rubridens.core.view.formatRelativeTimestamp
+import me.xizzhu.android.rubridens.core.view.formatSenderUsername
 
 class HomePresenter(private val application: Application) {
-    fun buildFeedItems(statuses: List<Status>): List<FeedItem<*>> {
-        val items = ArrayList<FeedItem<*>>(statuses.size * 3)
+    fun buildFeedItems(
+        statuses: List<Status>,
+        openStatus: (status: Status) -> Unit,
+        replyToStatus: (status: Status) -> Unit,
+        reblogStatus: (status: Status) -> Unit,
+        favoriteStatus: (status: Status) -> Unit,
+        openUser: (user: User) -> Unit,
+        openMedia: (media: Media) -> Unit,
+        openTag: (tag: String) -> Unit,
+        openUrl: (url: String) -> Unit,
+    ): List<FeedItem<*>> {
+        val items = ArrayList<FeedItem<*>>(statuses.size * 6)
         statuses.forEach { status ->
-            items.add(status.toFeedStatusHeaderItem())
-            items.add(status.toFeedStatusTextItem())
-            items.add(status.toFeedStatusFooterItem())
+            items.add(status.toFeedStatusHeaderItem(openStatus = openStatus, openUser = openUser))
+            items.add(status.toFeedStatusTextItem(openStatus = openStatus, openUrl = openUrl, openTag = openTag, openUser = openUser))
+            status.toFeedStatusMediaItem(openStatus = openStatus, openMedia = openMedia)?.let { items.add(it) }
+            status.toFeedStatusCardItem(openStatus = openStatus, openUrl = openUrl)?.let { items.add(it) }
+            status.toFeedStatusThreadItem(openStatus = openStatus)?.let { items.add(it) }
+            items.add(status.toFeedStatusFooterItem(openStatus = openStatus, replyToStatus = replyToStatus, reblogStatus = reblogStatus, favoriteStatus = favoriteStatus))
         }
         return items
     }
 
-    private fun Status.toFeedStatusHeaderItem(): FeedStatusHeaderItem = FeedStatusHeaderItem(
-        statusInstanceUrl = instanceUrl,
-        statusId = id,
+    private fun Status.toFeedStatusHeaderItem(
+        openStatus: (status: Status) -> Unit,
+        openUser: (user: User) -> Unit,
+    ): FeedStatusHeaderItem = FeedStatusHeaderItem(
+        status = this,
+        blogger = sender,
         bloggerDisplayName = sender.formatDisplayName(),
         bloggerProfileImageUrl = sender.avatarUrl,
         rebloggedBy = reblogger?.formatDisplayName()?.let { application.resources.getString(R.string.feed_text_reblogged_by, it) },
         subtitle = "${formatSenderUsername()} • ${formatRelativeTimestamp()}",
+        openStatus = openStatus,
+        openBlogger = openUser,
     )
 
-    private fun Status.toFeedStatusTextItem(): FeedStatusTextItem = FeedStatusTextItem(
-        statusInstanceUrl = instanceUrl,
-        statusId = id,
-        text = formatTextContent(),
+    private fun Status.toFeedStatusTextItem(
+        openStatus: (status: Status) -> Unit,
+        openUrl: (url: String) -> Unit,
+        openTag: (tag: String) -> Unit,
+        openUser: (user: User) -> Unit,
+    ): FeedStatusTextItem = FeedStatusTextItem(
+        status = this,
+        openStatus = openStatus,
+        openUrl = openUrl,
+        openTag = openTag,
+        openUser = openUser,
     )
 
-    private fun Status.toFeedStatusFooterItem(): FeedStatusFooterItem = FeedStatusFooterItem(
-        statusInstanceUrl = instanceUrl,
-        statusId = id,
+    private fun Status.toFeedStatusMediaItem(openStatus: (status: Status) -> Unit, openMedia: (media: Media) -> Unit): FeedItem<*>? =
+        media.mapNotNull { media ->
+            if (media.type == Media.Type.IMAGE || media.type == Media.Type.GIF || media.type == Media.Type.VIDEO) {
+                FeedStatusMediaInfo(
+                    media = media,
+                    imageUrl = media.previewUrl.takeIf { it.isNotEmpty() } ?: media.url,
+                    placeholder = BlurHashDecoder.decode(media.blurHash, 32, 18),
+                    isPlayable = media.type == Media.Type.GIF || media.type == Media.Type.VIDEO,
+                )
+            } else {
+                null
+            }
+        }.takeIf { mediaInfoList ->
+            mediaInfoList.isNotEmpty()
+        }?.let { mediaInfoList ->
+            FeedStatusMediaItem(
+                status = this,
+                mediaInfo = mediaInfoList,
+                openStatus = openStatus,
+                openMedia = openMedia,
+            )
+        }
+
+    private fun Status.toFeedStatusCardItem(openStatus: (status: Status) -> Unit, openUrl: (url: String) -> Unit): FeedStatusCardItem? = card?.let { card ->
+        FeedStatusCardItem(
+            status = this,
+            title = card.title,
+            description = card.description,
+            author = card.author,
+            imageUrl = card.previewUrl,
+            placeholder = BlurHashDecoder.decode(card.blurHash, 16, 16),
+            url = card.url,
+            openStatus = openStatus,
+            openUrl = openUrl,
+        )
+    }
+
+    private fun Status.toFeedStatusThreadItem(openStatus: (status: Status) -> Unit): FeedStatusThreadItem? =
+        if (inReplyToStatusId.isNullOrEmpty() || inReplyToAccountId.isNullOrEmpty()) {
+            null
+        } else {
+            FeedStatusThreadItem(status = this, openStatus = openStatus)
+        }
+
+    private fun Status.toFeedStatusFooterItem(
+        openStatus: (status: Status) -> Unit,
+        replyToStatus: (status: Status) -> Unit,
+        reblogStatus: (status: Status) -> Unit,
+        favoriteStatus: (status: Status) -> Unit,
+    ): FeedStatusFooterItem = FeedStatusFooterItem(
+        status = this,
         replies = repliesCount.formatCount(),
         reblogs = reblogsCount.formatCount(),
         reblogged = reblogged,
         favorites = favoritesCount.formatCount(),
         favorited = favorited,
+        openStatus = openStatus,
+        replyToStatus = replyToStatus,
+        reblogStatus = reblogStatus,
+        favoriteStatus = favoriteStatus,
     )
-
-    private fun Int.formatCount(): String = when {
-        this >= 1_000_000 -> "${this / 1_000_000}M+"
-        this >= 1_000 -> "${this / 1_000}K+"
-        this <= 0 -> ""
-        else -> toString()
-    }
-
-    private fun User.formatDisplayName(): String = displayName.takeIf { it.isNotEmpty() } ?: username
-
-    private fun Status.formatSenderUsername(): String = if (instanceUrl == sender.instanceUrl) {
-        "@${sender.username}"
-    } else {
-        "@${sender.username}@${sender.instanceUrl}"
-    }
-
-    private fun Status.formatRelativeTimestamp(): CharSequence =
-        DateUtils.getRelativeTimeSpanString(min(created.toEpochMilliseconds(), System.currentTimeMillis())) ?: ""
-
-    private fun Status.formatTextContent(): CharSequence = HtmlCompat.fromHtml(content, 0).trim().toString()
 }

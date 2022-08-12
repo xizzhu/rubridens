@@ -23,8 +23,8 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.PrimaryKey
 import androidx.room.Query
+import me.xizzhu.android.rubridens.core.model.ApplicationCredential
 import me.xizzhu.android.rubridens.core.repository.local.ApplicationCredentialCache
-import me.xizzhu.android.rubridens.core.repository.model.ApplicationCredential
 
 internal class RoomApplicationCredentialCache(private val appDatabase: AppDatabase) : ApplicationCredentialCache {
     override suspend fun readByInstanceUrl(instanceUrl: String): ApplicationCredential? =

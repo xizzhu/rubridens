@@ -22,23 +22,32 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.annotation.DrawableRes
 import androidx.core.content.res.ResourcesCompat
+import me.xizzhu.android.rubridens.core.model.Status
 import me.xizzhu.android.rubridens.core.view.R
 import me.xizzhu.android.rubridens.core.view.databinding.ItemFeedStatusFooterBinding
 
 data class FeedStatusFooterItem(
-    override val statusInstanceUrl: String,
-    override val statusId: String,
+    override val status: Status,
     val replies: String,
     val reblogs: String,
     val reblogged: Boolean,
     val favorites: String,
     val favorited: Boolean,
-) : FeedItem<FeedStatusFooterItem>(TYPE_STATUS_FOOTER, statusInstanceUrl, statusId)
+    val openStatus: (status: Status) -> Unit,
+    val replyToStatus: (status: Status) -> Unit,
+    val reblogStatus: (status: Status) -> Unit,
+    val favoriteStatus: (status: Status) -> Unit,
+) : FeedItem<FeedStatusFooterItem>(TYPE_STATUS_FOOTER, status)
 
 internal class FeedStatusFooterItemViewHolder(inflater: LayoutInflater, parent: ViewGroup)
     : FeedItemViewHolder<FeedStatusFooterItem, ItemFeedStatusFooterBinding>(ItemFeedStatusFooterBinding.inflate(inflater, parent, false)) {
     init {
+        viewBinding.root.setOnClickListener { item?.let { it.openStatus(it.status) } }
+
         setDrawable(viewBinding.replies, R.drawable.ic_reply_24, false)
+        viewBinding.replies.setOnClickListener { item?.let { it.replyToStatus(it.status) } }
+        viewBinding.reblogs.setOnClickListener { item?.let { it.reblogStatus(it.status) } }
+        viewBinding.favorites.setOnClickListener { item?.let { it.favoriteStatus(it.status) } }
     }
 
     override fun bind(item: FeedStatusFooterItem, payloads: List<Any>) = with(viewBinding) {

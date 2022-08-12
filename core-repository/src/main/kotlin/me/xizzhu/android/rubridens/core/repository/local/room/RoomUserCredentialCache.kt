@@ -22,8 +22,8 @@ import androidx.room.Entity
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import me.xizzhu.android.rubridens.core.model.UserCredential
 import me.xizzhu.android.rubridens.core.repository.local.UserCredentialCache
-import me.xizzhu.android.rubridens.core.repository.model.UserCredential
 
 internal class RoomUserCredentialCache(private val appDatabase: AppDatabase) : UserCredentialCache {
     override suspend fun hasCredential(): Boolean = appDatabase.userCredentialDao().count() > 0

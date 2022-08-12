@@ -30,18 +30,28 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.asExecutor
+import me.xizzhu.android.rubridens.core.model.Status
+import me.xizzhu.android.rubridens.core.view.ImageLoadingCancellable
 
-abstract class FeedItem<T : FeedItem<T>>(@ViewType val viewType: Int, open val statusInstanceUrl: String, open val statusId: String) {
+abstract class FeedItem<T : FeedItem<T>>(@ViewType internal val viewType: Int, open val status: Status) {
     companion object {
-        const val TYPE_STATUS_HEADER = 1
-        const val TYPE_STATUS_FOOTER = 2
-        const val TYPE_STATUS_TEXT = 3
+        internal const val TYPE_STATUS_HEADER = 1
+        internal const val TYPE_STATUS_FOOTER = 2
+        internal const val TYPE_STATUS_TEXT = 3
+        internal const val TYPE_STATUS_ONE_MEDIA = 4
+        internal const val TYPE_STATUS_TWO_MEDIA = 5
+        internal const val TYPE_STATUS_THREE_MEDIA = 6
+        internal const val TYPE_STATUS_FOUR_MEDIA = 7
+        internal const val TYPE_STATUS_CARD = 8
+        internal const val TYPE_STATUS_THREAD = 9
 
         @IntDef(
-            TYPE_STATUS_HEADER, TYPE_STATUS_FOOTER, TYPE_STATUS_TEXT
+            TYPE_STATUS_HEADER, TYPE_STATUS_FOOTER, TYPE_STATUS_TEXT,
+            TYPE_STATUS_ONE_MEDIA, TYPE_STATUS_TWO_MEDIA, TYPE_STATUS_THREE_MEDIA, TYPE_STATUS_FOUR_MEDIA,
+            TYPE_STATUS_CARD, TYPE_STATUS_THREAD
         )
         @Retention(AnnotationRetention.SOURCE)
-        annotation class ViewType
+        internal annotation class ViewType
 
         @Suppress("UNCHECKED_CAST")
         internal fun createViewHolder(inflater: LayoutInflater, parent: ViewGroup, @ViewType viewType: Int): FeedItemViewHolder<FeedItem<*>, *> =
@@ -49,11 +59,18 @@ abstract class FeedItem<T : FeedItem<T>>(@ViewType val viewType: Int, open val s
                 TYPE_STATUS_HEADER -> FeedStatusHeaderItemViewHolder(inflater, parent)
                 TYPE_STATUS_FOOTER -> FeedStatusFooterItemViewHolder(inflater, parent)
                 TYPE_STATUS_TEXT -> FeedStatusTextItemViewHolder(inflater, parent)
+                TYPE_STATUS_ONE_MEDIA -> FeedStatusMediaItemViewHolder.create(inflater, parent, TYPE_STATUS_ONE_MEDIA)
+                TYPE_STATUS_TWO_MEDIA -> FeedStatusMediaItemViewHolder.create(inflater, parent, TYPE_STATUS_TWO_MEDIA)
+                TYPE_STATUS_THREE_MEDIA -> FeedStatusMediaItemViewHolder.create(inflater, parent, TYPE_STATUS_THREE_MEDIA)
+                TYPE_STATUS_FOUR_MEDIA -> FeedStatusMediaItemViewHolder.create(inflater, parent, TYPE_STATUS_FOUR_MEDIA)
+                TYPE_STATUS_CARD -> FeedStatusCardItemViewHolder(inflater, parent)
+                TYPE_STATUS_THREAD -> FeedStatusThreadViewHolder(inflater, parent)
                 else -> throw IllegalStateException("Unsupported view type: $viewType")
             } as FeedItemViewHolder<FeedItem<*>, *>
     }
 
-    internal fun isSameItem(other: FeedItem<*>): Boolean = viewType == other.viewType && statusInstanceUrl == other.statusInstanceUrl && statusId == other.statusId
+    internal fun isSameItem(other: FeedItem<*>): Boolean =
+        viewType == other.viewType && status.instanceUrl == other.status.instanceUrl && status.id == other.status.id
 
     internal fun isContentTheSame(other: FeedItem<*>): Boolean = this == other
 
@@ -105,7 +122,7 @@ internal abstract class FeedItemViewHolder<I : FeedItem<*>, VB : ViewBinding>(pr
 }
 
 private class FeedItemAdapter(context: Context) : ListAdapter<FeedItem<*>, FeedItemViewHolder<FeedItem<*>, *>>(
-    AsyncDifferConfig.Builder(FeedItemDiffCallback()).setBackgroundThreadExecutor(Dispatchers.Default.asExecutor()).build()
+    AsyncDifferConfig.Builder(FeedItemDiffCallback()).setBackgroundThreadExecutor(Dispatchers.Default.limitedParallelism(1).asExecutor()).build()
 ) {
     private val inflater = LayoutInflater.from(context)
 
@@ -119,6 +136,14 @@ private class FeedItemAdapter(context: Context) : ListAdapter<FeedItem<*>, FeedI
 
     override fun onBindViewHolder(holder: FeedItemViewHolder<FeedItem<*>, *>, position: Int, payloads: List<Any>) {
         holder.bindData(getItem(position), payloads)
+    }
+
+    override fun onViewRecycled(holder: FeedItemViewHolder<FeedItem<*>, *>) {
+        super.onViewRecycled(holder)
+
+        if (holder is ImageLoadingCancellable) {
+            holder.cancelImageLoading()
+        }
     }
 }
 

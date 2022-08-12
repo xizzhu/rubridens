@@ -14,18 +14,22 @@
  * limitations under the License.
  */
 
-package me.xizzhu.android.rubridens.core.repository.model
+package me.xizzhu.android.rubridens.core.model
 
-data class User(
-    val id: String,
-    val instanceUrl: String,
-    val username: String,
-    val displayName: String,
-    val avatarUrl: String,
-)
+enum class OAuthScope {
+    READ,
+    WRITE,
+    FOLLOW,
+    PUSH,
+}
 
-data class UserCredential(
-    val instanceUrl: String,
-    val username: String,
-    val accessToken: String
+enum class OAuthGrantType {
+    AUTHORIZATION_CODE,
+    CLIENT_CREDENTIALS,
+}
+
+data class OAuthToken(
+    val accessToken: String,
+    val tokenType: String,
+    val scopes: Set<OAuthScope>,
 )

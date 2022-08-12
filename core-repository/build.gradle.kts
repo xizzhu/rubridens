@@ -87,6 +87,8 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
 }
 
 dependencies {
+    implementation(project(":core-model"))
+
     implementation(Dependencies.Kotlin.coroutines)
     implementation(Dependencies.Kotlin.datetime)
 

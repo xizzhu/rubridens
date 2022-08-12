@@ -14,22 +14,14 @@
  * limitations under the License.
  */
 
-package me.xizzhu.android.rubridens.core.repository.model
+package me.xizzhu.android.rubridens.core.view.feed
 
-enum class OAuthScope {
-    READ,
-    WRITE,
-    FOLLOW,
-    PUSH
+import io.mockk.mockk
+import kotlin.test.Test
+
+class FeedRecyclerViewTest {
+    @Test(expected = IllegalStateException::class)
+    fun `test createViewHolder with illegal viewType`() {
+        FeedItem.createViewHolder(mockk(), mockk(), -1)
+    }
 }
-
-enum class OAuthGrantType {
-    AUTHORIZATION_CODE,
-    CLIENT_CREDENTIALS
-}
-
-data class OAuthToken(
-    val accessToken: String,
-    val tokenType: String,
-    val scopes: Set<OAuthScope>,
-)

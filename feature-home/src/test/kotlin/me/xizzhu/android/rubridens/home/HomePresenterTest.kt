@@ -18,12 +18,17 @@ package me.xizzhu.android.rubridens.home
 
 import androidx.test.core.app.ApplicationProvider
 import kotlinx.datetime.Instant
-import me.xizzhu.android.rubridens.core.repository.model.Media
-import me.xizzhu.android.rubridens.core.repository.model.Status
-import me.xizzhu.android.rubridens.core.repository.model.User
+import me.xizzhu.android.rubridens.core.model.Card
+import me.xizzhu.android.rubridens.core.model.Media
+import me.xizzhu.android.rubridens.core.model.Status
+import me.xizzhu.android.rubridens.core.model.User
+import me.xizzhu.android.rubridens.core.view.feed.FeedStatusCardItem
 import me.xizzhu.android.rubridens.core.view.feed.FeedStatusFooterItem
 import me.xizzhu.android.rubridens.core.view.feed.FeedStatusHeaderItem
+import me.xizzhu.android.rubridens.core.view.feed.FeedStatusMediaInfo
+import me.xizzhu.android.rubridens.core.view.feed.FeedStatusMediaItem
 import me.xizzhu.android.rubridens.core.view.feed.FeedStatusTextItem
+import me.xizzhu.android.rubridens.core.view.feed.FeedStatusThreadItem
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import kotlin.test.BeforeTest
@@ -33,7 +38,135 @@ import kotlin.test.assertTrue
 
 @RunWith(RobolectricTestRunner::class)
 class HomePresenterTest {
+    private val openStatus = { _: Status -> }
+    private val replyToStatus = { _: Status -> }
+    private val reblogStatus = { _: Status -> }
+    private val favoriteStatus = { _: Status -> }
+    private val openUser = { _: User -> }
+    private val openMedia = { _: Media -> }
+    private val openTag = { _: String -> }
+    private val openUrl = { _: String -> }
     private lateinit var homePresenter: HomePresenter
+
+    private val testUser1 = User(
+        id = "67890",
+        instanceUrl = "xizzhu.me",
+        username = "random_username",
+        displayName = "Random Display Name",
+        avatarUrl = "https://xizzhu.me/avatar1.jpg",
+    )
+    private val testMedia1 = Media(
+        type = Media.Type.IMAGE,
+        url = "https://xizzhu.me/media1.jpg",
+        previewUrl = "",
+        blurHash = "",
+    )
+    private val testStatus1 = Status(
+        id = "12345",
+        instanceUrl = "xizzhu.me",
+        uri = "https://xizzhu.me/",
+        created = Instant.parse("2021-11-05T11:22:33.444Z"),
+        sender = testUser1,
+        reblogger = null,
+        rebloggedInstanceUrl = null,
+        inReplyToStatusId = null,
+        inReplyToAccountId = null,
+        content = "Let's Go Brandon!",
+        tags = emptyList(),
+        mentions = emptyList(),
+        media = listOf(testMedia1),
+        card = null,
+        repliesCount = 1,
+        reblogsCount = 2,
+        favoritesCount = 3,
+        reblogged = false,
+        favorited = true,
+    )
+
+    private val testUser2 = User(
+        id = "09876",
+        instanceUrl = "another_instance",
+        username = "random_username_2",
+        displayName = "Display Name 2",
+        avatarUrl = "",
+    )
+    private val testUser3 = User(
+        id = "54321",
+        instanceUrl = "another_instance",
+        username = "random_username_3",
+        displayName = "",
+        avatarUrl = "",
+    )
+    private val testMedia2 = Media(
+        type = Media.Type.VIDEO,
+        url = "https://xizzhu.me/media2.mp4",
+        previewUrl = "https://xizzhu.me/media_preview2.jpg",
+        blurHash = "",
+    )
+    private val testMedia3 = Media(
+        type = Media.Type.AUDIO,
+        url = "https://xizzhu.me/media3.mp3",
+        previewUrl = "",
+        blurHash = "",
+    )
+    private val testMedia4 = Media(
+        type = Media.Type.GIF,
+        url = "https://xizzhu.me/media4.gif",
+        previewUrl = "https://xizzhu.me/media_preview4.jpg",
+        blurHash = "",
+    )
+    private val testCard2 = Card(
+        type = Card.Type.LINK,
+        url = "https://xizzhu.me/",
+        title = "card_title",
+        description = "card_description",
+        author = "card_author",
+        previewUrl = "https://xizzhu.me/media_preview2.jpg",
+        blurHash = "",
+    )
+    private val testStatus2 = Status(
+        id = "54321",
+        instanceUrl = "xizzhu.me",
+        uri = "https://xizzhu.me/",
+        created = Instant.parse("2021-11-05T11:22:33.444Z"),
+        sender = testUser2,
+        reblogger = testUser3,
+        rebloggedInstanceUrl = "xizzhu.me",
+        inReplyToStatusId = testStatus1.id,
+        inReplyToAccountId = testStatus1.sender.id,
+        content = "FJB!",
+        tags = emptyList(),
+        mentions = emptyList(),
+        media = listOf(testMedia2, testMedia3, testMedia4),
+        card = testCard2,
+        repliesCount = 1234,
+        reblogsCount = 0,
+        favoritesCount = 7654321,
+        reblogged = false,
+        favorited = true,
+    )
+
+    private val testStatus3 = Status(
+        id = "55555",
+        instanceUrl = "xizzhu.me",
+        uri = "https://xizzhu.me/",
+        created = Instant.parse("2016-11-08T11:22:33.444Z"),
+        sender = testUser1,
+        reblogger = null,
+        rebloggedInstanceUrl = null,
+        inReplyToStatusId = null,
+        inReplyToAccountId = null,
+        content = "History has been made!",
+        tags = emptyList(),
+        mentions = emptyList(),
+        media = emptyList(),
+        card = null,
+        repliesCount = 1,
+        reblogsCount = 2,
+        favoritesCount = 3,
+        reblogged = true,
+        favorited = false,
+    )
 
     @BeforeTest
     fun setup() {
@@ -42,7 +175,7 @@ class HomePresenterTest {
 
     @Test
     fun `test buildFeedItems with empty list`() {
-        assertTrue(homePresenter.buildFeedItems(emptyList()).isEmpty())
+        assertTrue(homePresenter.buildFeedItems(emptyList(), openStatus, replyToStatus, reblogStatus, favoriteStatus, openUser, openMedia, openTag, openUrl).isEmpty())
     }
 
     @Test
@@ -50,64 +183,59 @@ class HomePresenterTest {
         assertEquals(
             listOf(
                 FeedStatusHeaderItem(
-                    statusInstanceUrl = "xizzhu.me",
-                    statusId = "12345",
+                    status = testStatus1,
+                    blogger = testUser1,
                     bloggerDisplayName = "Random Display Name",
                     bloggerProfileImageUrl = "https://xizzhu.me/avatar1.jpg",
                     rebloggedBy = null,
                     subtitle = "@random_username • Nov 5, 2021",
+                    openStatus = openStatus,
+                    openBlogger = openUser,
                 ),
                 FeedStatusTextItem(
-                    statusInstanceUrl = "xizzhu.me",
-                    statusId = "12345",
-                    text = "Let's Go Brandon!"
+                    status = testStatus1,
+                    openStatus = openStatus,
+                    openUrl = openUrl,
+                    openTag = openTag,
+                    openUser = openUser,
+                ),
+                FeedStatusMediaItem(
+                    status = testStatus1,
+                    mediaInfo = listOf(
+                        FeedStatusMediaInfo(
+                            media = testMedia1,
+                            imageUrl = "https://xizzhu.me/media1.jpg",
+                            placeholder = null,
+                            isPlayable = false,
+                        ),
+                    ),
+                    openStatus = openStatus,
+                    openMedia = openMedia,
                 ),
                 FeedStatusFooterItem(
-                    statusInstanceUrl = "xizzhu.me",
-                    statusId = "12345",
+                    status = testStatus1,
                     replies = "1",
                     reblogs = "2",
                     reblogged = false,
                     favorites = "3",
                     favorited = true,
+                    openStatus = openStatus,
+                    replyToStatus = replyToStatus,
+                    reblogStatus = reblogStatus,
+                    favoriteStatus = favoriteStatus,
                 ),
             ),
-            homePresenter.buildFeedItems(listOf(
-                Status(
-                    id = "12345",
-                    instanceUrl = "xizzhu.me",
-                    uri = "https://xizzhu.me/",
-                    created = Instant.parse("2021-11-05T11:22:33.444Z"),
-                    sender = User(
-                        id = "67890",
-                        instanceUrl = "xizzhu.me",
-                        username = "random_username",
-                        displayName = "Random Display Name",
-                        avatarUrl = "https://xizzhu.me/avatar1.jpg"
-                    ),
-                    reblogger = null,
-                    rebloggedInstanceUrl = null,
-                    inReplyToStatusId = null,
-                    inReplyToAccountId = null,
-                    content = "Let's Go Brandon!",
-                    tags = emptyList(),
-                    mentions = emptyList(),
-                    media = listOf(
-                        Media(
-                            type = Media.Type.IMAGE,
-                            url = "https://xizzhu.me/media1.jpg",
-                            previewUrl = "https://xizzhu.me/media_preview1.jpg",
-                            blurHash = ""
-                        )
-                    ),
-                    card = null,
-                    repliesCount = 1,
-                    reblogsCount = 2,
-                    favoritesCount = 3,
-                    reblogged = false,
-                    favorited = true,
-                )
-            ))
+            homePresenter.buildFeedItems(
+                listOf(testStatus1),
+                openStatus = openStatus,
+                replyToStatus = replyToStatus,
+                reblogStatus = reblogStatus,
+                favoriteStatus = favoriteStatus,
+                openUser = openUser,
+                openMedia = openMedia,
+                openTag = openTag,
+                openUrl = openUrl,
+            )
         )
     }
 
@@ -116,126 +244,151 @@ class HomePresenterTest {
         assertEquals(
             listOf(
                 FeedStatusHeaderItem(
-                    statusInstanceUrl = "xizzhu.me",
-                    statusId = "12345",
+                    status = testStatus1,
+                    blogger = testUser1,
                     bloggerDisplayName = "Random Display Name",
                     bloggerProfileImageUrl = "https://xizzhu.me/avatar1.jpg",
                     rebloggedBy = null,
                     subtitle = "@random_username • Nov 5, 2021",
+                    openStatus = openStatus,
+                    openBlogger = openUser,
                 ),
                 FeedStatusTextItem(
-                    statusInstanceUrl = "xizzhu.me",
-                    statusId = "12345",
-                    text = "Let's Go Brandon!"
+                    status = testStatus1,
+                    openStatus = openStatus,
+                    openUrl = openUrl,
+                    openTag = openTag,
+                    openUser = openUser,
+                ),
+                FeedStatusMediaItem(
+                    status = testStatus1,
+                    mediaInfo = listOf(
+                        FeedStatusMediaInfo(
+                            media = testMedia1,
+                            imageUrl = "https://xizzhu.me/media1.jpg",
+                            placeholder = null,
+                            isPlayable = false,
+                        ),
+                    ),
+                    openStatus = openStatus,
+                    openMedia = openMedia,
                 ),
                 FeedStatusFooterItem(
-                    statusInstanceUrl = "xizzhu.me",
-                    statusId = "12345",
+                    status = testStatus1,
                     replies = "1",
                     reblogs = "2",
                     reblogged = false,
                     favorites = "3",
                     favorited = true,
+                    openStatus = openStatus,
+                    replyToStatus = replyToStatus,
+                    reblogStatus = reblogStatus,
+                    favoriteStatus = favoriteStatus,
                 ),
                 FeedStatusHeaderItem(
-                    statusInstanceUrl = "xizzhu.me",
-                    statusId = "54321",
+                    status = testStatus2,
+                    blogger = testUser2,
                     bloggerDisplayName = "Display Name 2",
                     bloggerProfileImageUrl = "",
-                    rebloggedBy = "random_username boosted",
+                    rebloggedBy = "random_username_3 boosted",
                     subtitle = "@random_username_2@another_instance • Nov 5, 2021",
+                    openStatus = openStatus,
+                    openBlogger = openUser,
                 ),
                 FeedStatusTextItem(
-                    statusInstanceUrl = "xizzhu.me",
-                    statusId = "54321",
-                    text = "FJB!"
+                    status = testStatus2,
+                    openStatus = openStatus,
+                    openUrl = openUrl,
+                    openTag = openTag,
+                    openUser = openUser,
+                ),
+                FeedStatusMediaItem(
+                    status = testStatus2,
+                    mediaInfo = listOf(
+                        FeedStatusMediaInfo(
+                            media = testMedia2,
+                            imageUrl = "https://xizzhu.me/media_preview2.jpg",
+                            placeholder = null,
+                            isPlayable = true,
+                        ),
+                        FeedStatusMediaInfo(
+                            media = testMedia4,
+                            imageUrl = "https://xizzhu.me/media_preview4.jpg",
+                            placeholder = null,
+                            isPlayable = true,
+                        ),
+                    ),
+                    openStatus = openStatus,
+                    openMedia = openMedia,
+                ),
+                FeedStatusCardItem(
+                    status = testStatus2,
+                    title = "card_title",
+                    description = "card_description",
+                    author = "card_author",
+                    imageUrl = "https://xizzhu.me/media_preview2.jpg",
+                    placeholder = null,
+                    url = "https://xizzhu.me/",
+                    openStatus = openStatus,
+                    openUrl = openUrl,
+                ),
+                FeedStatusThreadItem(
+                    status = testStatus2,
+                    openStatus = openStatus,
                 ),
                 FeedStatusFooterItem(
-                    statusInstanceUrl = "xizzhu.me",
-                    statusId = "54321",
+                    status = testStatus2,
                     replies = "1K+",
                     reblogs = "",
                     reblogged = false,
                     favorites = "7M+",
                     favorited = true,
+                    openStatus = openStatus,
+                    replyToStatus = replyToStatus,
+                    reblogStatus = reblogStatus,
+                    favoriteStatus = favoriteStatus,
+                ),
+                FeedStatusHeaderItem(
+                    status = testStatus3,
+                    blogger = testUser1,
+                    bloggerDisplayName = "Random Display Name",
+                    bloggerProfileImageUrl = "https://xizzhu.me/avatar1.jpg",
+                    rebloggedBy = null,
+                    subtitle = "@random_username • Nov 8, 2016",
+                    openStatus = openStatus,
+                    openBlogger = openUser,
+                ),
+                FeedStatusTextItem(
+                    status = testStatus3,
+                    openStatus = openStatus,
+                    openUrl = openUrl,
+                    openTag = openTag,
+                    openUser = openUser,
+                ),
+                FeedStatusFooterItem(
+                    status = testStatus3,
+                    replies = "1",
+                    reblogs = "2",
+                    reblogged = true,
+                    favorites = "3",
+                    favorited = false,
+                    openStatus = openStatus,
+                    replyToStatus = replyToStatus,
+                    reblogStatus = reblogStatus,
+                    favoriteStatus = favoriteStatus,
                 ),
             ),
-            homePresenter.buildFeedItems(listOf(
-                Status(
-                    id = "12345",
-                    instanceUrl = "xizzhu.me",
-                    uri = "https://xizzhu.me/",
-                    created = Instant.parse("2021-11-05T11:22:33.444Z"),
-                    sender = User(
-                        id = "67890",
-                        instanceUrl = "xizzhu.me",
-                        username = "random_username",
-                        displayName = "Random Display Name",
-                        avatarUrl = "https://xizzhu.me/avatar1.jpg",
-                    ),
-                    reblogger = null,
-                    rebloggedInstanceUrl = null,
-                    inReplyToStatusId = null,
-                    inReplyToAccountId = null,
-                    content = "Let's Go Brandon!",
-                    tags = emptyList(),
-                    mentions = emptyList(),
-                    media = listOf(
-                        Media(
-                            type = Media.Type.IMAGE,
-                            url = "https://xizzhu.me/media1.jpg",
-                            previewUrl = "https://xizzhu.me/media_preview1.jpg",
-                            blurHash = "",
-                        )
-                    ),
-                    card = null,
-                    repliesCount = 1,
-                    reblogsCount = 2,
-                    favoritesCount = 3,
-                    reblogged = false,
-                    favorited = true,
-                ),
-                Status(
-                    id = "54321",
-                    instanceUrl = "xizzhu.me",
-                    uri = "https://xizzhu.me/",
-                    created = Instant.parse("2021-11-05T11:22:33.444Z"),
-                    sender = User(
-                        id = "09876",
-                        instanceUrl = "another_instance",
-                        username = "random_username_2",
-                        displayName = "Display Name 2",
-                        avatarUrl = "",
-                    ),
-                    reblogger = User(
-                        id = "67890",
-                        instanceUrl = "xizzhu.me",
-                        username = "random_username",
-                        displayName = "",
-                        avatarUrl = "https://xizzhu.me/avatar1.jpg",
-                    ),
-                    rebloggedInstanceUrl = "xizzhu.me",
-                    inReplyToStatusId = null,
-                    inReplyToAccountId = null,
-                    content = "FJB!",
-                    tags = emptyList(),
-                    mentions = emptyList(),
-                    media = listOf(
-                        Media(
-                            type = Media.Type.IMAGE,
-                            url = "https://xizzhu.me/media1.jpg",
-                            previewUrl = "https://xizzhu.me/media_preview1.jpg",
-                            blurHash = ""
-                        )
-                    ),
-                    card = null,
-                    repliesCount = 1234,
-                    reblogsCount = 0,
-                    favoritesCount = 7654321,
-                    reblogged = false,
-                    favorited = true,
-                ),
-            ))
+            homePresenter.buildFeedItems(
+                listOf(testStatus1, testStatus2, testStatus3),
+                openStatus = openStatus,
+                replyToStatus = replyToStatus,
+                reblogStatus = reblogStatus,
+                favoriteStatus = favoriteStatus,
+                openUser = openUser,
+                openMedia = openMedia,
+                openTag = openTag,
+                openUrl = openUrl,
+            )
         )
     }
 }

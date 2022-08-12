@@ -16,8 +16,8 @@
 
 package me.xizzhu.android.rubridens.core.repository
 
-import me.xizzhu.android.rubridens.core.repository.model.Status
-import me.xizzhu.android.rubridens.core.repository.model.UserCredential
+import me.xizzhu.android.rubridens.core.model.Status
+import me.xizzhu.android.rubridens.core.model.UserCredential
 import me.xizzhu.android.rubridens.core.repository.network.TimelinesService
 
 interface StatusRepository {

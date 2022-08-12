@@ -19,10 +19,14 @@ package me.xizzhu.android.rubridens.home
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import me.xizzhu.android.rubridens.core.infra.BaseViewModel
+import me.xizzhu.android.rubridens.core.model.Media
+import me.xizzhu.android.rubridens.core.model.Status
+import me.xizzhu.android.rubridens.core.model.User
+import me.xizzhu.android.rubridens.core.model.UserCredential
 import me.xizzhu.android.rubridens.core.repository.AuthRepository
 import me.xizzhu.android.rubridens.core.repository.StatusRepository
-import me.xizzhu.android.rubridens.core.repository.model.UserCredential
 import me.xizzhu.android.rubridens.core.view.feed.FeedItem
+import java.util.concurrent.atomic.AtomicBoolean
 
 class HomeViewModel(
     private val homePresenter: HomePresenter,
@@ -35,12 +39,22 @@ class HomeViewModel(
     )
 ) {
     sealed class ViewAction {
+        data class OpenStatus(val status: Status) : ViewAction()
+        data class ReplyToStatus(val status: Status) : ViewAction()
+        data class ReblogStatus(val status: Status) : ViewAction()
+        data class FavoriteStatus(val status: Status) : ViewAction()
+        data class OpenUser(val user: User) : ViewAction()
+        data class OpenMedia(val media: Media) : ViewAction()
+        data class OpenTag(val tag: String) : ViewAction()
+        data class OpenUrl(val url: String) : ViewAction()
         object RequestUserCredential : ViewAction()
     }
 
     data class ViewState(val loading: Boolean, val items: List<FeedItem<*>>)
 
-    fun loadLatest() {
+    private val loading = AtomicBoolean(false)
+
+    fun loadLatest() = load {
         emitViewState { currentViewState ->
             currentViewState.copy(
                 loading = true,
@@ -48,15 +62,22 @@ class HomeViewModel(
             )
         }
 
+        val userCredential = getUserCredential() ?: return@load
+        val items = buildFeedItems(statusRepository.loadLatest(userCredential))
+        emitViewState { currentViewState ->
+            currentViewState.copy(
+                loading = false,
+                items = items,
+            )
+        }
+    }
+
+    private inline fun load(crossinline block: suspend () -> Unit) {
+        if (loading.getAndSet(true)) return
+
         viewModelScope.launch {
-            val userCredential = getUserCredential() ?: return@launch
-            val latest = statusRepository.loadLatest(userCredential)
-            emitViewState { currentViewState ->
-                currentViewState.copy(
-                    loading = false,
-                    items = homePresenter.buildFeedItems(latest)
-                )
-            }
+            block()
+            loading.set(false)
         }
     }
 
@@ -73,5 +94,49 @@ class HomeViewModel(
             }
         }
         return userCredential
+    }
+
+    private fun buildFeedItems(statuses: List<Status>): List<FeedItem<*>> = homePresenter.buildFeedItems(
+        statuses = statuses,
+        openStatus = ::openStatus,
+        replyToStatus = ::replyToStatus,
+        reblogStatus = ::reblogStatus,
+        favoriteStatus = ::favoriteStatus,
+        openUser = ::openUser,
+        openMedia = ::openMedia,
+        openTag = ::openTag,
+        openUrl = ::openUrl,
+    )
+
+    private fun openStatus(status: Status) {
+        emitViewAction(ViewAction.OpenStatus(status))
+    }
+
+    private fun replyToStatus(status: Status) {
+        emitViewAction(ViewAction.ReplyToStatus(status))
+    }
+
+    private fun reblogStatus(status: Status) {
+        emitViewAction(ViewAction.ReblogStatus(status))
+    }
+
+    private fun favoriteStatus(status: Status) {
+        emitViewAction(ViewAction.FavoriteStatus(status))
+    }
+
+    private fun openUser(user: User) {
+        emitViewAction(ViewAction.OpenUser(user))
+    }
+
+    private fun openMedia(media: Media) {
+        emitViewAction(ViewAction.OpenMedia(media))
+    }
+
+    private fun openTag(tag: String) {
+        emitViewAction(ViewAction.OpenTag(tag))
+    }
+
+    private fun openUrl(url: String) {
+        emitViewAction(ViewAction.OpenUrl(url))
     }
 }

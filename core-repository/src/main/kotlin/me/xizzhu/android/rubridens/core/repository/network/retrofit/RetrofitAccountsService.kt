@@ -18,7 +18,7 @@ package me.xizzhu.android.rubridens.core.repository.network.retrofit
 
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
-import me.xizzhu.android.rubridens.core.repository.model.User
+import me.xizzhu.android.rubridens.core.model.User
 import me.xizzhu.android.rubridens.core.repository.network.AccountsService
 import retrofit2.http.GET
 import retrofit2.http.Header

@@ -16,7 +16,7 @@
 
 package me.xizzhu.android.rubridens.core.repository.local
 
-import me.xizzhu.android.rubridens.core.repository.model.UserCredential
+import me.xizzhu.android.rubridens.core.model.UserCredential
 
 internal interface UserCredentialCache {
     suspend fun hasCredential(): Boolean

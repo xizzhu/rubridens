@@ -17,8 +17,13 @@
 package me.xizzhu.android.rubridens
 
 import android.app.Activity
+import android.content.Intent
+import android.net.Uri
 import me.xizzhu.android.rubridens.auth.AuthActivity
 import me.xizzhu.android.rubridens.core.infra.Navigator
+import me.xizzhu.android.rubridens.core.model.Media
+import me.xizzhu.android.rubridens.core.model.Status
+import me.xizzhu.android.rubridens.core.model.User
 import me.xizzhu.android.rubridens.home.HomeActivity
 
 class AppNavigator : Navigator {
@@ -28,5 +33,25 @@ class AppNavigator : Navigator {
 
     override fun goToHome(activity: Activity) {
         activity.startActivity(HomeActivity.newStartIntent(activity))
+    }
+
+    override fun gotoMedia(activity: Activity, media: Media) {
+        // TODO
+    }
+
+    override fun goToStatus(activity: Activity, status: Status) {
+        // TODO
+    }
+
+    override fun goToTag(activity: Activity, tag: String) {
+        // TODO
+    }
+
+    override fun gotoUrl(activity: Activity, url: String) {
+        activity.startActivity(Intent(Intent.ACTION_VIEW).setData(Uri.parse(url)))
+    }
+
+    override fun gotoUser(activity: Activity, user: User) {
+        // TODO
     }
 }

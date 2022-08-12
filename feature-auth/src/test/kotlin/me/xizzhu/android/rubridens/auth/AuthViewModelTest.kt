@@ -28,10 +28,10 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import me.xizzhu.android.rubridens.core.model.ApplicationCredential
+import me.xizzhu.android.rubridens.core.model.Instance
 import me.xizzhu.android.rubridens.core.repository.AuthRepository
 import me.xizzhu.android.rubridens.core.repository.InstanceRepository
-import me.xizzhu.android.rubridens.core.repository.model.ApplicationCredential
-import me.xizzhu.android.rubridens.core.repository.model.Instance
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test

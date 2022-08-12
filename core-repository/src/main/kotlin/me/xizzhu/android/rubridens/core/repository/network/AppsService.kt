@@ -16,8 +16,8 @@
 
 package me.xizzhu.android.rubridens.core.repository.network
 
-import me.xizzhu.android.rubridens.core.repository.model.ApplicationCredential
-import me.xizzhu.android.rubridens.core.repository.model.OAuthScope
+import me.xizzhu.android.rubridens.core.model.ApplicationCredential
+import me.xizzhu.android.rubridens.core.model.OAuthScope
 
 internal interface AppsService {
     suspend fun create(
