@@ -20,6 +20,7 @@ import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import kotlinx.datetime.Instant
 import me.xizzhu.android.rubridens.core.model.Card
+import me.xizzhu.android.rubridens.core.model.EntityKey
 import me.xizzhu.android.rubridens.core.model.Media
 import me.xizzhu.android.rubridens.core.model.Mention
 import me.xizzhu.android.rubridens.core.model.Status
@@ -143,13 +144,15 @@ internal class MastodonMention(
     @Json(name = "acct") val accountName: String
 ) {
     fun toMention(instanceUrl: String): Mention = Mention(
-        userId = id,
+        userId = EntityKey(
+            instanceUrl = if (accountName.length > username.length) {
+                accountName.substring(username.length + 1)
+            } else {
+                instanceUrl
+            },
+            id = id,
+        ),
         username = username,
-        userInstanceUrl = if (accountName.length > username.length) {
-            accountName.substring(username.length + 1)
-        } else {
-            instanceUrl
-        },
     )
 }
 
@@ -188,8 +191,7 @@ internal class MastodonStatus(
         ?: toStatusInternal(instanceUrl, null, null)
 
     private fun toStatusInternal(instanceUrl: String, reblogger: User?, rebloggedInstanceUrl: String?): Status = Status(
-        id = id,
-        instanceUrl = instanceUrl,
+        id = EntityKey(instanceUrl, id),
         uri = uri,
         created = Instant.parse(createdAt),
         sender = account.toUser(instanceUrl),

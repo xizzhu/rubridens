@@ -69,8 +69,7 @@ abstract class FeedItem<T : FeedItem<T>>(@ViewType internal val viewType: Int, o
             } as FeedItemViewHolder<FeedItem<*>, *>
     }
 
-    internal fun isSameItem(other: FeedItem<*>): Boolean =
-        viewType == other.viewType && status.instanceUrl == other.status.instanceUrl && status.id == other.status.id
+    internal fun isSameItem(other: FeedItem<*>): Boolean = viewType == other.viewType && status.id == other.status.id
 
     internal fun isContentTheSame(other: FeedItem<*>): Boolean = this == other
 
@@ -106,6 +105,21 @@ class FeedRecyclerView : RecyclerView {
             null
         }
         adapter.submitList(items, commitCallback)
+    }
+
+    @UiThread
+    fun itemCount(): Int = adapter.itemCount
+
+    @UiThread
+    fun firstVisibleItemPosition(): Int = when (val lm = layoutManager) {
+        is LinearLayoutManager -> lm.findFirstVisibleItemPosition()
+        else -> throw IllegalStateException("Unsupported layout manager: $lm")
+    }
+
+    @UiThread
+    fun lastVisibleItemPosition(): Int = when (val lm = layoutManager) {
+        is LinearLayoutManager -> lm.findLastVisibleItemPosition()
+        else -> throw IllegalStateException("Unsupported layout manager: $lm")
     }
 }
 

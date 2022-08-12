@@ -29,6 +29,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import me.xizzhu.android.rubridens.core.model.ApplicationCredential
+import me.xizzhu.android.rubridens.core.model.EntityKey
 import me.xizzhu.android.rubridens.core.model.Instance
 import me.xizzhu.android.rubridens.core.repository.AuthRepository
 import me.xizzhu.android.rubridens.core.repository.InstanceRepository
@@ -84,8 +85,7 @@ class AuthViewModelTest {
         } coAnswers {
             delay(200)
             ApplicationCredential(
-                instanceUrl = "xizzhu.me",
-                clientId = "client_id",
+                clientId = EntityKey("xizzhu.me", "client_id"),
                 clientSecret = "client_secret",
                 accessToken = "access_token",
                 vapidKey = "vapid_key",
@@ -141,8 +141,7 @@ class AuthViewModelTest {
         coEvery {
             authRepository.loadApplicationCredential("xizzhu.me")
         } returns ApplicationCredential(
-            instanceUrl = "xizzhu.me",
-            clientId = "client_id",
+            clientId = EntityKey("xizzhu.me", "client_id"),
             clientSecret = "client_secret",
             accessToken = "access_token",
             vapidKey = "vapid_key",
@@ -162,8 +161,7 @@ class AuthViewModelTest {
         coEvery {
             authRepository.loadApplicationCredential("xizzhu.me")
         } returns ApplicationCredential(
-            instanceUrl = "xizzhu.me",
-            clientId = "client_id",
+            clientId = EntityKey("xizzhu.me", "client_id"),
             clientSecret = "client_secret",
             accessToken = "access_token",
             vapidKey = "vapid_key",

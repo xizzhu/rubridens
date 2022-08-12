@@ -50,14 +50,12 @@ data class Media(
 }
 
 data class Mention(
-    val userInstanceUrl: String,
-    val userId: String,
+    val userId: EntityKey,
     val username: String,
 )
 
 data class Status(
-    val id: String,
-    val instanceUrl: String,
+    val id: EntityKey,
     val uri: String,
     val created: Instant,
     val sender: User,

@@ -19,6 +19,7 @@ package me.xizzhu.android.rubridens.home
 import androidx.test.core.app.ApplicationProvider
 import kotlinx.datetime.Instant
 import me.xizzhu.android.rubridens.core.model.Card
+import me.xizzhu.android.rubridens.core.model.EntityKey
 import me.xizzhu.android.rubridens.core.model.Media
 import me.xizzhu.android.rubridens.core.model.Status
 import me.xizzhu.android.rubridens.core.model.User
@@ -49,8 +50,7 @@ class HomePresenterTest {
     private lateinit var homePresenter: HomePresenter
 
     private val testUser1 = User(
-        id = "67890",
-        instanceUrl = "xizzhu.me",
+        id = EntityKey("xizzhu.me", "67890"),
         username = "random_username",
         displayName = "Random Display Name",
         avatarUrl = "https://xizzhu.me/avatar1.jpg",
@@ -62,8 +62,7 @@ class HomePresenterTest {
         blurHash = "",
     )
     private val testStatus1 = Status(
-        id = "12345",
-        instanceUrl = "xizzhu.me",
+        id = EntityKey("xizzhu.me", "12345"),
         uri = "https://xizzhu.me/",
         created = Instant.parse("2021-11-05T11:22:33.444Z"),
         sender = testUser1,
@@ -84,15 +83,13 @@ class HomePresenterTest {
     )
 
     private val testUser2 = User(
-        id = "09876",
-        instanceUrl = "another_instance",
+        id = EntityKey("another_instance", "09876"),
         username = "random_username_2",
         displayName = "Display Name 2",
         avatarUrl = "",
     )
     private val testUser3 = User(
-        id = "54321",
-        instanceUrl = "another_instance",
+        id = EntityKey("another_instance", "54321"),
         username = "random_username_3",
         displayName = "",
         avatarUrl = "",
@@ -125,15 +122,14 @@ class HomePresenterTest {
         blurHash = "",
     )
     private val testStatus2 = Status(
-        id = "54321",
-        instanceUrl = "xizzhu.me",
+        id = EntityKey("xizzhu.me", "54321"),
         uri = "https://xizzhu.me/",
         created = Instant.parse("2021-11-05T11:22:33.444Z"),
         sender = testUser2,
         reblogger = testUser3,
         rebloggedInstanceUrl = "xizzhu.me",
-        inReplyToStatusId = testStatus1.id,
-        inReplyToAccountId = testStatus1.sender.id,
+        inReplyToStatusId = testStatus1.id.id,
+        inReplyToAccountId = testStatus1.sender.id.id,
         content = "FJB!",
         tags = emptyList(),
         mentions = emptyList(),
@@ -147,8 +143,7 @@ class HomePresenterTest {
     )
 
     private val testStatus3 = Status(
-        id = "55555",
-        instanceUrl = "xizzhu.me",
+        id = EntityKey("xizzhu.me", "55555"),
         uri = "https://xizzhu.me/",
         created = Instant.parse("2016-11-08T11:22:33.444Z"),
         sender = testUser1,

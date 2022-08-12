@@ -16,9 +16,7 @@
 
 package me.xizzhu.android.rubridens.core.model
 
-data class ApplicationCredential(
-    val clientId: EntityKey,
-    val clientSecret: String,
-    val accessToken: String,
-    val vapidKey: String,
+data class EntityKey(
+    val instanceUrl: String,
+    val id: String,
 )

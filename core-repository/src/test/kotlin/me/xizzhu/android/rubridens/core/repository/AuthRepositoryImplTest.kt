@@ -25,6 +25,7 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.spyk
 import kotlinx.coroutines.test.runTest
 import me.xizzhu.android.rubridens.core.model.ApplicationCredential
+import me.xizzhu.android.rubridens.core.model.EntityKey
 import me.xizzhu.android.rubridens.core.model.OAuthGrantType
 import me.xizzhu.android.rubridens.core.model.OAuthScope
 import me.xizzhu.android.rubridens.core.model.OAuthToken
@@ -73,8 +74,7 @@ class AuthRepositoryImplTest {
     @Test
     fun `test loadApplicationCredential with local cache`() = runTest {
         coEvery { applicationCredentialCache.readByInstanceUrl("xizzhu.me") } returns ApplicationCredential(
-            instanceUrl = "xizzhu.me",
-            clientId = "client_id",
+            clientId = EntityKey("xizzhu.me", "client_id"),
             clientSecret = "client_secret",
             accessToken = "access_token",
             vapidKey = "vapid_key",
@@ -82,8 +82,7 @@ class AuthRepositoryImplTest {
 
         assertEquals(
             ApplicationCredential(
-                instanceUrl = "xizzhu.me",
-                clientId = "client_id",
+                clientId = EntityKey("xizzhu.me", "client_id"),
                 clientSecret = "client_secret",
                 accessToken = "access_token",
                 vapidKey = "vapid_key",
@@ -98,8 +97,7 @@ class AuthRepositoryImplTest {
         coEvery {
             applicationCredentialCache.readByInstanceUrl("xizzhu.me")
         } returns ApplicationCredential(
-            instanceUrl = "xizzhu.me",
-            clientId = "client_id",
+            clientId = EntityKey("xizzhu.me", "client_id"),
             clientSecret = "client_secret",
             accessToken = "",
             vapidKey = "vapid_key",
@@ -114,8 +112,7 @@ class AuthRepositoryImplTest {
 
         assertEquals(
             ApplicationCredential(
-                instanceUrl = "xizzhu.me",
-                clientId = "client_id",
+                clientId = EntityKey("xizzhu.me", "client_id"),
                 clientSecret = "client_secret",
                 accessToken = "access_token",
                 vapidKey = "vapid_key",
@@ -137,8 +134,7 @@ class AuthRepositoryImplTest {
         coEvery {
             appsService.create("xizzhu.me", "Rubridens", website = "https://xizzhu.me/")
         } returns ApplicationCredential(
-            instanceUrl = "xizzhu.me",
-            clientId = "client_id",
+            clientId = EntityKey("xizzhu.me", "client_id"),
             clientSecret = "client_secret",
             accessToken = "",
             vapidKey = "vapid_key",
@@ -153,8 +149,7 @@ class AuthRepositoryImplTest {
 
         assertEquals(
             ApplicationCredential(
-                instanceUrl = "xizzhu.me",
-                clientId = "client_id",
+                clientId = EntityKey("xizzhu.me", "client_id"),
                 clientSecret = "client_secret",
                 accessToken = "access_token",
                 vapidKey = "vapid_key",
@@ -182,8 +177,7 @@ class AuthRepositoryImplTest {
         coEvery {
             accountsService.verifyCredentials("xizzhu.me", "access_token")
         } returns User(
-            id = "user_id",
-            instanceUrl = "xizzhu.me",
+            id = EntityKey("xizzhu.me", "user_id"),
             username = "username",
             displayName = "display_name",
             avatarUrl = ""
@@ -191,8 +185,7 @@ class AuthRepositoryImplTest {
 
         authRepositoryImpl = spyk(authRepositoryImpl)
         coEvery { authRepositoryImpl.loadApplicationCredential("xizzhu.me") } returns ApplicationCredential(
-            instanceUrl = "xizzhu.me",
-            clientId = "client_id",
+            clientId = EntityKey("xizzhu.me", "client_id"),
             clientSecret = "client_secret",
             accessToken = "access_token",
             vapidKey = "vapid_key",

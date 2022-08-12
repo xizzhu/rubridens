@@ -17,8 +17,7 @@
 package me.xizzhu.android.rubridens.core.model
 
 data class User(
-    val id: String,
-    val instanceUrl: String,
+    val id: EntityKey,
     val username: String,
     val displayName: String,
     val avatarUrl: String,

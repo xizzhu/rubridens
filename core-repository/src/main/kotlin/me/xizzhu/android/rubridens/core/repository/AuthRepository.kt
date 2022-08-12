@@ -47,7 +47,7 @@ internal class AuthRepositoryImpl(
     private val userCredentialCache: UserCredentialCache,
 ) : AuthRepository {
     override suspend fun getLoginUrl(instanceUrl: String): String =
-        oAuthService.getLoginUrl(instanceUrl, loadApplicationCredential(instanceUrl).clientId)
+        oAuthService.getLoginUrl(instanceUrl, loadApplicationCredential(instanceUrl).clientId.id)
 
     override fun getAuthCode(url: String): String? = oAuthService.getAuthCode(url)
 
@@ -70,7 +70,7 @@ internal class AuthRepositoryImpl(
             accessToken = oAuthService.createToken(
                 instanceUrl = instanceUrl,
                 grantType = OAuthGrantType.CLIENT_CREDENTIALS,
-                clientId = partialApplicationCredential.clientId,
+                clientId = partialApplicationCredential.clientId.id,
                 clientSecret = partialApplicationCredential.clientSecret,
             ).accessToken
         ).also {
@@ -83,7 +83,7 @@ internal class AuthRepositoryImpl(
         val userToken = oAuthService.createToken(
             instanceUrl = instanceUrl,
             grantType = OAuthGrantType.AUTHORIZATION_CODE,
-            clientId = applicationCredential.clientId,
+            clientId = applicationCredential.clientId.id,
             clientSecret = applicationCredential.clientSecret,
             code = authCode,
         )

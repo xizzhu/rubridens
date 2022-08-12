@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package me.xizzhu.android.rubridens.core.model
+package me.xizzhu.android.rubridens.core.repository.local
 
-data class ApplicationCredential(
-    val clientId: EntityKey,
-    val clientSecret: String,
-    val accessToken: String,
-    val vapidKey: String,
-)
+import me.xizzhu.android.rubridens.core.model.User
+
+internal interface UserCache {
+    suspend fun read(userIds: List<String>): List<User>
+
+    suspend fun save(users: List<User>)
+}

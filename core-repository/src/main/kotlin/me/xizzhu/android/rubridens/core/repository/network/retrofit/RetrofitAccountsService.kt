@@ -18,6 +18,7 @@ package me.xizzhu.android.rubridens.core.repository.network.retrofit
 
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
+import me.xizzhu.android.rubridens.core.model.EntityKey
 import me.xizzhu.android.rubridens.core.model.User
 import me.xizzhu.android.rubridens.core.repository.network.AccountsService
 import retrofit2.http.GET
@@ -58,8 +59,7 @@ internal class MastodonAccount(
     @Json(name = "avatar") val avatarUrl: String = "",
 ) {
     fun toUser(instanceUrl: String): User = User(
-        id = id,
-        instanceUrl = accountName.indexOf('@').takeIf { it >= 0 }?.let { accountName.substring(it + 1) } ?: instanceUrl,
+        id = EntityKey(accountName.indexOf('@').takeIf { it >= 0 }?.let { accountName.substring(it + 1) } ?: instanceUrl, id),
         username = username,
         displayName = displayName.takeIf { it.isNotEmpty() } ?: "",
         avatarUrl = avatarUrl.takeIf { it.isNotEmpty() } ?: ""

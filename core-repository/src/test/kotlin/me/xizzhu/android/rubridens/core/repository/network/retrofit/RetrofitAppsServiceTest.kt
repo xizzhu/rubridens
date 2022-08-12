@@ -18,6 +18,7 @@ package me.xizzhu.android.rubridens.core.repository.network.retrofit
 
 import kotlinx.coroutines.test.runTest
 import me.xizzhu.android.rubridens.core.model.ApplicationCredential
+import me.xizzhu.android.rubridens.core.model.EntityKey
 import me.xizzhu.android.rubridens.core.model.OAuthScope
 import me.xizzhu.android.rubridens.core.repository.network.NetworkException
 import okhttp3.mockwebserver.MockResponse
@@ -85,8 +86,7 @@ class RetrofitAppsServiceTest : BaseRetrofitTest() {
 
         assertEquals(
             ApplicationCredential(
-                instanceUrl = "xizzhu.me",
-                clientId = "my_client_id",
+                clientId = EntityKey("xizzhu.me", "my_client_id"),
                 clientSecret = "my_client_secret",
                 accessToken = "",
                 vapidKey = "my_vapid_key",
