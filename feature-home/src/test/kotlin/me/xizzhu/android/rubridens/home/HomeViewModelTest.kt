@@ -28,6 +28,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
@@ -35,16 +36,19 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import me.xizzhu.android.rubridens.core.model.Data
 import me.xizzhu.android.rubridens.core.model.Status
 import me.xizzhu.android.rubridens.core.model.User
 import me.xizzhu.android.rubridens.core.model.UserCredential
 import me.xizzhu.android.rubridens.core.repository.AuthRepository
 import me.xizzhu.android.rubridens.core.repository.StatusRepository
+import me.xizzhu.android.rubridens.core.repository.network.NetworkException
 import me.xizzhu.android.rubridens.core.view.feed.FeedStatusHeaderItem
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 class HomeViewModelTest {
     private val testDispatcher = UnconfinedTestDispatcher()
@@ -64,6 +68,8 @@ class HomeViewModelTest {
 
         mockkConstructor(HomePresenter::class)
         coEvery { anyConstructed<HomePresenter>().replace(any()) } returns Unit
+        coEvery { anyConstructed<HomePresenter>().prepend(any()) } returns Unit
+        coEvery { anyConstructed<HomePresenter>().append(any()) } returns Unit
 
         homeViewModel = HomeViewModel(mockk(), authRepository, statusRepository)
     }
@@ -108,7 +114,7 @@ class HomeViewModelTest {
     }
 
     @Test
-    fun `test loadLatest`() = runTest {
+    fun `test loadLatest with remote only`() = runTest {
         val userCredential = mockk<UserCredential>()
         val user = mockk<User>()
         val status = mockk<Status>().apply { every { sender } returns user }
@@ -123,7 +129,7 @@ class HomeViewModelTest {
             openBlogger = mockk(),
         )
         coEvery { authRepository.readUserCredentials() } returns listOf(userCredential)
-        every { statusRepository.loadLatest(userCredential) } returns flowOf(listOf(status))
+        every { statusRepository.loadLatest(userCredential) } returns flowOf(Data.Remote(listOf(status)))
         coEvery { anyConstructed<HomePresenter>().feedItems() } returns listOf(feedStatusHeaderItem)
 
         homeViewModel.loadLatest()
@@ -132,6 +138,79 @@ class HomeViewModelTest {
             listOf(
                 HomeViewModel.ViewState(loading = true, items = emptyList()),
                 HomeViewModel.ViewState(loading = false, items = listOf(feedStatusHeaderItem))
+            ),
+            homeViewModel.viewState().take(2).toList()
+        )
+    }
+
+    @Test
+    fun `test loadLatest with local and remote`() = runTest {
+        val userCredential = mockk<UserCredential>()
+        val user = mockk<User>()
+        val status = mockk<Status>().apply { every { sender } returns user }
+        val feedStatusHeaderItem = FeedStatusHeaderItem(
+            status = status,
+            blogger = user,
+            bloggerDisplayName = "Random Display Name",
+            bloggerProfileImageUrl = "https://xizzhu.me/avatar1.jpg",
+            rebloggedBy = null,
+            subtitle = "@random_username • Nov 5, 2021",
+            openStatus = mockk(),
+            openBlogger = mockk(),
+        )
+        coEvery { authRepository.readUserCredentials() } returns listOf(userCredential)
+        every { statusRepository.loadLatest(userCredential) } returns flow {
+            emit(Data.Local(listOf(status)))
+            delay(100)
+            emit(Data.Remote(emptyList()))
+        }
+        coEvery { anyConstructed<HomePresenter>().feedItems() } returns listOf(feedStatusHeaderItem)
+
+        homeViewModel.loadLatest()
+
+        assertEquals(
+            listOf(
+                HomeViewModel.ViewState(loading = true, items = emptyList()),
+                HomeViewModel.ViewState(loading = true, items = listOf(feedStatusHeaderItem)),
+                HomeViewModel.ViewState(loading = false, items = listOf(feedStatusHeaderItem))
+            ),
+            homeViewModel.viewState().take(3).toList()
+        )
+    }
+
+    @Test
+    fun `test loadLatest with network error`() = runTest {
+        val userCredential = mockk<UserCredential>()
+        coEvery { authRepository.readUserCredentials() } returns listOf(userCredential)
+        every { statusRepository.loadLatest(userCredential) } returns flow {
+            throw NetworkException.Other(RuntimeException("random error"))
+        }
+
+        homeViewModel.loadLatest()
+
+        assertEquals(
+            listOf(
+                HomeViewModel.ViewState(loading = true, items = emptyList()),
+                HomeViewModel.ViewState(loading = false, items = emptyList()),
+            ),
+            homeViewModel.viewState().take(2).toList()
+        )
+    }
+
+    @Test
+    fun `test loadLatest with random exception`() = runTest {
+        val userCredential = mockk<UserCredential>()
+        coEvery { authRepository.readUserCredentials() } returns listOf(userCredential)
+        every { statusRepository.loadLatest(userCredential) } returns flow {
+            throw RuntimeException("random error")
+        }
+
+        homeViewModel.loadLatest()
+
+        assertEquals(
+            listOf(
+                HomeViewModel.ViewState(loading = true, items = emptyList()),
+                HomeViewModel.ViewState(loading = false, items = emptyList()),
             ),
             homeViewModel.viewState().take(2).toList()
         )

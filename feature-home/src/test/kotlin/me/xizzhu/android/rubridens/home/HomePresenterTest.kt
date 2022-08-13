@@ -82,6 +82,50 @@ class HomePresenterTest {
         reblogged = false,
         favorited = true,
     )
+    private val feedItems1 = listOf(
+        FeedStatusHeaderItem(
+            status = testStatus1,
+            blogger = testUser1,
+            bloggerDisplayName = "Random Display Name",
+            bloggerProfileImageUrl = "https://xizzhu.me/avatar1.jpg",
+            rebloggedBy = null,
+            subtitle = "@random_username • Nov 5, 2021",
+            openStatus = openStatus,
+            openBlogger = openUser,
+        ),
+        FeedStatusTextItem(
+            status = testStatus1,
+            openStatus = openStatus,
+            openUrl = openUrl,
+            openTag = openTag,
+            openUser = openUser,
+        ),
+        FeedStatusMediaItem(
+            status = testStatus1,
+            mediaInfo = listOf(
+                FeedStatusMediaInfo(
+                    media = testMedia1,
+                    imageUrl = "https://xizzhu.me/media1.jpg",
+                    placeholder = null,
+                    isPlayable = false,
+                ),
+            ),
+            openStatus = openStatus,
+            openMedia = openMedia,
+        ),
+        FeedStatusFooterItem(
+            status = testStatus1,
+            replies = "1",
+            reblogs = "2",
+            reblogged = false,
+            favorites = "3",
+            favorited = true,
+            openStatus = openStatus,
+            replyToStatus = replyToStatus,
+            reblogStatus = reblogStatus,
+            favoriteStatus = favoriteStatus,
+        ),
+    )
 
     private val testUser2 = User(
         id = EntityKey("another_instance", "09876"),
@@ -142,6 +186,71 @@ class HomePresenterTest {
         reblogged = false,
         favorited = true,
     )
+    private val feedItems2 = listOf(
+        FeedStatusHeaderItem(
+            status = testStatus2,
+            blogger = testUser2,
+            bloggerDisplayName = "Display Name 2",
+            bloggerProfileImageUrl = "",
+            rebloggedBy = "random_username_3 boosted",
+            subtitle = "@random_username_2@another_instance • Nov 5, 2021",
+            openStatus = openStatus,
+            openBlogger = openUser,
+        ),
+        FeedStatusTextItem(
+            status = testStatus2,
+            openStatus = openStatus,
+            openUrl = openUrl,
+            openTag = openTag,
+            openUser = openUser,
+        ),
+        FeedStatusMediaItem(
+            status = testStatus2,
+            mediaInfo = listOf(
+                FeedStatusMediaInfo(
+                    media = testMedia2,
+                    imageUrl = "https://xizzhu.me/media_preview2.jpg",
+                    placeholder = null,
+                    isPlayable = true,
+                ),
+                FeedStatusMediaInfo(
+                    media = testMedia4,
+                    imageUrl = "https://xizzhu.me/media_preview4.jpg",
+                    placeholder = null,
+                    isPlayable = true,
+                ),
+            ),
+            openStatus = openStatus,
+            openMedia = openMedia,
+        ),
+        FeedStatusCardItem(
+            status = testStatus2,
+            title = "card_title",
+            description = "card_description",
+            author = "card_author",
+            imageUrl = "https://xizzhu.me/media_preview2.jpg",
+            placeholder = null,
+            url = "https://xizzhu.me/",
+            openStatus = openStatus,
+            openUrl = openUrl,
+        ),
+        FeedStatusThreadItem(
+            status = testStatus2,
+            openStatus = openStatus,
+        ),
+        FeedStatusFooterItem(
+            status = testStatus2,
+            replies = "1K+",
+            reblogs = "",
+            reblogged = false,
+            favorites = "7M+",
+            favorited = true,
+            openStatus = openStatus,
+            replyToStatus = replyToStatus,
+            reblogStatus = reblogStatus,
+            favoriteStatus = favoriteStatus,
+        ),
+    )
 
     private val testStatus3 = Status(
         id = EntityKey("xizzhu.me", "55555"),
@@ -163,6 +272,37 @@ class HomePresenterTest {
         reblogged = true,
         favorited = false,
     )
+    private val feedItems3 = listOf(
+        FeedStatusHeaderItem(
+            status = testStatus3,
+            blogger = testUser1,
+            bloggerDisplayName = "Random Display Name",
+            bloggerProfileImageUrl = "https://xizzhu.me/avatar1.jpg",
+            rebloggedBy = null,
+            subtitle = "@random_username • Nov 8, 2016",
+            openStatus = openStatus,
+            openBlogger = openUser,
+        ),
+        FeedStatusTextItem(
+            status = testStatus3,
+            openStatus = openStatus,
+            openUrl = openUrl,
+            openTag = openTag,
+            openUser = openUser,
+        ),
+        FeedStatusFooterItem(
+            status = testStatus3,
+            replies = "1",
+            reblogs = "2",
+            reblogged = true,
+            favorites = "3",
+            favorited = false,
+            openStatus = openStatus,
+            replyToStatus = replyToStatus,
+            reblogStatus = reblogStatus,
+            favoriteStatus = favoriteStatus,
+        ),
+    )
 
     @BeforeTest
     fun setup() {
@@ -183,196 +323,20 @@ class HomePresenterTest {
     @Test
     fun `test replace with single item`() = runTest {
         homePresenter.replace(listOf(testStatus1))
-        assertEquals(
-            listOf(
-                FeedStatusHeaderItem(
-                    status = testStatus1,
-                    blogger = testUser1,
-                    bloggerDisplayName = "Random Display Name",
-                    bloggerProfileImageUrl = "https://xizzhu.me/avatar1.jpg",
-                    rebloggedBy = null,
-                    subtitle = "@random_username • Nov 5, 2021",
-                    openStatus = openStatus,
-                    openBlogger = openUser,
-                ),
-                FeedStatusTextItem(
-                    status = testStatus1,
-                    openStatus = openStatus,
-                    openUrl = openUrl,
-                    openTag = openTag,
-                    openUser = openUser,
-                ),
-                FeedStatusMediaItem(
-                    status = testStatus1,
-                    mediaInfo = listOf(
-                        FeedStatusMediaInfo(
-                            media = testMedia1,
-                            imageUrl = "https://xizzhu.me/media1.jpg",
-                            placeholder = null,
-                            isPlayable = false,
-                        ),
-                    ),
-                    openStatus = openStatus,
-                    openMedia = openMedia,
-                ),
-                FeedStatusFooterItem(
-                    status = testStatus1,
-                    replies = "1",
-                    reblogs = "2",
-                    reblogged = false,
-                    favorites = "3",
-                    favorited = true,
-                    openStatus = openStatus,
-                    replyToStatus = replyToStatus,
-                    reblogStatus = reblogStatus,
-                    favoriteStatus = favoriteStatus,
-                ),
-            ),
-            homePresenter.feedItems()
-        )
+        assertEquals(feedItems1, homePresenter.feedItems())
     }
 
     @Test
     fun `test replace with multiple items`() = runTest {
         homePresenter.replace(listOf(testStatus1, testStatus2, testStatus3))
-        assertEquals(
-            listOf(
-                FeedStatusHeaderItem(
-                    status = testStatus1,
-                    blogger = testUser1,
-                    bloggerDisplayName = "Random Display Name",
-                    bloggerProfileImageUrl = "https://xizzhu.me/avatar1.jpg",
-                    rebloggedBy = null,
-                    subtitle = "@random_username • Nov 5, 2021",
-                    openStatus = openStatus,
-                    openBlogger = openUser,
-                ),
-                FeedStatusTextItem(
-                    status = testStatus1,
-                    openStatus = openStatus,
-                    openUrl = openUrl,
-                    openTag = openTag,
-                    openUser = openUser,
-                ),
-                FeedStatusMediaItem(
-                    status = testStatus1,
-                    mediaInfo = listOf(
-                        FeedStatusMediaInfo(
-                            media = testMedia1,
-                            imageUrl = "https://xizzhu.me/media1.jpg",
-                            placeholder = null,
-                            isPlayable = false,
-                        ),
-                    ),
-                    openStatus = openStatus,
-                    openMedia = openMedia,
-                ),
-                FeedStatusFooterItem(
-                    status = testStatus1,
-                    replies = "1",
-                    reblogs = "2",
-                    reblogged = false,
-                    favorites = "3",
-                    favorited = true,
-                    openStatus = openStatus,
-                    replyToStatus = replyToStatus,
-                    reblogStatus = reblogStatus,
-                    favoriteStatus = favoriteStatus,
-                ),
-                FeedStatusHeaderItem(
-                    status = testStatus2,
-                    blogger = testUser2,
-                    bloggerDisplayName = "Display Name 2",
-                    bloggerProfileImageUrl = "",
-                    rebloggedBy = "random_username_3 boosted",
-                    subtitle = "@random_username_2@another_instance • Nov 5, 2021",
-                    openStatus = openStatus,
-                    openBlogger = openUser,
-                ),
-                FeedStatusTextItem(
-                    status = testStatus2,
-                    openStatus = openStatus,
-                    openUrl = openUrl,
-                    openTag = openTag,
-                    openUser = openUser,
-                ),
-                FeedStatusMediaItem(
-                    status = testStatus2,
-                    mediaInfo = listOf(
-                        FeedStatusMediaInfo(
-                            media = testMedia2,
-                            imageUrl = "https://xizzhu.me/media_preview2.jpg",
-                            placeholder = null,
-                            isPlayable = true,
-                        ),
-                        FeedStatusMediaInfo(
-                            media = testMedia4,
-                            imageUrl = "https://xizzhu.me/media_preview4.jpg",
-                            placeholder = null,
-                            isPlayable = true,
-                        ),
-                    ),
-                    openStatus = openStatus,
-                    openMedia = openMedia,
-                ),
-                FeedStatusCardItem(
-                    status = testStatus2,
-                    title = "card_title",
-                    description = "card_description",
-                    author = "card_author",
-                    imageUrl = "https://xizzhu.me/media_preview2.jpg",
-                    placeholder = null,
-                    url = "https://xizzhu.me/",
-                    openStatus = openStatus,
-                    openUrl = openUrl,
-                ),
-                FeedStatusThreadItem(
-                    status = testStatus2,
-                    openStatus = openStatus,
-                ),
-                FeedStatusFooterItem(
-                    status = testStatus2,
-                    replies = "1K+",
-                    reblogs = "",
-                    reblogged = false,
-                    favorites = "7M+",
-                    favorited = true,
-                    openStatus = openStatus,
-                    replyToStatus = replyToStatus,
-                    reblogStatus = reblogStatus,
-                    favoriteStatus = favoriteStatus,
-                ),
-                FeedStatusHeaderItem(
-                    status = testStatus3,
-                    blogger = testUser1,
-                    bloggerDisplayName = "Random Display Name",
-                    bloggerProfileImageUrl = "https://xizzhu.me/avatar1.jpg",
-                    rebloggedBy = null,
-                    subtitle = "@random_username • Nov 8, 2016",
-                    openStatus = openStatus,
-                    openBlogger = openUser,
-                ),
-                FeedStatusTextItem(
-                    status = testStatus3,
-                    openStatus = openStatus,
-                    openUrl = openUrl,
-                    openTag = openTag,
-                    openUser = openUser,
-                ),
-                FeedStatusFooterItem(
-                    status = testStatus3,
-                    replies = "1",
-                    reblogs = "2",
-                    reblogged = true,
-                    favorites = "3",
-                    favorited = false,
-                    openStatus = openStatus,
-                    replyToStatus = replyToStatus,
-                    reblogStatus = reblogStatus,
-                    favoriteStatus = favoriteStatus,
-                ),
-            ),
-            homePresenter.feedItems()
-        )
+        assertEquals(feedItems1 + feedItems2 + feedItems3, homePresenter.feedItems())
+    }
+
+    @Test
+    fun `test replace, append, and prepend`() = runTest {
+        homePresenter.replace(listOf(testStatus1))
+        homePresenter.append(listOf(testStatus2))
+        homePresenter.prepend(listOf(testStatus3))
+        assertEquals(feedItems3 + feedItems1 + feedItems2, homePresenter.feedItems())
     }
 }

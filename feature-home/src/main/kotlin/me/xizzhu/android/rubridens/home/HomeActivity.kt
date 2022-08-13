@@ -18,6 +18,7 @@ package me.xizzhu.android.rubridens.home
 
 import android.content.Context
 import android.content.Intent
+import androidx.recyclerview.widget.RecyclerView
 import me.xizzhu.android.rubridens.core.infra.BaseActivity
 import me.xizzhu.android.rubridens.core.view.toast
 import me.xizzhu.android.rubridens.home.databinding.ActivityHomeBinding
@@ -25,6 +26,8 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class HomeActivity : BaseActivity<HomeViewModel.ViewAction, HomeViewModel.ViewState, ActivityHomeBinding, HomeViewModel>() {
     companion object {
+        private const val LOAD_MORE_ITEMS_POSITION_THRESHOLD = 6
+
         fun newStartIntent(context: Context): Intent = Intent(context, HomeActivity::class.java)
     }
 
@@ -34,6 +37,15 @@ class HomeActivity : BaseActivity<HomeViewModel.ViewAction, HomeViewModel.ViewSt
 
     override fun onViewCreated() = with(viewBinding) {
         swipeRefresher.setOnRefreshListener { viewModel.loadLatest() }
+        feed.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                if (feed.firstVisibleItemPosition() <= LOAD_MORE_ITEMS_POSITION_THRESHOLD) {
+                    viewModel.loadNewer()
+                } else if (feed.itemCount() - feed.lastVisibleItemPosition() <= LOAD_MORE_ITEMS_POSITION_THRESHOLD) {
+                    viewModel.loadOlder()
+                }
+            }
+        })
 
         viewModel.loadLatest()
     }

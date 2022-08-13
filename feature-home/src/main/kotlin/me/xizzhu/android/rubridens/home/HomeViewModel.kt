@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import me.xizzhu.android.rubridens.core.infra.BaseViewModel
+import me.xizzhu.android.rubridens.core.model.Data
 import me.xizzhu.android.rubridens.core.model.Media
 import me.xizzhu.android.rubridens.core.model.Status
 import me.xizzhu.android.rubridens.core.model.User
@@ -60,6 +61,9 @@ class HomeViewModel(
 
     private val loading = AtomicBoolean(false)
 
+    private val hasNewerStatuses = AtomicBoolean(true)
+    private val hasOlderStatuses = AtomicBoolean(true)
+
     private val homePresenter = HomePresenter(
         application = application,
         openStatus = ::openStatus,
@@ -73,23 +77,32 @@ class HomeViewModel(
     )
 
     fun loadLatest() = load {
-        homePresenter.clear()
+        val userCredential = getUserCredential() ?: return@load
+
         emitViewState { currentViewState ->
             currentViewState.copy(
                 loading = true,
                 items = emptyList(),
             )
         }
-
-        val userCredential = getUserCredential() ?: return@load
+        homePresenter.clear()
         statusRepository.loadLatest(userCredential)
-            .onEach { statuses ->
-                homePresenter.replace(statuses)
+            .onEach { data ->
+                val isLoading = when (data) {
+                    is Data.Local -> {
+                        homePresenter.replace(data.data)
+                        true
+                    }
+                    is Data.Remote -> {
+                        homePresenter.prepend(data.data)
+                        false
+                    }
+                }
 
                 val items = homePresenter.feedItems()
                 emitViewState { currentViewState ->
                     currentViewState.copy(
-                        loading = false,
+                        loading = isLoading,
                         items = items,
                     )
                 }
@@ -98,9 +111,17 @@ class HomeViewModel(
                 if (e is NetworkException.Other) {
                     emitViewAction(ViewAction.ShowNetworkError)
                 }
+                emitViewState { currentViewState -> currentViewState.copy(loading = false) }
             }
             .collect()
     }
+
+    fun loadNewer() = load {
+        if (!hasNewerStatuses.get()) return@load
+        val userCredential = getUserCredential() ?: return@load
+    }
+
+    fun loadOlder() = load {}
 
     private inline fun load(crossinline block: suspend () -> Unit) {
         if (loading.getAndSet(true)) return

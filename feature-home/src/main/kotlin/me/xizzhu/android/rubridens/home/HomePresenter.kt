@@ -49,7 +49,6 @@ internal class HomePresenter(
 ) {
     private val dispatcher = Dispatchers.Default.limitedParallelism(1)
 
-    // The items are sorted by timestamp in ascending order.
     private val feedItems = ArrayList<FeedItem<*>>()
 
     suspend fun feedItems(): List<FeedItem<*>> = withContext(dispatcher) {
@@ -61,8 +60,21 @@ internal class HomePresenter(
     }
 
     suspend fun replace(statuses: List<Status>): Unit = withContext(dispatcher) {
-        val items = ArrayList<FeedItem<*>>(statuses.size * 6)
-        statuses.forEach { status ->
+        feedItems.clear()
+        feedItems.addAll(statuses.toFeedItems())
+    }
+
+    suspend fun prepend(statuses: List<Status>): Unit = withContext(dispatcher) {
+        feedItems.addAll(0, statuses.toFeedItems())
+    }
+
+    suspend fun append(statuses: List<Status>): Unit = withContext(dispatcher) {
+        feedItems.addAll(statuses.toFeedItems())
+    }
+
+    private fun List<Status>.toFeedItems(): List<FeedItem<*>> {
+        val items = ArrayList<FeedItem<*>>(size * 6)
+        forEach { status ->
             items.add(status.toFeedStatusHeaderItem(openStatus = openStatus, openUser = openUser))
             items.add(status.toFeedStatusTextItem(openStatus = openStatus, openUrl = openUrl, openTag = openTag, openUser = openUser))
             status.toFeedStatusMediaItem(openStatus = openStatus, openMedia = openMedia)?.let { items.add(it) }
@@ -70,8 +82,7 @@ internal class HomePresenter(
             status.toFeedStatusThreadItem(openStatus = openStatus)?.let { items.add(it) }
             items.add(status.toFeedStatusFooterItem(openStatus = openStatus, replyToStatus = replyToStatus, reblogStatus = reblogStatus, favoriteStatus = favoriteStatus))
         }
-        feedItems.clear()
-        feedItems.addAll(items)
+        return items
     }
 
     private fun Status.toFeedStatusHeaderItem(

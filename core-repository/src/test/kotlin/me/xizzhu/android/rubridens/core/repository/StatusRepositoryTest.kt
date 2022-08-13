@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Instant
+import me.xizzhu.android.rubridens.core.model.Data
 import me.xizzhu.android.rubridens.core.model.EntityKey
 import me.xizzhu.android.rubridens.core.model.Status
 import me.xizzhu.android.rubridens.core.model.User
@@ -119,7 +120,7 @@ class StatusRepositoryTest {
         coEvery { timelinesService.fetchHome(any(), any(), any(), any(), any(), any(), any()) } returns emptyList()
 
         assertEquals(
-            listOf(emptyList()),
+            listOf(Data.Remote(emptyList())),
             statusRepository.loadLatest(userCredential).toList()
         )
     }
@@ -130,7 +131,7 @@ class StatusRepositoryTest {
         coEvery { timelinesService.fetchHome(any(), any(), any(), any(), any(), any(), any()) } returns listOf(testStatus2)
 
         assertEquals(
-            listOf(listOf(testStatus2)),
+            listOf(Data.Remote(listOf(testStatus2))),
             statusRepository.loadLatest(userCredential).toList()
         )
     }
@@ -148,7 +149,7 @@ class StatusRepositoryTest {
         }
 
         assertEquals(
-            listOf(listOf(testStatus1)),
+            listOf(Data.Local(listOf(testStatus1)), Data.Remote(emptyList())),
             statusRepository.loadLatest(userCredential).toList()
         )
     }
@@ -159,7 +160,7 @@ class StatusRepositoryTest {
         coEvery { timelinesService.fetchHome(any(), any(), any(), any(), any(), any(), any()) } returns listOf(testStatus2)
 
         assertEquals(
-            listOf(listOf(testStatus2)),
+            listOf(Data.Remote(listOf(testStatus2))),
             statusRepository.loadLatest(userCredential).toList()
         )
     }
@@ -170,7 +171,7 @@ class StatusRepositoryTest {
         coEvery { timelinesService.fetchHome(any(), any(), any(), any(), any(), any(), any()) } throws RuntimeException("random error")
 
         assertEquals(
-            listOf(listOf(testStatus1)),
+            listOf(Data.Local(listOf(testStatus1))),
             statusRepository.loadLatest(userCredential).take(1).toList()
         )
 
@@ -183,7 +184,10 @@ class StatusRepositoryTest {
         coEvery { timelinesService.fetchHome(any(), any(), any(), any(), any(), any(), any()) } returns listOf(testStatus2)
 
         assertEquals(
-            listOf(listOf(testStatus1), listOf(testStatus2, testStatus1)),
+            listOf(
+                Data.Local(listOf(testStatus1)),
+                Data.Remote(listOf(testStatus2))
+            ),
             statusRepository.loadLatest(userCredential).toList()
         )
     }
