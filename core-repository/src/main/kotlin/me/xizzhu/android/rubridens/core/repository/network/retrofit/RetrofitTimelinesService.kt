@@ -80,10 +80,10 @@ internal class MastodonCard(
     @Json(name = "url") val url: String,
     @Json(name = "title") val title: String,
     @Json(name = "description") val description: String,
-    @Json(name = "author_name") val authorName: String = "",
-    @Json(name = "provider_name") val providerName: String = "",
-    @Json(name = "image") val image: String = "",
-    @Json(name = "blurhash") val blurHash: String = "",
+    @Json(name = "author_name") val authorName: String?,
+    @Json(name = "provider_name") val providerName: String?,
+    @Json(name = "image") val image: String?,
+    @Json(name = "blurhash") val blurHash: String?,
 ) {
     fun toCard(): Card? = type.toCardType()?.let { cardType ->
         Card(
@@ -91,9 +91,9 @@ internal class MastodonCard(
             url = url,
             title = title,
             description = description,
-            author = authorName.takeIf { it.isNotEmpty() } ?: providerName,
-            previewUrl = image,
-            blurHash = blurHash,
+            author = authorName?.takeIf { it.isNotEmpty() } ?: providerName ?: "",
+            previewUrl = image ?: "",
+            blurHash = blurHash ?: "",
         )
     }
 }
@@ -113,15 +113,15 @@ internal fun String.toCardType(): Card.Type? = when (this) {
 internal class MastodonMediaAttachment(
     @Json(name = "type") val type: String,
     @Json(name = "url") val url: String,
-    @Json(name = "preview_url") val previewUrl: String = "",
-    @Json(name = "blurhash") val blurHash: String = "",
+    @Json(name = "preview_url") val previewUrl: String?,
+    @Json(name = "blurhash") val blurHash: String?,
 ) {
     fun toMedia(): Media? = type.toMediaType()?.let { mediaType ->
         Media(
             type = mediaType,
             url = url,
-            previewUrl = previewUrl,
-            blurHash = blurHash,
+            previewUrl = previewUrl ?: "",
+            blurHash = blurHash ?: "",
         )
     }
 }

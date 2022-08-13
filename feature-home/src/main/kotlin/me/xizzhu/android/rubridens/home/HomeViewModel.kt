@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import me.xizzhu.android.rubridens.core.infra.BaseViewModel
 import me.xizzhu.android.rubridens.core.model.Data
+import me.xizzhu.android.rubridens.core.model.Status
 import me.xizzhu.android.rubridens.core.model.UserCredential
 import me.xizzhu.android.rubridens.core.repository.AuthRepository
 import me.xizzhu.android.rubridens.core.repository.StatusRepository
@@ -53,8 +54,12 @@ class HomeViewModel(
 
     private val loading = AtomicBoolean(false)
 
-    private val hasNewerStatuses = AtomicBoolean(true)
-    private val hasOlderStatuses = AtomicBoolean(true)
+    // They are only accessed from "load", which is guaranteed to have only one "instance" running.
+    // Therefore, no lock is needed.
+    private var hasNewerStatuses = true
+    private var newestStatus: Status? = null
+    private var hasOlderStatuses = true
+    private var oldestStatus: Status? = null
 
     fun loadLatest() = load {
         val userCredential = getUserCredential() ?: return@load
@@ -65,16 +70,29 @@ class HomeViewModel(
                 items = emptyList(),
             )
         }
+
         homePresenter.clear()
+        hasNewerStatuses = true
+        hasOlderStatuses = true
+
         statusRepository.loadLatest(userCredential, STATUSES_TO_LOAD_PER_REQUEST)
             .onEach { data ->
                 val isLoading = when (data) {
                     is Data.Local -> {
                         homePresenter.replace(data.data)
+                        newestStatus = data.data.first()
+                        oldestStatus = data.data.last()
                         true
                     }
                     is Data.Remote -> {
                         homePresenter.prepend(data.data)
+                        if (data.data.size < STATUSES_TO_LOAD_PER_REQUEST) {
+                            hasNewerStatuses = false
+                        }
+                        data.data.firstOrNull()?.let { newestStatus = it }
+                        if (oldestStatus == null) {
+                            oldestStatus = data.data.lastOrNull()
+                        }
                         false
                     }
                 }
@@ -87,22 +105,39 @@ class HomeViewModel(
                     )
                 }
             }
-            .catch { e ->
-                if (e is NetworkException.Other) {
-                    emitViewAction(ViewAction.ShowNetworkError)
-                }
-                emitViewState { currentViewState -> currentViewState.copy(loading = false) }
-            }
+            .catch { e -> handleLoadingException(e) }
             .collect()
     }
 
     fun loadNewer() = load {
-        if (!hasNewerStatuses.get()) return@load
+        if (!hasNewerStatuses) return@load
         val userCredential = getUserCredential() ?: return@load
     }
 
-    fun loadOlder() = load {}
+    fun loadOlder() = load {
+        if (!hasOlderStatuses) return@load
+        val oldest = oldestStatus ?: return@load
+        val userCredential = getUserCredential() ?: return@load
 
+        statusRepository.loadOlder(userCredential, oldest, STATUSES_TO_LOAD_PER_REQUEST)
+            .onEach { data ->
+                homePresenter.append(data.data)
+
+                if (data is Data.Remote && data.data.size < STATUSES_TO_LOAD_PER_REQUEST) {
+                    hasOlderStatuses = false
+                }
+                data.data.lastOrNull()?.let { oldestStatus = it }
+
+                val items = homePresenter.feedItems()
+                emitViewState { currentViewState -> currentViewState.copy(items = items) }
+            }
+            .catch { e -> handleLoadingException(e) }
+            .collect()
+    }
+
+    /**
+     * NOTE: Always calls this helper function to load data. It makes sure only one loading is going on.
+     */
     private inline fun load(crossinline block: suspend () -> Unit) {
         if (loading.getAndSet(true)) return
 
@@ -110,6 +145,13 @@ class HomeViewModel(
             block()
             loading.set(false)
         }
+    }
+
+    private fun handleLoadingException(e: Throwable) {
+        if (e is NetworkException.Other) {
+            emitViewAction(ViewAction.ShowNetworkError)
+        }
+        emitViewState { currentViewState -> currentViewState.copy(loading = false) }
     }
 
     private suspend fun getUserCredential(): UserCredential? {

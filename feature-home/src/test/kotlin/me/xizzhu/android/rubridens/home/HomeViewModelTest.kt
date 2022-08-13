@@ -23,6 +23,7 @@ import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
@@ -36,8 +37,6 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import me.xizzhu.android.rubridens.core.model.Data
-import me.xizzhu.android.rubridens.core.model.Status
-import me.xizzhu.android.rubridens.core.model.User
 import me.xizzhu.android.rubridens.core.model.UserCredential
 import me.xizzhu.android.rubridens.core.repository.AuthRepository
 import me.xizzhu.android.rubridens.core.repository.StatusRepository
@@ -82,6 +81,25 @@ class HomeViewModelTest {
     }
 
     @Test
+    fun `test loadX called multiple times`() = runTest {
+        coEvery {
+            authRepository.readUserCredentials()
+        } coAnswers {
+            delay(1000)
+            listOf()
+        }
+
+        homeViewModel.loadLatest()
+        homeViewModel.loadLatest()
+        homeViewModel.loadOlder()
+        homeViewModel.loadOlder()
+        homeViewModel.loadNewer()
+        homeViewModel.loadNewer()
+
+        coVerify(exactly = 1) { authRepository.readUserCredentials() }
+    }
+
+    @Test
     fun `test loadLatest without user credential`() = runTest {
         coEvery { authRepository.readUserCredentials() } returns listOf()
 
@@ -95,35 +113,27 @@ class HomeViewModelTest {
     }
 
     @Test
-    fun `test loadLatest called multiple times`() = runTest {
-        coEvery {
-            authRepository.readUserCredentials()
-        } coAnswers {
-            delay(1000)
-            listOf()
-        }
+    fun `test loadLatest with local only`() = runTest {
+        val userCredential = mockk<UserCredential>()
+        val feedStatusHeaderItem = mockk<FeedStatusHeaderItem>()
+        coEvery { authRepository.readUserCredentials() } returns listOf(userCredential)
+        every { statusRepository.loadLatest(userCredential, any()) } returns flowOf(Data.Local(listOf(mockk())), Data.Remote(emptyList()))
+        coEvery { homePresenter.feedItems() } returns listOf(feedStatusHeaderItem)
 
         homeViewModel.loadLatest()
-        homeViewModel.loadLatest()
 
-        coVerify(exactly = 1) { authRepository.readUserCredentials() }
+        assertEquals(
+            HomeViewModel.ViewState(loading = false, items = listOf(feedStatusHeaderItem)),
+            homeViewModel.viewState().first()
+        )
     }
 
     @Test
     fun `test loadLatest with remote only`() = runTest {
         val userCredential = mockk<UserCredential>()
-        val user = mockk<User>()
-        val status = mockk<Status>().apply { every { sender } returns user }
-        val feedStatusHeaderItem = FeedStatusHeaderItem(
-            status = status,
-            blogger = user,
-            bloggerDisplayName = "Random Display Name",
-            bloggerProfileImageUrl = "https://xizzhu.me/avatar1.jpg",
-            rebloggedBy = null,
-            subtitle = "@random_username • Nov 5, 2021",
-        )
+        val feedStatusHeaderItem = mockk<FeedStatusHeaderItem>()
         coEvery { authRepository.readUserCredentials() } returns listOf(userCredential)
-        every { statusRepository.loadLatest(userCredential, any()) } returns flowOf(Data.Remote(listOf(status)))
+        every { statusRepository.loadLatest(userCredential, any()) } returns flowOf(Data.Remote(listOf(mockk())))
         coEvery { homePresenter.feedItems() } returns listOf(feedStatusHeaderItem)
 
         homeViewModel.loadLatest()
@@ -137,19 +147,10 @@ class HomeViewModelTest {
     @Test
     fun `test loadLatest with local and remote`() = runTest {
         val userCredential = mockk<UserCredential>()
-        val user = mockk<User>()
-        val status = mockk<Status>().apply { every { sender } returns user }
-        val feedStatusHeaderItem = FeedStatusHeaderItem(
-            status = status,
-            blogger = user,
-            bloggerDisplayName = "Random Display Name",
-            bloggerProfileImageUrl = "https://xizzhu.me/avatar1.jpg",
-            rebloggedBy = null,
-            subtitle = "@random_username • Nov 5, 2021",
-        )
+        val feedStatusHeaderItem = mockk<FeedStatusHeaderItem>()
         coEvery { authRepository.readUserCredentials() } returns listOf(userCredential)
         every { statusRepository.loadLatest(userCredential, any()) } returns flow {
-            emit(Data.Local(listOf(status)))
+            emit(Data.Local(listOf(mockk())))
             delay(100)
             emit(Data.Remote(emptyList()))
         }
@@ -200,5 +201,39 @@ class HomeViewModelTest {
             HomeViewModel.ViewState(loading = false, items = emptyList()),
             homeViewModel.viewState().first()
         )
+    }
+
+    @Test
+    fun `test loadLatest then loadOlder`() = runTest {
+        val userCredential = mockk<UserCredential>()
+        val feedStatusHeaderItem = mockk<FeedStatusHeaderItem>()
+        coEvery { authRepository.readUserCredentials() } returns listOf(userCredential)
+        every { statusRepository.loadLatest(userCredential, any()) } returns flowOf(Data.Remote(listOf(mockk())))
+        every { statusRepository.loadOlder(any(), any(), any()) } returns flowOf(Data.Remote(listOf(mockk())))
+
+        var called = 0
+        coEvery { homePresenter.feedItems() } answers { answer ->
+            if (called++ == 0) {
+                listOf(feedStatusHeaderItem)
+            } else {
+                listOf(feedStatusHeaderItem, feedStatusHeaderItem)
+            }
+        }
+
+        homeViewModel.loadLatest()
+        assertEquals(
+            HomeViewModel.ViewState(loading = false, items = listOf(feedStatusHeaderItem)),
+            homeViewModel.viewState().first()
+        )
+
+        homeViewModel.loadOlder()
+        assertEquals(
+            HomeViewModel.ViewState(loading = false, items = listOf(feedStatusHeaderItem, feedStatusHeaderItem)),
+            homeViewModel.viewState().first()
+        )
+        verify(exactly = 1) { statusRepository.loadOlder(any(), any(), any()) }
+
+        homeViewModel.loadOlder()
+        verify(exactly = 1) { statusRepository.loadOlder(any(), any(), any()) }
     }
 }

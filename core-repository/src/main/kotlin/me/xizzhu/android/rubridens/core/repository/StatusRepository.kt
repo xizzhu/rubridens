@@ -30,6 +30,11 @@ interface StatusRepository {
      * Otherwise, fetches the latest [Status] from server and emits them.
      */
     fun loadLatest(userCredential: UserCredential, limit: Int): Flow<Data<List<Status>>>
+
+    /**
+     * Load [Status] older than [olderThan]. If no older statuses are available, an empty list will be emitted.
+     */
+    fun loadOlder(userCredential: UserCredential, olderThan: Status, limit: Int): Flow<Data<List<Status>>>
 }
 
 internal class StatusRepositoryImpl(
@@ -52,6 +57,29 @@ internal class StatusRepositoryImpl(
             minId = local.firstOrNull()?.id?.id ?: "",
             maxId = "",
             limit = limit
+        )
+        emit(Data.Remote(remote))
+    }
+
+    override fun loadOlder(userCredential: UserCredential, olderThan: Status, limit: Int): Flow<Data<List<Status>>> = flow {
+        val local = readLatestSafely(
+            instanceUrl = userCredential.instanceUrl,
+            olderThan = olderThan.created.toEpochMilliseconds(),
+            limit = limit
+        )
+        if (local.isNotEmpty()) {
+            emit(Data.Local(local))
+        }
+
+        // Spare the server if we already have enough loaded.
+        if (local.size >= limit) return@flow
+
+        // When fetching fails, propagate the error.
+        val remote = fetchHome(
+            userCredential = userCredential,
+            minId = "",
+            maxId = local.lastOrNull()?.id?.id ?: olderThan.id.id,
+            limit = limit,
         )
         emit(Data.Remote(remote))
     }
