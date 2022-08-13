@@ -16,7 +16,6 @@
 
 package me.xizzhu.android.rubridens.home
 
-import android.app.Application
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
@@ -24,9 +23,6 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import me.xizzhu.android.rubridens.core.infra.BaseViewModel
 import me.xizzhu.android.rubridens.core.model.Data
-import me.xizzhu.android.rubridens.core.model.Media
-import me.xizzhu.android.rubridens.core.model.Status
-import me.xizzhu.android.rubridens.core.model.User
 import me.xizzhu.android.rubridens.core.model.UserCredential
 import me.xizzhu.android.rubridens.core.repository.AuthRepository
 import me.xizzhu.android.rubridens.core.repository.StatusRepository
@@ -35,9 +31,9 @@ import me.xizzhu.android.rubridens.core.view.feed.FeedItem
 import java.util.concurrent.atomic.AtomicBoolean
 
 class HomeViewModel(
-    application: Application,
     private val authRepository: AuthRepository,
     private val statusRepository: StatusRepository,
+    private val homePresenter: HomePresenter,
 ) : BaseViewModel<HomeViewModel.ViewAction, HomeViewModel.ViewState>(
     initialViewState = ViewState(
         loading = false,
@@ -45,14 +41,6 @@ class HomeViewModel(
     )
 ) {
     sealed class ViewAction {
-        data class OpenStatus(val status: Status) : ViewAction()
-        data class ReplyToStatus(val status: Status) : ViewAction()
-        data class ReblogStatus(val status: Status) : ViewAction()
-        data class FavoriteStatus(val status: Status) : ViewAction()
-        data class OpenUser(val user: User) : ViewAction()
-        data class OpenMedia(val media: Media) : ViewAction()
-        data class OpenTag(val tag: String) : ViewAction()
-        data class OpenUrl(val url: String) : ViewAction()
         object RequestUserCredential : ViewAction()
         object ShowNetworkError : ViewAction()
     }
@@ -63,18 +51,6 @@ class HomeViewModel(
 
     private val hasNewerStatuses = AtomicBoolean(true)
     private val hasOlderStatuses = AtomicBoolean(true)
-
-    private val homePresenter = HomePresenter(
-        application = application,
-        openStatus = ::openStatus,
-        replyToStatus = ::replyToStatus,
-        reblogStatus = ::reblogStatus,
-        favoriteStatus = ::favoriteStatus,
-        openUser = ::openUser,
-        openMedia = ::openMedia,
-        openTag = ::openTag,
-        openUrl = ::openUrl,
-    )
 
     fun loadLatest() = load {
         val userCredential = getUserCredential() ?: return@load
@@ -147,37 +123,5 @@ class HomeViewModel(
             }
         }
         return userCredential
-    }
-
-    private fun openStatus(status: Status) {
-        emitViewAction(ViewAction.OpenStatus(status))
-    }
-
-    private fun replyToStatus(status: Status) {
-        emitViewAction(ViewAction.ReplyToStatus(status))
-    }
-
-    private fun reblogStatus(status: Status) {
-        emitViewAction(ViewAction.ReblogStatus(status))
-    }
-
-    private fun favoriteStatus(status: Status) {
-        emitViewAction(ViewAction.FavoriteStatus(status))
-    }
-
-    private fun openUser(user: User) {
-        emitViewAction(ViewAction.OpenUser(user))
-    }
-
-    private fun openMedia(media: Media) {
-        emitViewAction(ViewAction.OpenMedia(media))
-    }
-
-    private fun openTag(tag: String) {
-        emitViewAction(ViewAction.OpenTag(tag))
-    }
-
-    private fun openUrl(url: String) {
-        emitViewAction(ViewAction.OpenUrl(url))
     }
 }

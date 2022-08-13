@@ -23,13 +23,12 @@ import me.xizzhu.android.rubridens.core.view.databinding.ItemFeedStatusThreadBin
 
 data class FeedStatusThreadItem(
     override val status: Status,
-    val openStatus: (status: Status) -> Unit,
 ) : FeedItem<FeedStatusThreadItem>(TYPE_STATUS_THREAD, status)
 
-internal class FeedStatusThreadViewHolder(inflater: LayoutInflater, parent: ViewGroup)
+internal class FeedStatusThreadViewHolder(inflater: LayoutInflater, parent: ViewGroup, openStatus: (status: Status) -> Unit)
     : FeedItemViewHolder<FeedStatusThreadItem, ItemFeedStatusThreadBinding>(ItemFeedStatusThreadBinding.inflate(inflater, parent, false)) {
     init {
-        viewBinding.root.setOnClickListener { item?.let { it.openStatus(it.status) } }
+        viewBinding.root.setOnClickListener { item?.let { openStatus(it.status) } }
     }
 
     override fun bind(item: FeedStatusThreadItem, payloads: List<Any>) = Unit

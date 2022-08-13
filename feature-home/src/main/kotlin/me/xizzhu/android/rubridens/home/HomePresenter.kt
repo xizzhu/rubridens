@@ -21,7 +21,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import me.xizzhu.android.rubridens.core.model.Media
 import me.xizzhu.android.rubridens.core.model.Status
-import me.xizzhu.android.rubridens.core.model.User
 import me.xizzhu.android.rubridens.core.view.BlurHashDecoder
 import me.xizzhu.android.rubridens.core.view.feed.FeedItem
 import me.xizzhu.android.rubridens.core.view.feed.FeedStatusCardItem
@@ -36,16 +35,8 @@ import me.xizzhu.android.rubridens.core.view.formatDisplayName
 import me.xizzhu.android.rubridens.core.view.formatRelativeTimestamp
 import me.xizzhu.android.rubridens.core.view.formatSenderUsername
 
-internal class HomePresenter(
+class HomePresenter(
     private val application: Application,
-    private val openStatus: (status: Status) -> Unit,
-    private val replyToStatus: (status: Status) -> Unit,
-    private val reblogStatus: (status: Status) -> Unit,
-    private val favoriteStatus: (status: Status) -> Unit,
-    private val openUser: (user: User) -> Unit,
-    private val openMedia: (media: Media) -> Unit,
-    private val openTag: (tag: String) -> Unit,
-    private val openUrl: (url: String) -> Unit,
 ) {
     private val dispatcher = Dispatchers.Default.limitedParallelism(1)
 
@@ -75,44 +66,28 @@ internal class HomePresenter(
     private fun List<Status>.toFeedItems(): List<FeedItem<*>> {
         val items = ArrayList<FeedItem<*>>(size * 6)
         forEach { status ->
-            items.add(status.toFeedStatusHeaderItem(openStatus = openStatus, openUser = openUser))
-            items.add(status.toFeedStatusTextItem(openStatus = openStatus, openUrl = openUrl, openTag = openTag, openUser = openUser))
-            status.toFeedStatusMediaItem(openStatus = openStatus, openMedia = openMedia)?.let { items.add(it) }
-            status.toFeedStatusCardItem(openStatus = openStatus, openUrl = openUrl)?.let { items.add(it) }
-            status.toFeedStatusThreadItem(openStatus = openStatus)?.let { items.add(it) }
-            items.add(status.toFeedStatusFooterItem(openStatus = openStatus, replyToStatus = replyToStatus, reblogStatus = reblogStatus, favoriteStatus = favoriteStatus))
+            items.add(status.toFeedStatusHeaderItem())
+            items.add(status.toFeedStatusTextItem())
+            status.toFeedStatusMediaItem()?.let { items.add(it) }
+            status.toFeedStatusCardItem()?.let { items.add(it) }
+            status.toFeedStatusThreadItem()?.let { items.add(it) }
+            items.add(status.toFeedStatusFooterItem())
         }
         return items
     }
 
-    private fun Status.toFeedStatusHeaderItem(
-        openStatus: (status: Status) -> Unit,
-        openUser: (user: User) -> Unit,
-    ): FeedStatusHeaderItem = FeedStatusHeaderItem(
+    private fun Status.toFeedStatusHeaderItem(): FeedStatusHeaderItem = FeedStatusHeaderItem(
         status = this,
         blogger = sender,
         bloggerDisplayName = sender.formatDisplayName(),
         bloggerProfileImageUrl = sender.avatarUrl,
         rebloggedBy = reblogger?.formatDisplayName()?.let { application.resources.getString(R.string.home_text_status_reblogged_by, it) },
         subtitle = "${formatSenderUsername()} • ${formatRelativeTimestamp()}",
-        openStatus = openStatus,
-        openBlogger = openUser,
     )
 
-    private fun Status.toFeedStatusTextItem(
-        openStatus: (status: Status) -> Unit,
-        openUrl: (url: String) -> Unit,
-        openTag: (tag: String) -> Unit,
-        openUser: (user: User) -> Unit,
-    ): FeedStatusTextItem = FeedStatusTextItem(
-        status = this,
-        openStatus = openStatus,
-        openUrl = openUrl,
-        openTag = openTag,
-        openUser = openUser,
-    )
+    private fun Status.toFeedStatusTextItem(): FeedStatusTextItem = FeedStatusTextItem(status = this)
 
-    private fun Status.toFeedStatusMediaItem(openStatus: (status: Status) -> Unit, openMedia: (media: Media) -> Unit): FeedItem<*>? =
+    private fun Status.toFeedStatusMediaItem(): FeedItem<*>? =
         media.mapNotNull { media ->
             if (media.type == Media.Type.IMAGE || media.type == Media.Type.GIF || media.type == Media.Type.VIDEO) {
                 FeedStatusMediaInfo(
@@ -130,12 +105,10 @@ internal class HomePresenter(
             FeedStatusMediaItem(
                 status = this,
                 mediaInfo = mediaInfoList,
-                openStatus = openStatus,
-                openMedia = openMedia,
             )
         }
 
-    private fun Status.toFeedStatusCardItem(openStatus: (status: Status) -> Unit, openUrl: (url: String) -> Unit): FeedStatusCardItem? = card?.let { card ->
+    private fun Status.toFeedStatusCardItem(): FeedStatusCardItem? = card?.let { card ->
         FeedStatusCardItem(
             status = this,
             title = card.title,
@@ -144,33 +117,22 @@ internal class HomePresenter(
             imageUrl = card.previewUrl,
             placeholder = BlurHashDecoder.decode(card.blurHash, 16, 16),
             url = card.url,
-            openStatus = openStatus,
-            openUrl = openUrl,
         )
     }
 
-    private fun Status.toFeedStatusThreadItem(openStatus: (status: Status) -> Unit): FeedStatusThreadItem? =
+    private fun Status.toFeedStatusThreadItem(): FeedStatusThreadItem? =
         if (inReplyToStatusId.isNullOrEmpty() || inReplyToAccountId.isNullOrEmpty()) {
             null
         } else {
-            FeedStatusThreadItem(status = this, openStatus = openStatus)
+            FeedStatusThreadItem(status = this)
         }
 
-    private fun Status.toFeedStatusFooterItem(
-        openStatus: (status: Status) -> Unit,
-        replyToStatus: (status: Status) -> Unit,
-        reblogStatus: (status: Status) -> Unit,
-        favoriteStatus: (status: Status) -> Unit,
-    ): FeedStatusFooterItem = FeedStatusFooterItem(
+    private fun Status.toFeedStatusFooterItem(): FeedStatusFooterItem = FeedStatusFooterItem(
         status = this,
         replies = repliesCount.formatCount(),
         reblogs = reblogsCount.formatCount(),
         reblogged = reblogged,
         favorites = favoritesCount.formatCount(),
         favorited = favorited,
-        openStatus = openStatus,
-        replyToStatus = replyToStatus,
-        reblogStatus = reblogStatus,
-        favoriteStatus = favoriteStatus,
     )
 }

@@ -40,14 +40,6 @@ import kotlin.test.assertTrue
 
 @RunWith(RobolectricTestRunner::class)
 class HomePresenterTest {
-    private val openStatus = { _: Status -> }
-    private val replyToStatus = { _: Status -> }
-    private val reblogStatus = { _: Status -> }
-    private val favoriteStatus = { _: Status -> }
-    private val openUser = { _: User -> }
-    private val openMedia = { _: Media -> }
-    private val openTag = { _: String -> }
-    private val openUrl = { _: String -> }
     private lateinit var homePresenter: HomePresenter
 
     private val testUser1 = User(
@@ -90,15 +82,9 @@ class HomePresenterTest {
             bloggerProfileImageUrl = "https://xizzhu.me/avatar1.jpg",
             rebloggedBy = null,
             subtitle = "@random_username • Nov 5, 2021",
-            openStatus = openStatus,
-            openBlogger = openUser,
         ),
         FeedStatusTextItem(
             status = testStatus1,
-            openStatus = openStatus,
-            openUrl = openUrl,
-            openTag = openTag,
-            openUser = openUser,
         ),
         FeedStatusMediaItem(
             status = testStatus1,
@@ -110,8 +96,6 @@ class HomePresenterTest {
                     isPlayable = false,
                 ),
             ),
-            openStatus = openStatus,
-            openMedia = openMedia,
         ),
         FeedStatusFooterItem(
             status = testStatus1,
@@ -120,10 +104,6 @@ class HomePresenterTest {
             reblogged = false,
             favorites = "3",
             favorited = true,
-            openStatus = openStatus,
-            replyToStatus = replyToStatus,
-            reblogStatus = reblogStatus,
-            favoriteStatus = favoriteStatus,
         ),
     )
 
@@ -194,15 +174,9 @@ class HomePresenterTest {
             bloggerProfileImageUrl = "",
             rebloggedBy = "random_username_3 boosted",
             subtitle = "@random_username_2@another_instance • Nov 5, 2021",
-            openStatus = openStatus,
-            openBlogger = openUser,
         ),
         FeedStatusTextItem(
             status = testStatus2,
-            openStatus = openStatus,
-            openUrl = openUrl,
-            openTag = openTag,
-            openUser = openUser,
         ),
         FeedStatusMediaItem(
             status = testStatus2,
@@ -220,8 +194,6 @@ class HomePresenterTest {
                     isPlayable = true,
                 ),
             ),
-            openStatus = openStatus,
-            openMedia = openMedia,
         ),
         FeedStatusCardItem(
             status = testStatus2,
@@ -231,12 +203,9 @@ class HomePresenterTest {
             imageUrl = "https://xizzhu.me/media_preview2.jpg",
             placeholder = null,
             url = "https://xizzhu.me/",
-            openStatus = openStatus,
-            openUrl = openUrl,
         ),
         FeedStatusThreadItem(
             status = testStatus2,
-            openStatus = openStatus,
         ),
         FeedStatusFooterItem(
             status = testStatus2,
@@ -245,10 +214,6 @@ class HomePresenterTest {
             reblogged = false,
             favorites = "7M+",
             favorited = true,
-            openStatus = openStatus,
-            replyToStatus = replyToStatus,
-            reblogStatus = reblogStatus,
-            favoriteStatus = favoriteStatus,
         ),
     )
 
@@ -280,15 +245,9 @@ class HomePresenterTest {
             bloggerProfileImageUrl = "https://xizzhu.me/avatar1.jpg",
             rebloggedBy = null,
             subtitle = "@random_username • Nov 8, 2016",
-            openStatus = openStatus,
-            openBlogger = openUser,
         ),
         FeedStatusTextItem(
             status = testStatus3,
-            openStatus = openStatus,
-            openUrl = openUrl,
-            openTag = openTag,
-            openUser = openUser,
         ),
         FeedStatusFooterItem(
             status = testStatus3,
@@ -297,16 +256,12 @@ class HomePresenterTest {
             reblogged = true,
             favorites = "3",
             favorited = false,
-            openStatus = openStatus,
-            replyToStatus = replyToStatus,
-            reblogStatus = reblogStatus,
-            favoriteStatus = favoriteStatus,
         ),
     )
 
     @BeforeTest
     fun setup() {
-        homePresenter = HomePresenter(ApplicationProvider.getApplicationContext(), openStatus, replyToStatus, reblogStatus, favoriteStatus, openUser, openMedia, openTag, openUrl)
+        homePresenter = HomePresenter(ApplicationProvider.getApplicationContext())
     }
 
     @Test
@@ -333,10 +288,13 @@ class HomePresenterTest {
     }
 
     @Test
-    fun `test replace, append, and prepend`() = runTest {
+    fun `test replace, append, prepend, and clear`() = runTest {
         homePresenter.replace(listOf(testStatus1))
         homePresenter.append(listOf(testStatus2))
         homePresenter.prepend(listOf(testStatus3))
         assertEquals(feedItems3 + feedItems1 + feedItems2, homePresenter.feedItems())
+
+        homePresenter.clear()
+        assertTrue(homePresenter.feedItems().isEmpty())
     }
 }

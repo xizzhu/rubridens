@@ -27,40 +27,51 @@ import me.xizzhu.android.rubridens.core.view.formatTextContent
 
 data class FeedStatusTextItem(
     override val status: Status,
-    val openStatus: (status: Status) -> Unit,
-    val openUrl: (url: String) -> Unit,
-    val openTag: (tag: String) -> Unit,
-    val openUser: (user: User) -> Unit,
 ) : FeedItem<FeedStatusTextItem>(TYPE_STATUS_TEXT, status) {
-    val text: CharSequence by lazy(LazyThreadSafetyMode.NONE) {
-        status.formatTextContent(
-            openUrl = { url ->
-                clickableSpanLastClicked = SystemClock.elapsedRealtime()
-                openUrl(url)
-            },
-            openTag = { tag ->
-                clickableSpanLastClicked = SystemClock.elapsedRealtime()
-                openTag(tag)
-            },
-            openUser = { user ->
-                clickableSpanLastClicked = SystemClock.elapsedRealtime()
-                openUser(user)
-            }
-        )
-    }
-
     internal var clickableSpanLastClicked: Long = 0L
+
+    private var text: CharSequence? = null
+
+    internal fun getText(
+        openUrl: (url: String) -> Unit,
+        openTag: (tag: String) -> Unit,
+        openUser: (user: User) -> Unit,
+    ): CharSequence {
+        if (text == null) {
+            text = status.formatTextContent(
+                openUrl = { url ->
+                    clickableSpanLastClicked = SystemClock.elapsedRealtime()
+                    openUrl(url)
+                },
+                openTag = { tag ->
+                    clickableSpanLastClicked = SystemClock.elapsedRealtime()
+                    openTag(tag)
+                },
+                openUser = { user ->
+                    clickableSpanLastClicked = SystemClock.elapsedRealtime()
+                    openUser(user)
+                }
+            )
+        }
+        return text!!
+    }
 }
 
-internal class FeedStatusTextItemViewHolder(inflater: LayoutInflater, parent: ViewGroup)
-    : FeedItemViewHolder<FeedStatusTextItem, ItemFeedStatusTextBinding>(ItemFeedStatusTextBinding.inflate(inflater, parent, false)) {
+internal class FeedStatusTextItemViewHolder(
+    inflater: LayoutInflater,
+    parent: ViewGroup,
+    openStatus: (status: Status) -> Unit,
+    private val openUrl: (url: String) -> Unit,
+    private val openTag: (tag: String) -> Unit,
+    private val openUser: (user: User) -> Unit,
+) : FeedItemViewHolder<FeedStatusTextItem, ItemFeedStatusTextBinding>(ItemFeedStatusTextBinding.inflate(inflater, parent, false)) {
     init {
         // ClickableSpan prevents the click event from being propagated to parent, so have to set the listener on the same TextView
         viewBinding.text.setOnClickListener {
             item?.let { item ->
                 // The text view can still receive the click event even when the ClickableSpan is clicked.
                 if (SystemClock.elapsedRealtime() - item.clickableSpanLastClicked > 250L) {
-                    item.openStatus(item.status)
+                    openStatus(item.status)
                 }
             }
         }
@@ -68,6 +79,6 @@ internal class FeedStatusTextItemViewHolder(inflater: LayoutInflater, parent: Vi
     }
 
     override fun bind(item: FeedStatusTextItem, payloads: List<Any>) = with(viewBinding) {
-        text.text = item.text
+        text.text = item.getText(openUrl = openUrl, openTag = openTag, openUser = openUser)
     }
 }

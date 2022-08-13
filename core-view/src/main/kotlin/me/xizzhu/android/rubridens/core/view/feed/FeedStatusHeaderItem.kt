@@ -38,20 +38,22 @@ data class FeedStatusHeaderItem(
     val bloggerProfileImageUrl: String,
     val rebloggedBy: String?,
     val subtitle: String,
-    val openStatus: (status: Status) -> Unit,
-    val openBlogger: (blogger: User) -> Unit,
 ) : FeedItem<FeedStatusHeaderItem>(TYPE_STATUS_HEADER, status)
 
-internal class FeedStatusHeaderItemViewHolder(inflater: LayoutInflater, parent: ViewGroup)
-    : FeedItemViewHolder<FeedStatusHeaderItem, ItemFeedStatusHeaderBinding>(ItemFeedStatusHeaderBinding.inflate(inflater, parent, false)), ImageLoadingCancellable {
+internal class FeedStatusHeaderItemViewHolder(
+    inflater: LayoutInflater,
+    parent: ViewGroup,
+    openStatus: (status: Status) -> Unit,
+    openBlogger: (blogger: User) -> Unit,
+) : FeedItemViewHolder<FeedStatusHeaderItem, ItemFeedStatusHeaderBinding>(ItemFeedStatusHeaderBinding.inflate(inflater, parent, false)), ImageLoadingCancellable {
     init {
-        viewBinding.root.setOnClickListener { item?.let { it.openStatus(it.status) } }
+        viewBinding.root.setOnClickListener { item?.let { openStatus(it.status) } }
 
         val reblog = DrawableCompat.wrap(ResourcesCompat.getDrawable(itemView.resources, R.drawable.ic_reblog_16, null)!!)
             .apply { DrawableCompat.setTint(this, Color.GRAY) }
         viewBinding.rebloggedBy.setCompoundDrawablesRelativeWithIntrinsicBounds(reblog, null, null, null)
 
-        val openUserListener = View.OnClickListener { item?.let { it.openBlogger(it.blogger) } }
+        val openUserListener = View.OnClickListener { item?.let { openBlogger(it.blogger) } }
         viewBinding.profileImage.setOnClickListener(openUserListener)
         viewBinding.displayName.setOnClickListener(openUserListener)
     }

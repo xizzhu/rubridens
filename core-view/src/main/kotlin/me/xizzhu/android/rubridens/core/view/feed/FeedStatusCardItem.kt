@@ -34,15 +34,17 @@ data class FeedStatusCardItem(
     val imageUrl: String,
     val placeholder: Bitmap?,
     val url: String,
-    val openStatus: (status: Status) -> Unit,
-    val openUrl: (url: String) -> Unit,
 ) : FeedItem<FeedStatusCardItem>(TYPE_STATUS_CARD, status)
 
-internal class FeedStatusCardItemViewHolder(inflater: LayoutInflater, parent: ViewGroup)
-    : FeedItemViewHolder<FeedStatusCardItem, ItemFeedStatusCardBinding>(ItemFeedStatusCardBinding.inflate(inflater, parent, false)), ImageLoadingCancellable {
+internal class FeedStatusCardItemViewHolder(
+    inflater: LayoutInflater,
+    parent: ViewGroup,
+    openStatus: (status: Status) -> Unit,
+    openUrl: (url: String) -> Unit,
+) : FeedItemViewHolder<FeedStatusCardItem, ItemFeedStatusCardBinding>(ItemFeedStatusCardBinding.inflate(inflater, parent, false)), ImageLoadingCancellable {
     init {
-        viewBinding.root.setOnClickListener { item?.let { it.openStatus(it.status) } }
-        viewBinding.card.setOnClickListener { item?.let { it.openUrl(it.url) } }
+        viewBinding.root.setOnClickListener { item?.let { openStatus(it.status) } }
+        viewBinding.card.setOnClickListener { item?.let { openUrl(it.url) } }
     }
 
     override fun bind(item: FeedStatusCardItem, payloads: List<Any>) = with(viewBinding) {

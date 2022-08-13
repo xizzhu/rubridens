@@ -33,21 +33,23 @@ data class FeedStatusFooterItem(
     val reblogged: Boolean,
     val favorites: String,
     val favorited: Boolean,
-    val openStatus: (status: Status) -> Unit,
-    val replyToStatus: (status: Status) -> Unit,
-    val reblogStatus: (status: Status) -> Unit,
-    val favoriteStatus: (status: Status) -> Unit,
 ) : FeedItem<FeedStatusFooterItem>(TYPE_STATUS_FOOTER, status)
 
-internal class FeedStatusFooterItemViewHolder(inflater: LayoutInflater, parent: ViewGroup)
-    : FeedItemViewHolder<FeedStatusFooterItem, ItemFeedStatusFooterBinding>(ItemFeedStatusFooterBinding.inflate(inflater, parent, false)) {
+internal class FeedStatusFooterItemViewHolder(
+    inflater: LayoutInflater,
+    parent: ViewGroup,
+    openStatus: (status: Status) -> Unit,
+    replyToStatus: (status: Status) -> Unit,
+    reblogStatus: (status: Status) -> Unit,
+    favoriteStatus: (status: Status) -> Unit,
+) : FeedItemViewHolder<FeedStatusFooterItem, ItemFeedStatusFooterBinding>(ItemFeedStatusFooterBinding.inflate(inflater, parent, false)) {
     init {
-        viewBinding.root.setOnClickListener { item?.let { it.openStatus(it.status) } }
+        viewBinding.root.setOnClickListener { item?.let { openStatus(it.status) } }
 
         setDrawable(viewBinding.replies, R.drawable.ic_reply_24, false)
-        viewBinding.replies.setOnClickListener { item?.let { it.replyToStatus(it.status) } }
-        viewBinding.reblogs.setOnClickListener { item?.let { it.reblogStatus(it.status) } }
-        viewBinding.favorites.setOnClickListener { item?.let { it.favoriteStatus(it.status) } }
+        viewBinding.replies.setOnClickListener { item?.let { replyToStatus(it.status) } }
+        viewBinding.reblogs.setOnClickListener { item?.let { reblogStatus(it.status) } }
+        viewBinding.favorites.setOnClickListener { item?.let { favoriteStatus(it.status) } }
     }
 
     override fun bind(item: FeedStatusFooterItem, payloads: List<Any>) = with(viewBinding) {

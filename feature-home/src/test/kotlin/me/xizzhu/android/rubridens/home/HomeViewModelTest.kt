@@ -23,7 +23,6 @@ import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
-import io.mockk.mockkConstructor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
@@ -48,7 +47,6 @@ import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 class HomeViewModelTest {
     private val testDispatcher = UnconfinedTestDispatcher()
@@ -59,6 +57,9 @@ class HomeViewModelTest {
     @MockK
     private lateinit var statusRepository: StatusRepository
 
+    @MockK
+    private lateinit var homePresenter: HomePresenter
+
     private lateinit var homeViewModel: HomeViewModel
 
     @BeforeTest
@@ -66,12 +67,7 @@ class HomeViewModelTest {
         Dispatchers.setMain(testDispatcher)
         MockKAnnotations.init(this, relaxed = true)
 
-        mockkConstructor(HomePresenter::class)
-        coEvery { anyConstructed<HomePresenter>().replace(any()) } returns Unit
-        coEvery { anyConstructed<HomePresenter>().prepend(any()) } returns Unit
-        coEvery { anyConstructed<HomePresenter>().append(any()) } returns Unit
-
-        homeViewModel = HomeViewModel(mockk(), authRepository, statusRepository)
+        homeViewModel = HomeViewModel(authRepository, statusRepository, homePresenter)
     }
 
     @AfterTest
@@ -125,21 +121,16 @@ class HomeViewModelTest {
             bloggerProfileImageUrl = "https://xizzhu.me/avatar1.jpg",
             rebloggedBy = null,
             subtitle = "@random_username • Nov 5, 2021",
-            openStatus = mockk(),
-            openBlogger = mockk(),
         )
         coEvery { authRepository.readUserCredentials() } returns listOf(userCredential)
         every { statusRepository.loadLatest(userCredential) } returns flowOf(Data.Remote(listOf(status)))
-        coEvery { anyConstructed<HomePresenter>().feedItems() } returns listOf(feedStatusHeaderItem)
+        coEvery { homePresenter.feedItems() } returns listOf(feedStatusHeaderItem)
 
         homeViewModel.loadLatest()
 
         assertEquals(
-            listOf(
-                HomeViewModel.ViewState(loading = true, items = emptyList()),
-                HomeViewModel.ViewState(loading = false, items = listOf(feedStatusHeaderItem))
-            ),
-            homeViewModel.viewState().take(2).toList()
+            HomeViewModel.ViewState(loading = false, items = listOf(feedStatusHeaderItem)),
+            homeViewModel.viewState().first()
         )
     }
 
@@ -155,8 +146,6 @@ class HomeViewModelTest {
             bloggerProfileImageUrl = "https://xizzhu.me/avatar1.jpg",
             rebloggedBy = null,
             subtitle = "@random_username • Nov 5, 2021",
-            openStatus = mockk(),
-            openBlogger = mockk(),
         )
         coEvery { authRepository.readUserCredentials() } returns listOf(userCredential)
         every { statusRepository.loadLatest(userCredential) } returns flow {
@@ -164,17 +153,16 @@ class HomeViewModelTest {
             delay(100)
             emit(Data.Remote(emptyList()))
         }
-        coEvery { anyConstructed<HomePresenter>().feedItems() } returns listOf(feedStatusHeaderItem)
+        coEvery { homePresenter.feedItems() } returns listOf(feedStatusHeaderItem)
 
         homeViewModel.loadLatest()
 
         assertEquals(
             listOf(
-                HomeViewModel.ViewState(loading = true, items = emptyList()),
                 HomeViewModel.ViewState(loading = true, items = listOf(feedStatusHeaderItem)),
                 HomeViewModel.ViewState(loading = false, items = listOf(feedStatusHeaderItem))
             ),
-            homeViewModel.viewState().take(3).toList()
+            homeViewModel.viewState().take(2).toList()
         )
     }
 
@@ -186,14 +174,15 @@ class HomeViewModelTest {
             throw NetworkException.Other(RuntimeException("random error"))
         }
 
+        val viewAction = async { homeViewModel.viewAction().first() }
+        delay(100)
+
         homeViewModel.loadLatest()
 
+        assertEquals(HomeViewModel.ViewAction.ShowNetworkError, viewAction.await())
         assertEquals(
-            listOf(
-                HomeViewModel.ViewState(loading = true, items = emptyList()),
-                HomeViewModel.ViewState(loading = false, items = emptyList()),
-            ),
-            homeViewModel.viewState().take(2).toList()
+            HomeViewModel.ViewState(loading = false, items = emptyList()),
+            homeViewModel.viewState().first()
         )
     }
 
@@ -208,11 +197,8 @@ class HomeViewModelTest {
         homeViewModel.loadLatest()
 
         assertEquals(
-            listOf(
-                HomeViewModel.ViewState(loading = true, items = emptyList()),
-                HomeViewModel.ViewState(loading = false, items = emptyList()),
-            ),
-            homeViewModel.viewState().take(2).toList()
+            HomeViewModel.ViewState(loading = false, items = emptyList()),
+            homeViewModel.viewState().first()
         )
     }
 }
