@@ -32,6 +32,11 @@ interface StatusRepository {
     fun loadLatest(userCredential: UserCredential, limit: Int): Flow<Data<List<Status>>>
 
     /**
+     * Load [Status] newer than [newerThan]. If no newer statuses are available, an empty list will be emitted.
+     */
+    fun loadNewer(userCredential: UserCredential, newerThan: Status, limit: Int): Flow<Data<List<Status>>>
+
+    /**
      * Load [Status] older than [olderThan]. If no older statuses are available, an empty list will be emitted.
      */
     fun loadOlder(userCredential: UserCredential, olderThan: Status, limit: Int): Flow<Data<List<Status>>>
@@ -61,6 +66,29 @@ internal class StatusRepositoryImpl(
         emit(Data.Remote(remote))
     }
 
+    override fun loadNewer(userCredential: UserCredential, newerThan: Status, limit: Int): Flow<Data<List<Status>>> = flow {
+        val local = readOldestSafely(
+            instanceUrl = userCredential.instanceUrl,
+            newerThan = newerThan.created.toEpochMilliseconds(),
+            limit = limit
+        )
+        if (local.isNotEmpty()) {
+            emit(Data.Local(local))
+        }
+
+        // Spare the server if we already have enough loaded.
+        if (local.size >= limit) return@flow
+
+        // When fetching fails, propagate the error.
+        val remote = fetchHome(
+            userCredential = userCredential,
+            minId = local.firstOrNull()?.id?.id ?: newerThan.id.id,
+            maxId = "",
+            limit = limit,
+        )
+        emit(Data.Remote(remote))
+    }
+
     override fun loadOlder(userCredential: UserCredential, olderThan: Status, limit: Int): Flow<Data<List<Status>>> = flow {
         val local = readLatestSafely(
             instanceUrl = userCredential.instanceUrl,
@@ -86,6 +114,10 @@ internal class StatusRepositoryImpl(
 
     private suspend fun readLatestSafely(instanceUrl: String, olderThan: Long, limit: Int): List<Status> = runCatching<List<Status>> {
         statusCache.readLatest(instanceUrl = instanceUrl, olderThan = olderThan, limit = limit)
+    }.getOrNull() ?: emptyList()
+
+    private suspend fun readOldestSafely(instanceUrl: String, newerThan: Long, limit: Int): List<Status> = runCatching<List<Status>> {
+        statusCache.readOldest(instanceUrl = instanceUrl, newerThan = newerThan, limit = limit)
     }.getOrNull() ?: emptyList()
 
     private suspend fun fetchHome(userCredential: UserCredential, minId: String, maxId: String, limit: Int): List<Status> =

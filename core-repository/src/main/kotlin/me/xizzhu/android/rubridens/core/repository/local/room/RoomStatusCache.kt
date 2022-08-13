@@ -39,6 +39,10 @@ internal class RoomStatusCache(private val appDatabase: AppDatabase) : StatusCac
         buildStatuses(appDatabase.statusDao().readLatest(instanceUrl, olderThan, limit))
     }
 
+    override suspend fun readOldest(instanceUrl: String, newerThan: Long, limit: Int): List<Status> = appDatabase.withTransaction {
+        buildStatuses(appDatabase.statusDao().readOldest(instanceUrl, newerThan, limit))
+    }
+
     private suspend fun buildStatuses(statusEntities: List<StatusEntity>): List<Status> {
         val statusIds = arrayListOf<String>()
         val userIds = hashSetOf<String>()
@@ -72,7 +76,7 @@ internal class RoomStatusCache(private val appDatabase: AppDatabase) : StatusCac
                 media = media[statusId] ?: emptyList(),
                 card = cards[statusId],
             )
-        }
+        }.sortedByDescending { it.created }
     }
 
     override suspend fun save(statuses: List<Status>) {
@@ -223,7 +227,7 @@ internal class MediaEntity(
 @Dao
 internal interface StatusDao {
     @Query("""
-        SELECT * 
+        SELECT *
         FROM ${StatusEntity.TABLE_NAME}
         WHERE
             (${StatusEntity.COLUMN_NAME_INSTANCE_URL} = :instanceUrl OR ${StatusEntity.COLUMN_NAME_REBLOGGED_INSTANCE_URL} = :instanceUrl)
@@ -233,6 +237,18 @@ internal interface StatusDao {
         LIMIT :limit
     """)
     suspend fun readLatest(instanceUrl: String, olderThan: Long, limit: Int): List<StatusEntity>
+
+    @Query("""
+        SELECT *
+        FROM ${StatusEntity.TABLE_NAME}
+        WHERE
+            (${StatusEntity.COLUMN_NAME_INSTANCE_URL} = :instanceUrl OR ${StatusEntity.COLUMN_NAME_REBLOGGED_INSTANCE_URL} = :instanceUrl)
+            AND
+            ${StatusEntity.COLUMN_NAME_CREATED} > :newerThan
+        ORDER BY ${StatusEntity.COLUMN_NAME_CREATED} ASC
+        LIMIT :limit
+    """)
+    suspend fun readOldest(instanceUrl: String, newerThan: Long, limit: Int): List<StatusEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun save(statuses: Collection<StatusEntity>)

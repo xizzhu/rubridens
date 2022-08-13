@@ -111,7 +111,23 @@ class HomeViewModel(
 
     fun loadNewer() = load {
         if (!hasNewerStatuses) return@load
+        val newest = newestStatus ?: return@load
         val userCredential = getUserCredential() ?: return@load
+
+        statusRepository.loadNewer(userCredential, newest, STATUSES_TO_LOAD_PER_REQUEST)
+            .onEach { data ->
+                homePresenter.prepend(data.data)
+
+                if (data is Data.Remote && data.data.size < STATUSES_TO_LOAD_PER_REQUEST) {
+                    hasNewerStatuses = false
+                }
+                data.data.firstOrNull()?.let { newestStatus = it }
+
+                val items = homePresenter.feedItems()
+                emitViewState { currentViewState -> currentViewState.copy(items = items) }
+            }
+            .catch { e -> handleLoadingException(e) }
+            .collect()
     }
 
     fun loadOlder() = load {

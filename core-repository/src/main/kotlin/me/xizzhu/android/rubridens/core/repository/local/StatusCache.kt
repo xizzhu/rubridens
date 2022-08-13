@@ -25,5 +25,11 @@ internal interface StatusCache {
         limit: Int = 20,
     ): List<Status>
 
+    suspend fun readOldest(
+        instanceUrl: String,
+        newerThan: Long = Long.MIN_VALUE,
+        limit: Int = 20,
+    ): List<Status>
+
     suspend fun save(statuses: List<Status>)
 }

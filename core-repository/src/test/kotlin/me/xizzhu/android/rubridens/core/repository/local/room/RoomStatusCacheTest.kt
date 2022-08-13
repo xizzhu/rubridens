@@ -103,7 +103,7 @@ internal class RoomStatusCacheTest : BaseRoomTest() {
     private val testStatus2 = Status(
         id = EntityKey("xizzhu.me", "54321"),
         uri = "https://xizzhu.me/",
-        created = Instant.parse("2021-11-05T11:22:33.444Z"),
+        created = Instant.parse("2021-11-05T11:33:44.555Z"),
         sender = testUser2,
         reblogger = testUser3,
         rebloggedInstanceUrl = "xizzhu.me",
@@ -130,14 +130,21 @@ internal class RoomStatusCacheTest : BaseRoomTest() {
     @Test
     fun `test read from empty database`() = runTest {
         assertTrue(roomStatusCache.readLatest("xizzhu.me").isEmpty())
+        assertTrue(roomStatusCache.readOldest("xizzhu.me").isEmpty())
     }
 
     @Test
     fun `test save then read`() = runTest {
         roomStatusCache.save(listOf(testStatus1))
         assertEquals(listOf(testStatus1), roomStatusCache.readLatest("xizzhu.me"))
+        assertTrue(roomStatusCache.readLatest("xizzhu.me", olderThan = testStatus1.created.toEpochMilliseconds()).isEmpty())
+        assertEquals(listOf(testStatus1), roomStatusCache.readOldest("xizzhu.me"))
+        assertTrue(roomStatusCache.readOldest("xizzhu.me", newerThan = testStatus1.created.toEpochMilliseconds()).isEmpty())
 
         roomStatusCache.save(listOf(testStatus2))
-        assertEquals(listOf(testStatus1, testStatus2), roomStatusCache.readLatest("xizzhu.me"))
+        assertEquals(listOf(testStatus2, testStatus1), roomStatusCache.readLatest("xizzhu.me"))
+        assertEquals(listOf(testStatus1), roomStatusCache.readLatest("xizzhu.me", olderThan = testStatus2.created.toEpochMilliseconds()))
+        assertEquals(listOf(testStatus2, testStatus1), roomStatusCache.readOldest("xizzhu.me"))
+        assertEquals(listOf(testStatus2), roomStatusCache.readOldest("xizzhu.me", newerThan = testStatus1.created.toEpochMilliseconds()))
     }
 }

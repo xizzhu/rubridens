@@ -198,6 +198,100 @@ class StatusRepositoryTest {
     }
 
     @Test
+    fun `test loadNewer - local is not empty, and hits limit`() = runTest {
+        coEvery { statusCache.readOldest(any(), any(), any()) } returns listOf(testStatus1)
+        coEvery { timelinesService.fetchHome(any(), any(), any(), any(), any(), any(), any()) } throws RuntimeException("random error")
+
+        assertEquals(
+            listOf(Data.Local(listOf(testStatus1))),
+            statusRepository.loadNewer(userCredential, testStatus1, 1).toList()
+        )
+    }
+
+    @Test
+    fun `test loadNewer - local throws exception, but remote is not empty`() = runTest {
+        coEvery { statusCache.readOldest(any(), any()) } throws RuntimeException("random error")
+        coEvery { timelinesService.fetchHome(any(), any(), any(), any(), any(), any(), any()) } returns listOf(testStatus2)
+
+        assertEquals(
+            listOf(Data.Remote(listOf(testStatus2))),
+            statusRepository.loadNewer(userCredential, testStatus1, 20).toList()
+        )
+    }
+
+    @Test(expected = RuntimeException::class)
+    fun `test loadNewer - local is not empty, but remote throws exception`() = runTest {
+        coEvery { statusCache.readOldest(any(), any()) } returns listOf(testStatus1)
+        coEvery { timelinesService.fetchHome(any(), any(), any(), any(), any(), any(), any()) } throws RuntimeException("random error")
+
+        assertEquals(
+            listOf(Data.Local(listOf(testStatus1))),
+            statusRepository.loadNewer(userCredential, testStatus1, 20).take(1).toList()
+        )
+
+        statusRepository.loadNewer(userCredential, testStatus1, 20).toList()
+    }
+
+    @Test
+    fun `test loadNewer - both local and remote are not empty`() = runTest {
+        coEvery { statusCache.readOldest(any(), any()) } returns listOf(testStatus1)
+        coEvery { timelinesService.fetchHome(any(), any(), any(), any(), any(), any(), any()) } returns listOf(testStatus2)
+
+        assertEquals(
+            listOf(
+                Data.Local(listOf(testStatus1)),
+                Data.Remote(listOf(testStatus2))
+            ),
+            statusRepository.loadNewer(userCredential, testStatus1, 20).toList()
+        )
+    }
+
+    @Test
+    fun `test loadNewer - both local and remote are empty`() = runTest {
+        coEvery { statusCache.readOldest(any(), any()) } returns emptyList()
+        coEvery { timelinesService.fetchHome(any(), any(), any(), any(), any(), any(), any()) } returns emptyList()
+
+        assertEquals(
+            listOf(Data.Remote(emptyList())),
+            statusRepository.loadNewer(userCredential, testStatus1, 20).toList()
+        )
+    }
+
+    @Test
+    fun `test loadNewer - local is empty, but remote is not empty`() = runTest {
+        coEvery { statusCache.readOldest(any(), any()) } returns emptyList()
+        coEvery { timelinesService.fetchHome(any(), any(), any(), any(), any(), any(), any()) } returns listOf(testStatus2)
+
+        assertEquals(
+            listOf(Data.Remote(listOf(testStatus2))),
+            statusRepository.loadNewer(userCredential, testStatus1, 20).toList()
+        )
+    }
+
+    @Test
+    fun `test loadNewer - local is not empty, but remote is empty`() = runTest {
+        coEvery {
+            statusCache.readOldest(any(), any())
+        } answers { answer ->
+            assertEquals(Instant.parse("2021-11-05T11:22:33.444Z").toEpochMilliseconds(), answer.invocation.args[1])
+            listOf(testStatus1)
+        }
+        coEvery {
+            timelinesService.fetchHome(any(), any(), any(), any(), any(), any(), any())
+        } answers { answer ->
+            assertEquals("", answer.invocation.args[3])
+            assertEquals("12345", answer.invocation.args[4])
+
+            emptyList()
+        }
+
+        assertEquals(
+            listOf(Data.Local(listOf(testStatus1)), Data.Remote(emptyList())),
+            statusRepository.loadNewer(userCredential, testStatus1, 20).toList()
+        )
+    }
+
+    @Test
     fun `test loadOlder - both local and remote are empty`() = runTest {
         coEvery { statusCache.readLatest(any(), any()) } returns emptyList()
         coEvery { timelinesService.fetchHome(any(), any(), any(), any(), any(), any(), any()) } returns emptyList()

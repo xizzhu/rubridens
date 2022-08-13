@@ -37,10 +37,12 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import me.xizzhu.android.rubridens.core.model.Data
+import me.xizzhu.android.rubridens.core.model.Status
 import me.xizzhu.android.rubridens.core.model.UserCredential
 import me.xizzhu.android.rubridens.core.repository.AuthRepository
 import me.xizzhu.android.rubridens.core.repository.StatusRepository
 import me.xizzhu.android.rubridens.core.repository.network.NetworkException
+import me.xizzhu.android.rubridens.core.view.feed.FeedItem
 import me.xizzhu.android.rubridens.core.view.feed.FeedStatusHeaderItem
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
@@ -204,20 +206,16 @@ class HomeViewModelTest {
     }
 
     @Test
-    fun `test loadLatest then loadOlder`() = runTest {
+    fun `test loadLatest then loadNewer`() = runTest {
         val userCredential = mockk<UserCredential>()
         val feedStatusHeaderItem = mockk<FeedStatusHeaderItem>()
         coEvery { authRepository.readUserCredentials() } returns listOf(userCredential)
-        every { statusRepository.loadLatest(userCredential, any()) } returns flowOf(Data.Remote(listOf(mockk())))
-        every { statusRepository.loadOlder(any(), any(), any()) } returns flowOf(Data.Remote(listOf(mockk())))
+        every { statusRepository.loadLatest(userCredential, any()) } returns flowOf(Data.Remote(mutableListOf<Status>().apply { repeat(20) { add(mockk()) } }))
 
         var called = 0
-        coEvery { homePresenter.feedItems() } answers { answer ->
-            if (called++ == 0) {
-                listOf(feedStatusHeaderItem)
-            } else {
-                listOf(feedStatusHeaderItem, feedStatusHeaderItem)
-            }
+        coEvery { homePresenter.feedItems() } answers { _ ->
+            called++
+            mutableListOf<FeedItem<*>>().apply { repeat(called) { add(feedStatusHeaderItem) } }
         }
 
         homeViewModel.loadLatest()
@@ -226,14 +224,90 @@ class HomeViewModelTest {
             homeViewModel.viewState().first()
         )
 
+        // Throws an exception, should emit the error.
+        every { statusRepository.loadNewer(any(), any(), any()) } returns flow { throw NetworkException.Other(RuntimeException("random error")) }
+
+        val viewAction = async { homeViewModel.viewAction().first() }
+        delay(100)
+
+        homeViewModel.loadNewer()
+
+        assertEquals(HomeViewModel.ViewAction.ShowNetworkError, viewAction.await())
+        verify(exactly = 1) { statusRepository.loadNewer(any(), any(), any()) }
+
+        // Loads same amount as requested.
+        every { statusRepository.loadNewer(any(), any(), any()) } returns flowOf(Data.Remote(mutableListOf<Status>().apply { repeat(20) { add(mockk()) } }))
+        homeViewModel.loadNewer()
+        assertEquals(
+            HomeViewModel.ViewState(loading = false, items = listOf(feedStatusHeaderItem, feedStatusHeaderItem)),
+            homeViewModel.viewState().first()
+        )
+        verify(exactly = 2) { statusRepository.loadNewer(any(), any(), any()) }
+
+        // Loads less than requested, meaning no more data available after this.
+        every { statusRepository.loadNewer(any(), any(), any()) } returns flowOf(Data.Remote(listOf(mockk())))
+        homeViewModel.loadNewer()
+        assertEquals(
+            HomeViewModel.ViewState(loading = false, items = listOf(feedStatusHeaderItem, feedStatusHeaderItem, feedStatusHeaderItem)),
+            homeViewModel.viewState().first()
+        )
+        verify(exactly = 3) { statusRepository.loadNewer(any(), any(), any()) }
+
+        // Already loaded all data, should not bother the server.
+        homeViewModel.loadNewer()
+        verify(exactly = 3) { statusRepository.loadNewer(any(), any(), any()) }
+    }
+
+    @Test
+    fun `test loadLatest then loadOlder`() = runTest {
+        val userCredential = mockk<UserCredential>()
+        val feedStatusHeaderItem = mockk<FeedStatusHeaderItem>()
+        coEvery { authRepository.readUserCredentials() } returns listOf(userCredential)
+        every { statusRepository.loadLatest(userCredential, any()) } returns flowOf(Data.Remote(listOf(mockk())))
+
+        var called = 0
+        coEvery { homePresenter.feedItems() } answers { _ ->
+            called++
+            mutableListOf<FeedItem<*>>().apply { repeat(called) { add(feedStatusHeaderItem) } }
+        }
+
+        homeViewModel.loadLatest()
+        assertEquals(
+            HomeViewModel.ViewState(loading = false, items = listOf(feedStatusHeaderItem)),
+            homeViewModel.viewState().first()
+        )
+
+        // Throws an exception, should emit the error.
+        every { statusRepository.loadOlder(any(), any(), any()) } returns flow { throw NetworkException.Other(RuntimeException("random error")) }
+
+        val viewAction = async { homeViewModel.viewAction().first() }
+        delay(100)
+
+        homeViewModel.loadOlder()
+
+        assertEquals(HomeViewModel.ViewAction.ShowNetworkError, viewAction.await())
+        verify(exactly = 1) { statusRepository.loadOlder(any(), any(), any()) }
+
+        // Loads same amount as requested.
+        every { statusRepository.loadOlder(any(), any(), any()) } returns flowOf(Data.Remote(mutableListOf<Status>().apply { repeat(20) { add(mockk()) } }))
         homeViewModel.loadOlder()
         assertEquals(
             HomeViewModel.ViewState(loading = false, items = listOf(feedStatusHeaderItem, feedStatusHeaderItem)),
             homeViewModel.viewState().first()
         )
-        verify(exactly = 1) { statusRepository.loadOlder(any(), any(), any()) }
+        verify(exactly = 2) { statusRepository.loadOlder(any(), any(), any()) }
 
+        // Loads less than requested, meaning no more data available after this.
+        every { statusRepository.loadOlder(any(), any(), any()) } returns flowOf(Data.Remote(listOf(mockk())))
         homeViewModel.loadOlder()
-        verify(exactly = 1) { statusRepository.loadOlder(any(), any(), any()) }
+        assertEquals(
+            HomeViewModel.ViewState(loading = false, items = listOf(feedStatusHeaderItem, feedStatusHeaderItem, feedStatusHeaderItem)),
+            homeViewModel.viewState().first()
+        )
+        verify(exactly = 3) { statusRepository.loadOlder(any(), any(), any()) }
+
+        // Already loaded all data, should not bother the server.
+        homeViewModel.loadOlder()
+        verify(exactly = 3) { statusRepository.loadOlder(any(), any(), any()) }
     }
 }
