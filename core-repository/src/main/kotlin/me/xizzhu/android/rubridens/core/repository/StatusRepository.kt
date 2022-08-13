@@ -29,15 +29,19 @@ interface StatusRepository {
      * If locally cached [Status] are available, emits the latest ones, then fetches immediate newer ones from the server and emits them.
      * Otherwise, fetches the latest [Status] from server and emits them.
      */
-    fun loadLatest(userCredential: UserCredential): Flow<Data<List<Status>>>
+    fun loadLatest(userCredential: UserCredential, limit: Int): Flow<Data<List<Status>>>
 }
 
 internal class StatusRepositoryImpl(
     private val timelinesService: TimelinesService,
     private val statusCache: StatusCache,
 ) : StatusRepository {
-    override fun loadLatest(userCredential: UserCredential): Flow<Data<List<Status>>> = flow {
-        val local = readLatestSafely(userCredential.instanceUrl, Long.MAX_VALUE)
+    override fun loadLatest(userCredential: UserCredential, limit: Int): Flow<Data<List<Status>>> = flow {
+        val local = readLatestSafely(
+            instanceUrl = userCredential.instanceUrl,
+            olderThan = Long.MAX_VALUE,
+            limit = limit
+        )
         if (local.isNotEmpty()) {
             emit(Data.Local(local))
         }
@@ -47,19 +51,21 @@ internal class StatusRepositoryImpl(
             userCredential = userCredential,
             minId = local.firstOrNull()?.id?.id ?: "",
             maxId = "",
+            limit = limit
         )
         emit(Data.Remote(remote))
     }
 
-    private suspend fun readLatestSafely(instanceUrl: String, olderThan: Long): List<Status> = runCatching<List<Status>> {
-        statusCache.readLatest(instanceUrl, olderThan)
+    private suspend fun readLatestSafely(instanceUrl: String, olderThan: Long, limit: Int): List<Status> = runCatching<List<Status>> {
+        statusCache.readLatest(instanceUrl = instanceUrl, olderThan = olderThan, limit = limit)
     }.getOrNull() ?: emptyList()
 
-    private suspend fun fetchHome(userCredential: UserCredential, minId: String, maxId: String): List<Status> =
+    private suspend fun fetchHome(userCredential: UserCredential, minId: String, maxId: String, limit: Int): List<Status> =
         timelinesService.fetchHome(
             instanceUrl = userCredential.instanceUrl,
             userOAuthToken = userCredential.accessToken,
             minId = minId,
             maxId = maxId,
+            limit = limit,
         ).also { runCatching { statusCache.save(it) } }
 }

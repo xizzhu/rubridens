@@ -121,7 +121,7 @@ class StatusRepositoryTest {
 
         assertEquals(
             listOf(Data.Remote(emptyList())),
-            statusRepository.loadLatest(userCredential).toList()
+            statusRepository.loadLatest(userCredential, 20).toList()
         )
     }
 
@@ -132,7 +132,7 @@ class StatusRepositoryTest {
 
         assertEquals(
             listOf(Data.Remote(listOf(testStatus2))),
-            statusRepository.loadLatest(userCredential).toList()
+            statusRepository.loadLatest(userCredential, 20).toList()
         )
     }
 
@@ -150,7 +150,7 @@ class StatusRepositoryTest {
 
         assertEquals(
             listOf(Data.Local(listOf(testStatus1)), Data.Remote(emptyList())),
-            statusRepository.loadLatest(userCredential).toList()
+            statusRepository.loadLatest(userCredential, 20).toList()
         )
     }
 
@@ -161,7 +161,7 @@ class StatusRepositoryTest {
 
         assertEquals(
             listOf(Data.Remote(listOf(testStatus2))),
-            statusRepository.loadLatest(userCredential).toList()
+            statusRepository.loadLatest(userCredential, 20).toList()
         )
     }
 
@@ -172,10 +172,10 @@ class StatusRepositoryTest {
 
         assertEquals(
             listOf(Data.Local(listOf(testStatus1))),
-            statusRepository.loadLatest(userCredential).take(1).toList()
+            statusRepository.loadLatest(userCredential, 20).take(1).toList()
         )
 
-        statusRepository.loadLatest(userCredential).toList()
+        statusRepository.loadLatest(userCredential, 20).toList()
     }
 
     @Test
@@ -188,7 +188,7 @@ class StatusRepositoryTest {
                 Data.Local(listOf(testStatus1)),
                 Data.Remote(listOf(testStatus2))
             ),
-            statusRepository.loadLatest(userCredential).toList()
+            statusRepository.loadLatest(userCredential, 20).toList()
         )
     }
 }

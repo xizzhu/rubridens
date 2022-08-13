@@ -123,7 +123,7 @@ class HomeViewModelTest {
             subtitle = "@random_username • Nov 5, 2021",
         )
         coEvery { authRepository.readUserCredentials() } returns listOf(userCredential)
-        every { statusRepository.loadLatest(userCredential) } returns flowOf(Data.Remote(listOf(status)))
+        every { statusRepository.loadLatest(userCredential, any()) } returns flowOf(Data.Remote(listOf(status)))
         coEvery { homePresenter.feedItems() } returns listOf(feedStatusHeaderItem)
 
         homeViewModel.loadLatest()
@@ -148,7 +148,7 @@ class HomeViewModelTest {
             subtitle = "@random_username • Nov 5, 2021",
         )
         coEvery { authRepository.readUserCredentials() } returns listOf(userCredential)
-        every { statusRepository.loadLatest(userCredential) } returns flow {
+        every { statusRepository.loadLatest(userCredential, any()) } returns flow {
             emit(Data.Local(listOf(status)))
             delay(100)
             emit(Data.Remote(emptyList()))
@@ -170,7 +170,7 @@ class HomeViewModelTest {
     fun `test loadLatest with network error`() = runTest {
         val userCredential = mockk<UserCredential>()
         coEvery { authRepository.readUserCredentials() } returns listOf(userCredential)
-        every { statusRepository.loadLatest(userCredential) } returns flow {
+        every { statusRepository.loadLatest(userCredential, any()) } returns flow {
             throw NetworkException.Other(RuntimeException("random error"))
         }
 
@@ -190,7 +190,7 @@ class HomeViewModelTest {
     fun `test loadLatest with random exception`() = runTest {
         val userCredential = mockk<UserCredential>()
         coEvery { authRepository.readUserCredentials() } returns listOf(userCredential)
-        every { statusRepository.loadLatest(userCredential) } returns flow {
+        every { statusRepository.loadLatest(userCredential, any()) } returns flow {
             throw RuntimeException("random error")
         }
 

@@ -47,6 +47,10 @@ class HomeViewModel(
 
     data class ViewState(val loading: Boolean, val items: List<FeedItem<*>>)
 
+    companion object {
+        private const val STATUSES_TO_LOAD_PER_REQUEST = 20
+    }
+
     private val loading = AtomicBoolean(false)
 
     private val hasNewerStatuses = AtomicBoolean(true)
@@ -62,7 +66,7 @@ class HomeViewModel(
             )
         }
         homePresenter.clear()
-        statusRepository.loadLatest(userCredential)
+        statusRepository.loadLatest(userCredential, STATUSES_TO_LOAD_PER_REQUEST)
             .onEach { data ->
                 val isLoading = when (data) {
                     is Data.Local -> {
