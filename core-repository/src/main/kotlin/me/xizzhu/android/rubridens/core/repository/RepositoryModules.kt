@@ -19,9 +19,13 @@ package me.xizzhu.android.rubridens.core.repository
 import androidx.room.Room
 import com.squareup.moshi.Moshi
 import me.xizzhu.android.rubridens.core.repository.local.ApplicationCredentialCache
+import me.xizzhu.android.rubridens.core.repository.local.StatusCache
+import me.xizzhu.android.rubridens.core.repository.local.UserCache
 import me.xizzhu.android.rubridens.core.repository.local.UserCredentialCache
 import me.xizzhu.android.rubridens.core.repository.local.room.AppDatabase
 import me.xizzhu.android.rubridens.core.repository.local.room.RoomApplicationCredentialCache
+import me.xizzhu.android.rubridens.core.repository.local.room.RoomStatusCache
+import me.xizzhu.android.rubridens.core.repository.local.room.RoomUserCache
 import me.xizzhu.android.rubridens.core.repository.local.room.RoomUserCredentialCache
 import me.xizzhu.android.rubridens.core.repository.network.AccountsService
 import me.xizzhu.android.rubridens.core.repository.network.AppsService
@@ -42,6 +46,8 @@ import java.util.concurrent.TimeUnit
 val repositoryModule = module {
     single { Room.databaseBuilder(get(), AppDatabase::class.java, "app_database").build() }
     single<ApplicationCredentialCache> { RoomApplicationCredentialCache(get()) }
+    single<StatusCache> { RoomStatusCache(get()) }
+    single<UserCache> { RoomUserCache(get()) }
     single<UserCredentialCache> { RoomUserCredentialCache(get()) }
 
     single { Moshi.Builder().build() }
@@ -67,5 +73,5 @@ val repositoryModule = module {
 
     single<AuthRepository> { AuthRepositoryImpl(get(), get(), get(), get(), get()) }
     single<InstanceRepository> { InstanceRepositoryImpl(get()) }
-    single<StatusRepository> { StatusRepositoryImpl(get()) }
+    single<StatusRepository> { StatusRepositoryImpl(get(), get()) }
 }

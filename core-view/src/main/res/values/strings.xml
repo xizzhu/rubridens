@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <string name="feed_item_text_no_more_status">You have reached end of the feed\nw(ﾟДﾟ)w</string>
     <string name="feed_item_text_show_thread">Show Thread</string>
 </resources>

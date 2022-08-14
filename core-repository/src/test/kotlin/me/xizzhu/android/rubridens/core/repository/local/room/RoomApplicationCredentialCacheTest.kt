@@ -18,6 +18,7 @@ package me.xizzhu.android.rubridens.core.repository.local.room
 
 import kotlinx.coroutines.test.runTest
 import me.xizzhu.android.rubridens.core.model.ApplicationCredential
+import me.xizzhu.android.rubridens.core.model.EntityKey
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import kotlin.test.BeforeTest
@@ -43,8 +44,7 @@ internal class RoomApplicationCredentialCacheTest : BaseRoomTest() {
     @Test
     fun `test save then readByInstanceUrl`() = runTest {
         roomApplicationCredentialCache.save(ApplicationCredential(
-            instanceUrl = "xizzhu.me",
-            clientId = "client_id",
+            clientId = EntityKey("xizzhu.me", "client_id"),
             clientSecret = "client_secret",
             accessToken = "access_token",
             vapidKey = "vapid_key",
@@ -53,8 +53,7 @@ internal class RoomApplicationCredentialCacheTest : BaseRoomTest() {
         assertNull(roomApplicationCredentialCache.readByInstanceUrl("non-exist"))
         assertEquals(
             ApplicationCredential(
-                instanceUrl = "xizzhu.me",
-                clientId = "client_id",
+                clientId = EntityKey("xizzhu.me", "client_id"),
                 clientSecret = "client_secret",
                 accessToken = "access_token",
                 vapidKey = "vapid_key",
@@ -63,16 +62,14 @@ internal class RoomApplicationCredentialCacheTest : BaseRoomTest() {
         )
 
         roomApplicationCredentialCache.save(ApplicationCredential(
-            instanceUrl = "xizzhu.me",
-            clientId = "client_id_2",
+            clientId = EntityKey("xizzhu.me", "client_id_2"),
             clientSecret = "client_secret_2",
             accessToken = "access_token_2",
             vapidKey = "vapid_key_2",
         ))
         assertEquals(
             ApplicationCredential(
-                instanceUrl = "xizzhu.me",
-                clientId = "client_id_2",
+                clientId = EntityKey("xizzhu.me", "client_id_2"),
                 clientSecret = "client_secret_2",
                 accessToken = "access_token_2",
                 vapidKey = "vapid_key_2",

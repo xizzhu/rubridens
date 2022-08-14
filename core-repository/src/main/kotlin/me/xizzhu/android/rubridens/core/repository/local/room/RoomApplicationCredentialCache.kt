@@ -24,6 +24,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.PrimaryKey
 import androidx.room.Query
 import me.xizzhu.android.rubridens.core.model.ApplicationCredential
+import me.xizzhu.android.rubridens.core.model.EntityKey
 import me.xizzhu.android.rubridens.core.repository.local.ApplicationCredentialCache
 
 internal class RoomApplicationCredentialCache(private val appDatabase: AppDatabase) : ApplicationCredentialCache {
@@ -62,16 +63,15 @@ internal class ApplicationCredentialEntity(
     }
 
     constructor(applicationCredential: ApplicationCredential) : this(
-        instanceUrl = applicationCredential.instanceUrl,
-        clientId = applicationCredential.clientId,
+        instanceUrl = applicationCredential.clientId.instanceUrl,
+        clientId = applicationCredential.clientId.id,
         clientSecret = applicationCredential.clientSecret,
         accessToken = applicationCredential.accessToken,
         vapidKey = applicationCredential.vapidKey,
     )
 
     fun toApplicationCredential(): ApplicationCredential = ApplicationCredential(
-        instanceUrl = instanceUrl,
-        clientId = clientId,
+        clientId = EntityKey(instanceUrl, clientId),
         clientSecret = clientSecret,
         accessToken = accessToken,
         vapidKey = vapidKey,

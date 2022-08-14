@@ -36,10 +36,10 @@ fun Int.formatCount(): String = when {
 
 fun User.formatDisplayName(): String = displayName.takeIf { it.isNotEmpty() } ?: username
 
-fun Status.formatSenderUsername(): String = if (instanceUrl == sender.instanceUrl) {
+fun Status.formatSenderUsername(): String = if (id.instanceUrl == sender.id.instanceUrl) {
     "@${sender.username}"
 } else {
-    "@${sender.username}@${sender.instanceUrl}"
+    "@${sender.username}@${sender.id.instanceUrl}"
 }
 
 fun Status.formatRelativeTimestamp(): CharSequence = DateUtils.getRelativeTimeSpanString(min(created.toEpochMilliseconds(), System.currentTimeMillis()))
@@ -83,7 +83,6 @@ fun Status.formatTextContent(openUrl: (url: String) -> Unit, openTag: (tag: Stri
                 openUser(User(
                     id = mention.userId,
                     username = mention.username,
-                    instanceUrl = mention.userInstanceUrl,
                     displayName = "",
                     avatarUrl = ""
                 ))

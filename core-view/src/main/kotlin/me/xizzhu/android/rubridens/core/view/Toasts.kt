@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package me.xizzhu.android.rubridens.core.model
+package me.xizzhu.android.rubridens.core.view
 
-data class ApplicationCredential(
-    val clientId: EntityKey,
-    val clientSecret: String,
-    val accessToken: String,
-    val vapidKey: String,
-)
+import android.content.Context
+import android.widget.Toast
+import androidx.annotation.StringRes
+
+fun Context.toast(@StringRes text: Int) {
+    Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
+}

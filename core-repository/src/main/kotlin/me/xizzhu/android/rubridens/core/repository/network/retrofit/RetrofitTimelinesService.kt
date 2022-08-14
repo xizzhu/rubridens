@@ -20,6 +20,7 @@ import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import kotlinx.datetime.Instant
 import me.xizzhu.android.rubridens.core.model.Card
+import me.xizzhu.android.rubridens.core.model.EntityKey
 import me.xizzhu.android.rubridens.core.model.Media
 import me.xizzhu.android.rubridens.core.model.Mention
 import me.xizzhu.android.rubridens.core.model.Status
@@ -79,10 +80,10 @@ internal class MastodonCard(
     @Json(name = "url") val url: String,
     @Json(name = "title") val title: String,
     @Json(name = "description") val description: String,
-    @Json(name = "author_name") val authorName: String = "",
-    @Json(name = "provider_name") val providerName: String = "",
-    @Json(name = "image") val image: String = "",
-    @Json(name = "blurhash") val blurHash: String = "",
+    @Json(name = "author_name") val authorName: String?,
+    @Json(name = "provider_name") val providerName: String?,
+    @Json(name = "image") val image: String?,
+    @Json(name = "blurhash") val blurHash: String?,
 ) {
     fun toCard(): Card? = type.toCardType()?.let { cardType ->
         Card(
@@ -90,9 +91,9 @@ internal class MastodonCard(
             url = url,
             title = title,
             description = description,
-            author = authorName.takeIf { it.isNotEmpty() } ?: providerName,
-            previewUrl = image,
-            blurHash = blurHash,
+            author = authorName?.takeIf { it.isNotEmpty() } ?: providerName ?: "",
+            previewUrl = image ?: "",
+            blurHash = blurHash ?: "",
         )
     }
 }
@@ -112,15 +113,15 @@ internal fun String.toCardType(): Card.Type? = when (this) {
 internal class MastodonMediaAttachment(
     @Json(name = "type") val type: String,
     @Json(name = "url") val url: String,
-    @Json(name = "preview_url") val previewUrl: String = "",
-    @Json(name = "blurhash") val blurHash: String = "",
+    @Json(name = "preview_url") val previewUrl: String?,
+    @Json(name = "blurhash") val blurHash: String?,
 ) {
     fun toMedia(): Media? = type.toMediaType()?.let { mediaType ->
         Media(
             type = mediaType,
             url = url,
-            previewUrl = previewUrl,
-            blurHash = blurHash,
+            previewUrl = previewUrl ?: "",
+            blurHash = blurHash ?: "",
         )
     }
 }
@@ -143,13 +144,15 @@ internal class MastodonMention(
     @Json(name = "acct") val accountName: String
 ) {
     fun toMention(instanceUrl: String): Mention = Mention(
-        userId = id,
+        userId = EntityKey(
+            instanceUrl = if (accountName.length > username.length) {
+                accountName.substring(username.length + 1)
+            } else {
+                instanceUrl
+            },
+            id = id,
+        ),
         username = username,
-        userInstanceUrl = if (accountName.length > username.length) {
-            accountName.substring(username.length + 1)
-        } else {
-            instanceUrl
-        },
     )
 }
 
@@ -188,8 +191,7 @@ internal class MastodonStatus(
         ?: toStatusInternal(instanceUrl, null, null)
 
     private fun toStatusInternal(instanceUrl: String, reblogger: User?, rebloggedInstanceUrl: String?): Status = Status(
-        id = id,
-        instanceUrl = instanceUrl,
+        id = EntityKey(instanceUrl, id),
         uri = uri,
         created = Instant.parse(createdAt),
         sender = account.toUser(instanceUrl),

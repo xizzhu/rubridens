@@ -19,6 +19,7 @@ package me.xizzhu.android.rubridens.core.repository.network.retrofit
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Instant
 import me.xizzhu.android.rubridens.core.model.Card
+import me.xizzhu.android.rubridens.core.model.EntityKey
 import me.xizzhu.android.rubridens.core.model.Media
 import me.xizzhu.android.rubridens.core.model.Status
 import me.xizzhu.android.rubridens.core.model.User
@@ -114,13 +115,11 @@ class RetrofitTimelinesServiceTest : BaseRetrofitTest() {
         assertEquals(
             listOf(
                 Status(
-                    id = "12345",
-                    instanceUrl = "xizzhu.me",
+                    id = EntityKey("xizzhu.me", "12345"),
                     uri = "https://xizzhu.me/",
                     created = Instant.parse("2021-11-05T11:22:33.444Z"),
                     sender = User(
-                        id = "67890",
-                        instanceUrl = "xizzhu.me",
+                        id = EntityKey("xizzhu.me", "67890"),
                         username = "random_username",
                         displayName = "Random Display Name",
                         avatarUrl = "https://xizzhu.me/avatar1.jpg"
@@ -148,13 +147,11 @@ class RetrofitTimelinesServiceTest : BaseRetrofitTest() {
                     favorited = true,
                 ),
                 Status(
-                    id = "54321",
-                    instanceUrl = "xizzhu.me",
+                    id = EntityKey("xizzhu.me", "54321"),
                     uri = "https://xizzhu.me/pages/about/",
                     created = Instant.parse("2021-12-25T00:11:22.333Z"),
                     sender = User(
-                        id = "09876",
-                        instanceUrl = "xizzhu.me",
+                        id = EntityKey("xizzhu.me", "09876"),
                         username = "random_username_2",
                         displayName = "",
                         avatarUrl = "https://xizzhu.me/avatar2.jpg"

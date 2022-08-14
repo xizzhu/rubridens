@@ -14,11 +14,22 @@
  * limitations under the License.
  */
 
-package me.xizzhu.android.rubridens.core.model
+package me.xizzhu.android.rubridens.core.repository.local
 
-data class ApplicationCredential(
-    val clientId: EntityKey,
-    val clientSecret: String,
-    val accessToken: String,
-    val vapidKey: String,
-)
+import me.xizzhu.android.rubridens.core.model.Status
+
+internal interface StatusCache {
+    suspend fun readLatest(
+        instanceUrl: String,
+        olderThan: Long = Long.MAX_VALUE,
+        limit: Int = 20,
+    ): List<Status>
+
+    suspend fun readOldest(
+        instanceUrl: String,
+        newerThan: Long = Long.MIN_VALUE,
+        limit: Int = 20,
+    ): List<Status>
+
+    suspend fun save(statuses: List<Status>)
+}

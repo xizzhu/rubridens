@@ -18,12 +18,16 @@ package me.xizzhu.android.rubridens.home
 
 import android.content.Context
 import android.content.Intent
+import androidx.recyclerview.widget.RecyclerView
 import me.xizzhu.android.rubridens.core.infra.BaseActivity
+import me.xizzhu.android.rubridens.core.view.toast
 import me.xizzhu.android.rubridens.home.databinding.ActivityHomeBinding
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class HomeActivity : BaseActivity<HomeViewModel.ViewAction, HomeViewModel.ViewState, ActivityHomeBinding, HomeViewModel>() {
     companion object {
+        private const val LOAD_MORE_ITEMS_POSITION_THRESHOLD = 6
+
         fun newStartIntent(context: Context): Intent = Intent(context, HomeActivity::class.java)
     }
 
@@ -32,44 +36,43 @@ class HomeActivity : BaseActivity<HomeViewModel.ViewAction, HomeViewModel.ViewSt
     override val viewModel: HomeViewModel by viewModel()
 
     override fun onViewCreated() = with(viewBinding) {
-        swipeRefresher.setOnRefreshListener { viewModel.loadLatest() }
+        swipeRefresher.setOnRefreshListener { viewModel.freshLatest() }
+
+        feed.init(
+            openStatus = { status -> navigator.goToStatus(this@HomeActivity, status) },
+            replyToStatus = { status -> /* TODO */ },
+            reblogStatus = { status -> /* TODO */ },
+            favoriteStatus = { status -> /* TODO */ },
+            openUser = { user -> navigator.gotoUser(this@HomeActivity, user) },
+            openMedia = { media -> navigator.gotoMedia(this@HomeActivity, media) },
+            openTag = { tag -> navigator.goToTag(this@HomeActivity, tag) },
+            openUrl = { url -> navigator.gotoUrl(this@HomeActivity, url) },
+        )
+        feed.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                if (feed.firstVisibleItemPosition() <= LOAD_MORE_ITEMS_POSITION_THRESHOLD) {
+                    viewModel.loadNewer()
+                } else if (feed.itemCount() - feed.lastVisibleItemPosition() <= LOAD_MORE_ITEMS_POSITION_THRESHOLD) {
+                    viewModel.loadOlder()
+                }
+            }
+        })
 
         viewModel.loadLatest()
     }
 
     override fun onViewAction(viewAction: HomeViewModel.ViewAction) = when (viewAction) {
-        is HomeViewModel.ViewAction.OpenStatus -> {
-            navigator.goToStatus(this, viewAction.status)
-        }
-        is HomeViewModel.ViewAction.FavoriteStatus -> {
-            // TODO
-        }
-        is HomeViewModel.ViewAction.ReblogStatus -> {
-            // TODO
-        }
-        is HomeViewModel.ViewAction.ReplyToStatus -> {
-            // TODO
-        }
-        is HomeViewModel.ViewAction.OpenUser -> {
-            navigator.gotoUser(this, viewAction.user)
-        }
-        is HomeViewModel.ViewAction.OpenMedia -> {
-            navigator.gotoMedia(this, viewAction.media)
-        }
-        is HomeViewModel.ViewAction.OpenTag -> {
-            navigator.goToTag(this, viewAction.tag)
-        }
-        is HomeViewModel.ViewAction.OpenUrl -> {
-            navigator.gotoUrl(this, viewAction.url)
-        }
         HomeViewModel.ViewAction.RequestUserCredential -> {
             navigator.goToAuthentication(this)
             finish()
+        }
+        HomeViewModel.ViewAction.ShowNetworkError -> {
+            toast(R.string.home_error_network_failure)
         }
     }
 
     override fun onViewState(viewState: HomeViewModel.ViewState) = with(viewBinding) {
         swipeRefresher.isRefreshing = viewState.loading
-        feed.setItems(viewState.items)
+        feed.setItems(viewState.items, viewState.scrollToPosition)
     }
 }

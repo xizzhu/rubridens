@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-package me.xizzhu.android.rubridens.core.view.feed
+package me.xizzhu.android.rubridens.core.repository.local
 
-import io.mockk.mockk
-import kotlin.test.Test
+import me.xizzhu.android.rubridens.core.model.User
 
-class FeedRecyclerViewTest {
-    @Test(expected = IllegalStateException::class)
-    fun `test createViewHolder with illegal viewType`() {
-        FeedItem.createViewHolder(mockk(), mockk(), -1)
-    }
+internal interface UserCache {
+    suspend fun read(userIds: List<String>): List<User>
+
+    suspend fun save(users: List<User>)
 }

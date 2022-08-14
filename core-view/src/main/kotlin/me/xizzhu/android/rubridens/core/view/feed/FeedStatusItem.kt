@@ -14,11 +14,14 @@
  * limitations under the License.
  */
 
-package me.xizzhu.android.rubridens.core.model
+package me.xizzhu.android.rubridens.core.view.feed
 
-data class ApplicationCredential(
-    val clientId: EntityKey,
-    val clientSecret: String,
-    val accessToken: String,
-    val vapidKey: String,
-)
+import me.xizzhu.android.rubridens.core.model.Status
+
+abstract class FeedStatusItem<T : FeedStatusItem<T>>(
+    @Companion.ViewType viewType: Int,
+    open val status: Status,
+) : FeedItem<T>(viewType) {
+    override fun isSameItem(other: FeedItem<*>): Boolean =
+        this::class == other::class && viewType == other.viewType && status.id == (other as FeedStatusItem).status.id
+}

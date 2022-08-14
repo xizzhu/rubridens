@@ -22,6 +22,7 @@ import androidx.core.text.getSpans
 import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.datetime.Instant
+import me.xizzhu.android.rubridens.core.model.EntityKey
 import me.xizzhu.android.rubridens.core.model.Mention
 import me.xizzhu.android.rubridens.core.model.Status
 import me.xizzhu.android.rubridens.core.model.User
@@ -34,23 +35,20 @@ import kotlin.test.assertTrue
 @RunWith(RobolectricTestRunner::class)
 class FormattersTest {
     private val testUser1 = User(
-        id = "user_1",
-        instanceUrl = "xizzhu.me",
+        id = EntityKey("xizzhu.me", "user_1"),
         username = "random_username",
         displayName = "Random Display Name",
         avatarUrl = "https://xizzhu.me/avatar1.jpg",
     )
     private val testUser2 = User(
-        id = "user_2",
-        instanceUrl = "another_instance",
+        id = EntityKey("another_instance", "user_2"),
         username = "random_username_2",
         displayName = "",
         avatarUrl = "",
     )
 
     private val testStatus1 = Status(
-        id = "status_1",
-        instanceUrl = "xizzhu.me",
+        id = EntityKey("xizzhu.me", "status_1"),
         uri = "https://xizzhu.me/",
         created = Instant.parse("2021-11-05T11:22:33.444Z"),
         sender = testUser1,
@@ -70,8 +68,7 @@ class FormattersTest {
         favorited = false,
     )
     private val testStatus2 = Status(
-        id = "status_2",
-        instanceUrl = "xizzhu.me",
+        id = EntityKey("xizzhu.me", "status_2"),
         uri = "https://xizzhu.me/",
         created = Instant.parse("2021-11-05T11:22:33.444Z"),
         sender = testUser2,
@@ -91,8 +88,7 @@ class FormattersTest {
         favorited = false,
     )
     private val testStatus3 = Status(
-        id = "status_3",
-        instanceUrl = "xizzhu.me",
+        id = EntityKey("xizzhu.me", "status_3"),
         uri = "https://xizzhu.me/",
         created = Instant.parse("2021-11-05T11:22:33.444Z"),
         sender = testUser2,
@@ -104,8 +100,7 @@ class FormattersTest {
         tags = listOf("tag"),
         mentions = listOf(
             Mention(
-                userInstanceUrl = "xizzhu.me",
-                userId = "user_1",
+                userId = EntityKey("xizzhu.me", "user_1"),
                 username = "random_username",
             )
         ),
@@ -191,9 +186,8 @@ class FormattersTest {
         verify(exactly = 1) {
             openUser(
                 User(
-                    id = "user_1",
+                    id = EntityKey("xizzhu.me", "user_1"),
                     username = "random_username",
-                    instanceUrl = "xizzhu.me",
                     displayName = "",
                     avatarUrl = ""
                 )

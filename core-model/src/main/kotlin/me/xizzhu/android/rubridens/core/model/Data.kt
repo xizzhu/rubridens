@@ -16,9 +16,10 @@
 
 package me.xizzhu.android.rubridens.core.model
 
-data class ApplicationCredential(
-    val clientId: EntityKey,
-    val clientSecret: String,
-    val accessToken: String,
-    val vapidKey: String,
-)
+sealed class Data<T>(
+    open val data: T,
+) {
+    data class Local<T>(override val data: T) : Data<T>(data)
+
+    data class Remote<T>(override val data: T) : Data<T>(data)
+}

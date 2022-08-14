@@ -17,6 +17,7 @@
 package me.xizzhu.android.rubridens.core.repository.network.retrofit
 
 import kotlinx.coroutines.test.runTest
+import me.xizzhu.android.rubridens.core.model.EntityKey
 import me.xizzhu.android.rubridens.core.model.User
 import me.xizzhu.android.rubridens.core.repository.network.NetworkException
 import okhttp3.mockwebserver.MockResponse
@@ -63,8 +64,7 @@ class RetrofitAccountsServiceTest : BaseRetrofitTest() {
 
         assertEquals(
             User(
-                id = "198964",
-                instanceUrl = "xizzhu.me",
+                id = EntityKey("xizzhu.me", "198964"),
                 username = "xizzhu_username",
                 displayName = "Keep Speech Free",
                 avatarUrl = "https://xizzhu.me/images/logo.png",
@@ -93,8 +93,7 @@ class RetrofitAccountsServiceTest : BaseRetrofitTest() {
 
         assertEquals(
             User(
-                id = "198964",
-                instanceUrl = "another",
+                id = EntityKey("another", "198964"),
                 username = "xizzhu",
                 displayName = "Keep Speech Free",
                 avatarUrl = "https://xizzhu.me/images/logo.png",

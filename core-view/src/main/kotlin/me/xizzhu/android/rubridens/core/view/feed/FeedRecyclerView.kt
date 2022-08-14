@@ -30,11 +30,14 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.asExecutor
+import me.xizzhu.android.rubridens.core.model.Media
 import me.xizzhu.android.rubridens.core.model.Status
+import me.xizzhu.android.rubridens.core.model.User
 import me.xizzhu.android.rubridens.core.view.ImageLoadingCancellable
 
-abstract class FeedItem<T : FeedItem<T>>(@ViewType internal val viewType: Int, open val status: Status) {
+abstract class FeedItem<T : FeedItem<T>>(@ViewType internal val viewType: Int) {
     companion object {
+        internal const val TYPE_NO_MORE_STATUS = 0
         internal const val TYPE_STATUS_HEADER = 1
         internal const val TYPE_STATUS_FOOTER = 2
         internal const val TYPE_STATUS_TEXT = 3
@@ -46,33 +49,18 @@ abstract class FeedItem<T : FeedItem<T>>(@ViewType internal val viewType: Int, o
         internal const val TYPE_STATUS_THREAD = 9
 
         @IntDef(
+            TYPE_NO_MORE_STATUS,
             TYPE_STATUS_HEADER, TYPE_STATUS_FOOTER, TYPE_STATUS_TEXT,
             TYPE_STATUS_ONE_MEDIA, TYPE_STATUS_TWO_MEDIA, TYPE_STATUS_THREE_MEDIA, TYPE_STATUS_FOUR_MEDIA,
             TYPE_STATUS_CARD, TYPE_STATUS_THREAD
         )
         @Retention(AnnotationRetention.SOURCE)
         internal annotation class ViewType
-
-        @Suppress("UNCHECKED_CAST")
-        internal fun createViewHolder(inflater: LayoutInflater, parent: ViewGroup, @ViewType viewType: Int): FeedItemViewHolder<FeedItem<*>, *> =
-            when (viewType) {
-                TYPE_STATUS_HEADER -> FeedStatusHeaderItemViewHolder(inflater, parent)
-                TYPE_STATUS_FOOTER -> FeedStatusFooterItemViewHolder(inflater, parent)
-                TYPE_STATUS_TEXT -> FeedStatusTextItemViewHolder(inflater, parent)
-                TYPE_STATUS_ONE_MEDIA -> FeedStatusMediaItemViewHolder.create(inflater, parent, TYPE_STATUS_ONE_MEDIA)
-                TYPE_STATUS_TWO_MEDIA -> FeedStatusMediaItemViewHolder.create(inflater, parent, TYPE_STATUS_TWO_MEDIA)
-                TYPE_STATUS_THREE_MEDIA -> FeedStatusMediaItemViewHolder.create(inflater, parent, TYPE_STATUS_THREE_MEDIA)
-                TYPE_STATUS_FOUR_MEDIA -> FeedStatusMediaItemViewHolder.create(inflater, parent, TYPE_STATUS_FOUR_MEDIA)
-                TYPE_STATUS_CARD -> FeedStatusCardItemViewHolder(inflater, parent)
-                TYPE_STATUS_THREAD -> FeedStatusThreadViewHolder(inflater, parent)
-                else -> throw IllegalStateException("Unsupported view type: $viewType")
-            } as FeedItemViewHolder<FeedItem<*>, *>
     }
 
-    internal fun isSameItem(other: FeedItem<*>): Boolean =
-        viewType == other.viewType && status.instanceUrl == other.status.instanceUrl && status.id == other.status.id
+    internal abstract fun isSameItem(other: FeedItem<*>): Boolean
 
-    internal fun isContentTheSame(other: FeedItem<*>): Boolean = this == other
+    internal open fun isContentTheSame(other: FeedItem<*>): Boolean = this == other
 
     @Suppress("UNCHECKED_CAST")
     internal fun getChangePayload(other: FeedItem<*>): Any? = calculateDiff(other as T)
@@ -81,7 +69,7 @@ abstract class FeedItem<T : FeedItem<T>>(@ViewType internal val viewType: Int, o
 }
 
 class FeedRecyclerView : RecyclerView {
-    private var adapter = FeedItemAdapter(context).apply { setAdapter(this) }
+    private lateinit var adapter: FeedItemAdapter
 
     constructor(context: Context) : super(context)
 
@@ -91,6 +79,31 @@ class FeedRecyclerView : RecyclerView {
 
     init {
         layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+    }
+
+    @UiThread
+    fun init(
+        openStatus: (status: Status) -> Unit,
+        replyToStatus: (status: Status) -> Unit,
+        reblogStatus: (status: Status) -> Unit,
+        favoriteStatus: (status: Status) -> Unit,
+        openUser: (user: User) -> Unit,
+        openMedia: (media: Media) -> Unit,
+        openTag: (tag: String) -> Unit,
+        openUrl: (url: String) -> Unit,
+    ) {
+        adapter = FeedItemAdapter(
+            context = context,
+            openStatus = openStatus,
+            replyToStatus = replyToStatus,
+            reblogStatus = reblogStatus,
+            favoriteStatus = favoriteStatus,
+            openUser = openUser,
+            openMedia = openMedia,
+            openTag = openTag,
+            openUrl = openUrl,
+        )
+        setAdapter(adapter)
     }
 
     @UiThread
@@ -107,6 +120,21 @@ class FeedRecyclerView : RecyclerView {
         }
         adapter.submitList(items, commitCallback)
     }
+
+    @UiThread
+    fun itemCount(): Int = adapter.itemCount
+
+    @UiThread
+    fun firstVisibleItemPosition(): Int = when (val lm = layoutManager) {
+        is LinearLayoutManager -> lm.findFirstVisibleItemPosition()
+        else -> throw IllegalStateException("Unsupported layout manager: $lm")
+    }
+
+    @UiThread
+    fun lastVisibleItemPosition(): Int = when (val lm = layoutManager) {
+        is LinearLayoutManager -> lm.findLastVisibleItemPosition()
+        else -> throw IllegalStateException("Unsupported layout manager: $lm")
+    }
 }
 
 internal abstract class FeedItemViewHolder<I : FeedItem<*>, VB : ViewBinding>(protected val viewBinding: VB) : RecyclerView.ViewHolder(viewBinding.root) {
@@ -121,14 +149,89 @@ internal abstract class FeedItemViewHolder<I : FeedItem<*>, VB : ViewBinding>(pr
     protected abstract fun bind(item: I, payloads: List<Any>)
 }
 
-private class FeedItemAdapter(context: Context) : ListAdapter<FeedItem<*>, FeedItemViewHolder<FeedItem<*>, *>>(
+private class FeedItemAdapter(
+    context: Context,
+    private val openStatus: (status: Status) -> Unit,
+    private val replyToStatus: (status: Status) -> Unit,
+    private val reblogStatus: (status: Status) -> Unit,
+    private val favoriteStatus: (status: Status) -> Unit,
+    private val openUser: (user: User) -> Unit,
+    private val openMedia: (media: Media) -> Unit,
+    private val openTag: (tag: String) -> Unit,
+    private val openUrl: (url: String) -> Unit,
+) : ListAdapter<FeedItem<*>, FeedItemViewHolder<FeedItem<*>, *>>(
     AsyncDifferConfig.Builder(FeedItemDiffCallback()).setBackgroundThreadExecutor(Dispatchers.Default.limitedParallelism(1).asExecutor()).build()
 ) {
     private val inflater = LayoutInflater.from(context)
 
     override fun getItemViewType(position: Int): Int = getItem(position).viewType
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FeedItemViewHolder<FeedItem<*>, *> = FeedItem.createViewHolder(inflater, parent, viewType)
+    @Suppress("UNCHECKED_CAST")
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FeedItemViewHolder<FeedItem<*>, *> =
+        when (viewType) {
+            FeedItem.TYPE_NO_MORE_STATUS -> {
+                FeedNoMoreStatusViewHolder(
+                    inflater = inflater,
+                    parent = parent,
+                )
+            }
+            FeedItem.TYPE_STATUS_HEADER -> {
+                FeedStatusHeaderItemViewHolder(
+                    inflater = inflater,
+                    parent = parent,
+                    openStatus = openStatus,
+                    openBlogger = openUser,
+                )
+            }
+            FeedItem.TYPE_STATUS_FOOTER -> {
+                FeedStatusFooterItemViewHolder(
+                    inflater = inflater,
+                    parent = parent,
+                    openStatus = openStatus,
+                    replyToStatus = replyToStatus,
+                    reblogStatus = reblogStatus,
+                    favoriteStatus = favoriteStatus,
+                )
+            }
+            FeedItem.TYPE_STATUS_TEXT -> {
+                FeedStatusTextItemViewHolder(
+                    inflater = inflater,
+                    parent = parent,
+                    openStatus = openStatus,
+                    openUrl = openUrl,
+                    openTag = openTag,
+                    openUser = openUser,
+                )
+            }
+            FeedItem.TYPE_STATUS_ONE_MEDIA,
+            FeedItem.TYPE_STATUS_TWO_MEDIA,
+            FeedItem.TYPE_STATUS_THREE_MEDIA,
+            FeedItem.TYPE_STATUS_FOUR_MEDIA -> {
+                FeedStatusMediaItemViewHolder.create(
+                    inflater = inflater,
+                    parent = parent,
+                    openStatus = openStatus,
+                    openMedia = openMedia,
+                    viewType = viewType,
+                )
+            }
+            FeedItem.TYPE_STATUS_CARD -> {
+                FeedStatusCardItemViewHolder(
+                    inflater = inflater,
+                    parent = parent,
+                    openStatus = openStatus,
+                    openUrl = openUrl,
+                )
+            }
+            FeedItem.TYPE_STATUS_THREAD -> {
+                FeedStatusThreadViewHolder(
+                    inflater = inflater,
+                    parent = parent,
+                    openStatus = openStatus,
+                )
+            }
+            else -> throw IllegalStateException("Unsupported view type: $viewType")
+        } as FeedItemViewHolder<FeedItem<*>, *>
 
     override fun onBindViewHolder(holder: FeedItemViewHolder<FeedItem<*>, *>, position: Int) {
         holder.bindData(getItem(position), emptyList())

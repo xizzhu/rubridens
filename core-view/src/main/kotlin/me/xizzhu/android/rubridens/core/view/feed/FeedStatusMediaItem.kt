@@ -43,9 +43,7 @@ data class FeedStatusMediaInfo(
 data class FeedStatusMediaItem(
     override val status: Status,
     val mediaInfo: List<FeedStatusMediaInfo>,
-    val openStatus: (status: Status) -> Unit,
-    val openMedia: (media: Media) -> Unit,
-) : FeedItem<FeedStatusMediaItem>(
+) : FeedStatusItem<FeedStatusMediaItem>(
     viewType = when (mediaInfo.size) {
         0 -> throw IllegalArgumentException("mediaInfo is empty")
         1 -> TYPE_STATUS_ONE_MEDIA
@@ -57,12 +55,20 @@ data class FeedStatusMediaItem(
 )
 
 internal abstract class FeedStatusMediaItemViewHolder<VB : ViewBinding>(
+    viewBinding: VB,
     private val imageViews: Array<AspectRatioImageView>,
     private val playButtons: Array<ShapeableImageView>,
-    viewBinding: VB
+    openStatus: (status: Status) -> Unit,
+    openMedia: (media: Media) -> Unit,
 ) : FeedItemViewHolder<FeedStatusMediaItem, VB>(viewBinding), ImageLoadingCancellable {
     companion object {
-        fun create(inflater: LayoutInflater, parent: ViewGroup, @FeedItem.Companion.ViewType viewType: Int): FeedStatusMediaItemViewHolder<*> {
+        fun create(
+            inflater: LayoutInflater,
+            parent: ViewGroup,
+            openStatus: (status: Status) -> Unit,
+            openMedia: (media: Media) -> Unit,
+            @FeedItem.Companion.ViewType viewType: Int,
+        ): FeedStatusMediaItemViewHolder<*> {
             val viewBinding: ViewBinding
             val imageViews: Array<AspectRatioImageView>
             val playButtons: Array<ShapeableImageView>
@@ -89,14 +95,14 @@ internal abstract class FeedStatusMediaItemViewHolder<VB : ViewBinding>(
                 }
                 else -> throw IllegalStateException("Unsupported view type: $viewType")
             }
-            return object : FeedStatusMediaItemViewHolder<ViewBinding>(imageViews, playButtons, viewBinding) {}
+            return object : FeedStatusMediaItemViewHolder<ViewBinding>(viewBinding, imageViews, playButtons, openStatus, openMedia) {}
         }
     }
 
     init {
-        viewBinding.root.setOnClickListener { item?.let { it.openStatus(it.status) } }
+        viewBinding.root.setOnClickListener { item?.let { openStatus(it.status) } }
         imageViews.forEachIndexed { i, imageView ->
-            imageView.setOnClickListener { item?.let { it.openMedia(it.mediaInfo[i].media) } }
+            imageView.setOnClickListener { item?.let { openMedia(it.mediaInfo[i].media) } }
         }
     }
 
