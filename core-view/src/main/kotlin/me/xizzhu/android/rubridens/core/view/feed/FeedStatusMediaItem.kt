@@ -43,7 +43,7 @@ data class FeedStatusMediaInfo(
 data class FeedStatusMediaItem(
     override val status: Status,
     val mediaInfo: List<FeedStatusMediaInfo>,
-) : FeedItem<FeedStatusMediaItem>(
+) : FeedStatusItem<FeedStatusMediaItem>(
     viewType = when (mediaInfo.size) {
         0 -> throw IllegalArgumentException("mediaInfo is empty")
         1 -> TYPE_STATUS_ONE_MEDIA

@@ -304,6 +304,7 @@ class HomeViewModelTest {
             HomeViewModel.ViewState(loading = false, items = listOf(feedStatusHeaderItem, feedStatusHeaderItem, feedStatusHeaderItem)),
             homeViewModel.viewState().first()
         )
+        coVerify(exactly = 1) { homePresenter.noMoreItemsToAppend() }
         verify(exactly = 3) { statusRepository.loadOlder(any(), any(), any()) }
 
         // Already loaded all data, should not bother the server.

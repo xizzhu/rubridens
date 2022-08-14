@@ -18,18 +18,15 @@ package me.xizzhu.android.rubridens.core.view.feed
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import me.xizzhu.android.rubridens.core.model.Status
-import me.xizzhu.android.rubridens.core.view.databinding.ItemFeedStatusThreadBinding
+import me.xizzhu.android.rubridens.core.view.databinding.ItemFeedNoMoreStatusBinding
 
-data class FeedStatusThreadItem(
-    override val status: Status,
-) : FeedStatusItem<FeedStatusThreadItem>(TYPE_STATUS_THREAD, status)
+class FeedNoMoreStatusItem : FeedItem<FeedNoMoreStatusItem>(TYPE_NO_MORE_STATUS) {
+    override fun isSameItem(other: FeedItem<*>): Boolean = other is FeedNoMoreStatusItem
 
-internal class FeedStatusThreadViewHolder(inflater: LayoutInflater, parent: ViewGroup, openStatus: (status: Status) -> Unit)
-    : FeedItemViewHolder<FeedStatusThreadItem, ItemFeedStatusThreadBinding>(ItemFeedStatusThreadBinding.inflate(inflater, parent, false)) {
-    init {
-        viewBinding.root.setOnClickListener { item?.let { openStatus(it.status) } }
-    }
+    override fun isContentTheSame(other: FeedItem<*>): Boolean = other is FeedNoMoreStatusItem
+}
 
-    override fun bind(item: FeedStatusThreadItem, payloads: List<Any>) = Unit
+internal class FeedNoMoreStatusViewHolder(inflater: LayoutInflater, parent: ViewGroup)
+    : FeedItemViewHolder<FeedNoMoreStatusItem, ItemFeedNoMoreStatusBinding>(ItemFeedNoMoreStatusBinding.inflate(inflater, parent, false)) {
+    override fun bind(item: FeedNoMoreStatusItem, payloads: List<Any>) = Unit
 }

@@ -141,6 +141,7 @@ class HomeViewModel(
 
                 if (data is Data.Remote && data.data.size < STATUSES_TO_LOAD_PER_REQUEST) {
                     hasOlderStatuses = false
+                    homePresenter.noMoreItemsToAppend()
                 }
                 data.data.lastOrNull()?.let { oldestStatus = it }
 

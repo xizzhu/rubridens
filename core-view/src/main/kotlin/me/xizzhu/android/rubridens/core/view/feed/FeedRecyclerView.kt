@@ -35,8 +35,9 @@ import me.xizzhu.android.rubridens.core.model.Status
 import me.xizzhu.android.rubridens.core.model.User
 import me.xizzhu.android.rubridens.core.view.ImageLoadingCancellable
 
-abstract class FeedItem<T : FeedItem<T>>(@ViewType internal val viewType: Int, open val status: Status) {
+abstract class FeedItem<T : FeedItem<T>>(@ViewType internal val viewType: Int) {
     companion object {
+        internal const val TYPE_NO_MORE_STATUS = 0
         internal const val TYPE_STATUS_HEADER = 1
         internal const val TYPE_STATUS_FOOTER = 2
         internal const val TYPE_STATUS_TEXT = 3
@@ -48,6 +49,7 @@ abstract class FeedItem<T : FeedItem<T>>(@ViewType internal val viewType: Int, o
         internal const val TYPE_STATUS_THREAD = 9
 
         @IntDef(
+            TYPE_NO_MORE_STATUS,
             TYPE_STATUS_HEADER, TYPE_STATUS_FOOTER, TYPE_STATUS_TEXT,
             TYPE_STATUS_ONE_MEDIA, TYPE_STATUS_TWO_MEDIA, TYPE_STATUS_THREE_MEDIA, TYPE_STATUS_FOUR_MEDIA,
             TYPE_STATUS_CARD, TYPE_STATUS_THREAD
@@ -56,9 +58,9 @@ abstract class FeedItem<T : FeedItem<T>>(@ViewType internal val viewType: Int, o
         internal annotation class ViewType
     }
 
-    internal fun isSameItem(other: FeedItem<*>): Boolean = viewType == other.viewType && status.id == other.status.id
+    internal abstract fun isSameItem(other: FeedItem<*>): Boolean
 
-    internal fun isContentTheSame(other: FeedItem<*>): Boolean = this == other
+    internal open fun isContentTheSame(other: FeedItem<*>): Boolean = this == other
 
     @Suppress("UNCHECKED_CAST")
     internal fun getChangePayload(other: FeedItem<*>): Any? = calculateDiff(other as T)
@@ -167,6 +169,12 @@ private class FeedItemAdapter(
     @Suppress("UNCHECKED_CAST")
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FeedItemViewHolder<FeedItem<*>, *> =
         when (viewType) {
+            FeedItem.TYPE_NO_MORE_STATUS -> {
+                FeedNoMoreStatusViewHolder(
+                    inflater = inflater,
+                    parent = parent,
+                )
+            }
             FeedItem.TYPE_STATUS_HEADER -> {
                 FeedStatusHeaderItemViewHolder(
                     inflater = inflater,

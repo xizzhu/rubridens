@@ -34,7 +34,7 @@ data class FeedStatusCardItem(
     val imageUrl: String,
     val placeholder: Bitmap?,
     val url: String,
-) : FeedItem<FeedStatusCardItem>(TYPE_STATUS_CARD, status)
+) : FeedStatusItem<FeedStatusCardItem>(TYPE_STATUS_CARD, status)
 
 internal class FeedStatusCardItemViewHolder(
     inflater: LayoutInflater,

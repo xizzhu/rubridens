@@ -38,7 +38,7 @@ data class FeedStatusHeaderItem(
     val bloggerProfileImageUrl: String,
     val rebloggedBy: String?,
     val subtitle: String,
-) : FeedItem<FeedStatusHeaderItem>(TYPE_STATUS_HEADER, status)
+) : FeedStatusItem<FeedStatusHeaderItem>(TYPE_STATUS_HEADER, status)
 
 internal class FeedStatusHeaderItemViewHolder(
     inflater: LayoutInflater,

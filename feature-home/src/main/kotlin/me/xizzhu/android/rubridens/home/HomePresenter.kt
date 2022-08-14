@@ -23,6 +23,7 @@ import me.xizzhu.android.rubridens.core.model.Media
 import me.xizzhu.android.rubridens.core.model.Status
 import me.xizzhu.android.rubridens.core.view.BlurHashDecoder
 import me.xizzhu.android.rubridens.core.view.feed.FeedItem
+import me.xizzhu.android.rubridens.core.view.feed.FeedNoMoreStatusItem
 import me.xizzhu.android.rubridens.core.view.feed.FeedStatusCardItem
 import me.xizzhu.android.rubridens.core.view.feed.FeedStatusFooterItem
 import me.xizzhu.android.rubridens.core.view.feed.FeedStatusHeaderItem
@@ -61,6 +62,10 @@ class HomePresenter(
 
     suspend fun append(statuses: List<Status>): Unit = withContext(dispatcher) {
         feedItems.addAll(statuses.toFeedItems())
+    }
+
+    suspend fun noMoreItemsToAppend(): Unit = withContext(dispatcher) {
+        feedItems.add(FeedNoMoreStatusItem())
     }
 
     private fun List<Status>.toFeedItems(): List<FeedItem<*>> {

@@ -33,7 +33,7 @@ data class FeedStatusFooterItem(
     val reblogged: Boolean,
     val favorites: String,
     val favorited: Boolean,
-) : FeedItem<FeedStatusFooterItem>(TYPE_STATUS_FOOTER, status)
+) : FeedStatusItem<FeedStatusFooterItem>(TYPE_STATUS_FOOTER, status)
 
 internal class FeedStatusFooterItemViewHolder(
     inflater: LayoutInflater,
