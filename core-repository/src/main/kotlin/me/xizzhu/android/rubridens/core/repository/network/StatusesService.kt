@@ -14,25 +14,11 @@
  * limitations under the License.
  */
 
-package me.xizzhu.android.rubridens.core.repository.local
+package me.xizzhu.android.rubridens.core.repository.network
 
 import me.xizzhu.android.rubridens.core.model.EntityKey
 import me.xizzhu.android.rubridens.core.model.Status
 
-internal interface StatusCache {
-    suspend fun readLatest(
-        instanceUrl: String,
-        olderThan: Long = Long.MAX_VALUE,
-        limit: Int = 20,
-    ): List<Status>
-
-    suspend fun readOldest(
-        instanceUrl: String,
-        newerThan: Long = Long.MIN_VALUE,
-        limit: Int = 20,
-    ): List<Status>
-
-    suspend fun read(statusId: EntityKey): Status?
-
-    suspend fun save(statuses: List<Status>)
+internal interface StatusesService {
+    suspend fun fetch(userOAuthToken: String?, statusId: EntityKey): Status
 }

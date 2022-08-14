@@ -20,6 +20,10 @@ import io.mockk.MockKAnnotations
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
 import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
@@ -30,13 +34,20 @@ import me.xizzhu.android.rubridens.core.model.Status
 import me.xizzhu.android.rubridens.core.model.User
 import me.xizzhu.android.rubridens.core.model.UserCredential
 import me.xizzhu.android.rubridens.core.repository.local.StatusCache
+import me.xizzhu.android.rubridens.core.repository.network.NetworkException
+import me.xizzhu.android.rubridens.core.repository.network.StatusesService
 import me.xizzhu.android.rubridens.core.repository.network.TimelinesService
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
+import kotlin.test.fail
 
 class StatusRepositoryTest {
+    @MockK
+    private lateinit var statusesService: StatusesService
+
     @MockK
     private lateinit var timelinesService: TimelinesService
 
@@ -106,7 +117,7 @@ class StatusRepositoryTest {
     fun setup() {
         MockKAnnotations.init(this, relaxed = true)
 
-        statusRepository = StatusRepositoryImpl(timelinesService, statusCache)
+        statusRepository = StatusRepositoryImpl(statusesService, timelinesService, statusCache)
     }
 
     @AfterTest
@@ -426,6 +437,71 @@ class StatusRepositoryTest {
                 Data.Remote(listOf(testStatus2))
             ),
             statusRepository.loadOlder(userCredential, testStatus1, 20).toList()
+        )
+    }
+
+    @Test
+    fun `test load - both local and remote are empty`() = runTest {
+        coEvery { statusCache.read(any()) } returns null
+        coEvery { statusesService.fetch(any(), any()) } throws NetworkException.HttpError(404, null, null)
+
+        var called = 0
+        statusRepository.load(null, mockk())
+            .onEach { fail() }
+            .catch {
+                assertTrue(it is NetworkException.HttpError)
+                assertEquals(404, it.code)
+                called++
+            }
+            .collect()
+        assertEquals(1, called)
+    }
+
+    @Test
+    fun `test load - local is not empty, but remote is empty`() = runTest {
+        val local = mockk<Status>()
+        coEvery { statusCache.read(any()) } returns local
+        coEvery { statusesService.fetch(any(), any()) } throws NetworkException.HttpError(404, null, null)
+
+        var onEachCalled = 0
+        var catchCalled = 0
+        statusRepository.load(null, mockk())
+            .onEach {
+                assertEquals(Data.Local(local), it)
+                onEachCalled++
+            }
+            .catch {
+                assertTrue(it is NetworkException.HttpError)
+                assertEquals(404, it.code)
+                catchCalled++
+            }
+            .collect()
+        assertEquals(1, onEachCalled)
+        assertEquals(1, catchCalled)
+    }
+
+    @Test
+    fun `test load - local throws, but remote is not empty`() = runTest {
+        val remote = mockk<Status>()
+        coEvery { statusCache.read(any()) } throws RuntimeException("random error")
+        coEvery { statusesService.fetch(any(), any()) } returns remote
+
+        assertEquals(
+            listOf(Data.Remote(remote)),
+            statusRepository.load(null, mockk()).toList()
+        )
+    }
+
+    @Test
+    fun `test load - both local and remote are not empty`() = runTest {
+        val local = mockk<Status>()
+        val remote = mockk<Status>()
+        coEvery { statusCache.read(any()) } returns local
+        coEvery { statusesService.fetch(any(), any()) } returns remote
+
+        assertEquals(
+            listOf(Data.Local(local), Data.Remote(remote)),
+            statusRepository.load(null, mockk()).toList()
         )
     }
 }

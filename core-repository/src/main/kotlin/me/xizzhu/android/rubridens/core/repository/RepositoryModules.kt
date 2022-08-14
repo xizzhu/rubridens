@@ -31,11 +31,13 @@ import me.xizzhu.android.rubridens.core.repository.network.AccountsService
 import me.xizzhu.android.rubridens.core.repository.network.AppsService
 import me.xizzhu.android.rubridens.core.repository.network.InstanceService
 import me.xizzhu.android.rubridens.core.repository.network.OAuthService
+import me.xizzhu.android.rubridens.core.repository.network.StatusesService
 import me.xizzhu.android.rubridens.core.repository.network.TimelinesService
 import me.xizzhu.android.rubridens.core.repository.network.retrofit.RetrofitAccountsService
 import me.xizzhu.android.rubridens.core.repository.network.retrofit.RetrofitAppsService
 import me.xizzhu.android.rubridens.core.repository.network.retrofit.RetrofitInstanceService
 import me.xizzhu.android.rubridens.core.repository.network.retrofit.RetrofitOAuthService
+import me.xizzhu.android.rubridens.core.repository.network.retrofit.RetrofitStatusesService
 import me.xizzhu.android.rubridens.core.repository.network.retrofit.RetrofitTimelinesService
 import okhttp3.OkHttpClient
 import org.koin.dsl.module
@@ -69,9 +71,10 @@ val repositoryModule = module {
     single<AppsService> { RetrofitAppsService() }
     single<InstanceService> { RetrofitInstanceService() }
     single<OAuthService> { RetrofitOAuthService() }
+    single<StatusesService> { RetrofitStatusesService() }
     single<TimelinesService> { RetrofitTimelinesService() }
 
     single<AuthRepository> { AuthRepositoryImpl(get(), get(), get(), get(), get()) }
     single<InstanceRepository> { InstanceRepositoryImpl(get()) }
-    single<StatusRepository> { StatusRepositoryImpl(get(), get()) }
+    single<StatusRepository> { StatusRepositoryImpl(get(), get(), get()) }
 }

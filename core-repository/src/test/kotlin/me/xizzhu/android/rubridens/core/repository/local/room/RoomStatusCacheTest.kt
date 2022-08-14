@@ -28,6 +28,7 @@ import org.robolectric.RobolectricTestRunner
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 @RunWith(RobolectricTestRunner::class)
@@ -131,6 +132,8 @@ internal class RoomStatusCacheTest : BaseRoomTest() {
     fun `test read from empty database`() = runTest {
         assertTrue(roomStatusCache.readLatest("xizzhu.me").isEmpty())
         assertTrue(roomStatusCache.readOldest("xizzhu.me").isEmpty())
+        assertNull(roomStatusCache.read(testStatus1.id))
+        assertNull(roomStatusCache.read(testStatus2.id))
     }
 
     @Test
@@ -140,11 +143,17 @@ internal class RoomStatusCacheTest : BaseRoomTest() {
         assertTrue(roomStatusCache.readLatest("xizzhu.me", olderThan = testStatus1.created.toEpochMilliseconds()).isEmpty())
         assertEquals(listOf(testStatus1), roomStatusCache.readOldest("xizzhu.me"))
         assertTrue(roomStatusCache.readOldest("xizzhu.me", newerThan = testStatus1.created.toEpochMilliseconds()).isEmpty())
+        assertEquals(testStatus1, roomStatusCache.read(testStatus1.id))
+        assertNull(roomStatusCache.read(testStatus2.id))
+        assertNull(roomStatusCache.read(EntityKey("xizzhu.me", "non_exist")))
 
         roomStatusCache.save(listOf(testStatus2))
         assertEquals(listOf(testStatus2, testStatus1), roomStatusCache.readLatest("xizzhu.me"))
         assertEquals(listOf(testStatus1), roomStatusCache.readLatest("xizzhu.me", olderThan = testStatus2.created.toEpochMilliseconds()))
         assertEquals(listOf(testStatus2, testStatus1), roomStatusCache.readOldest("xizzhu.me"))
         assertEquals(listOf(testStatus2), roomStatusCache.readOldest("xizzhu.me", newerThan = testStatus1.created.toEpochMilliseconds()))
+        assertEquals(testStatus1, roomStatusCache.read(testStatus1.id))
+        assertEquals(testStatus2, roomStatusCache.read(testStatus2.id))
+        assertNull(roomStatusCache.read(EntityKey("xizzhu.me", "non_exist")))
     }
 }

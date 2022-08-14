@@ -19,9 +19,11 @@ package me.xizzhu.android.rubridens.core.repository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import me.xizzhu.android.rubridens.core.model.Data
+import me.xizzhu.android.rubridens.core.model.EntityKey
 import me.xizzhu.android.rubridens.core.model.Status
 import me.xizzhu.android.rubridens.core.model.UserCredential
 import me.xizzhu.android.rubridens.core.repository.local.StatusCache
+import me.xizzhu.android.rubridens.core.repository.network.StatusesService
 import me.xizzhu.android.rubridens.core.repository.network.TimelinesService
 
 interface StatusRepository {
@@ -45,9 +47,15 @@ interface StatusRepository {
      * Load [Status] older than [olderThan]. If no older statuses are available, an empty list will be emitted.
      */
     fun loadOlder(userCredential: UserCredential, olderThan: Status, limit: Int): Flow<Data<List<Status>>>
+
+    /**
+     * Load the [Status] specified by [statusId] from local cache and emit it if available. Then fetch from backend and emit it.
+     */
+    fun load(userCredential: UserCredential?, statusId: EntityKey): Flow<Data<Status>>
 }
 
 internal class StatusRepositoryImpl(
+    private val statusesService: StatusesService,
     private val timelinesService: TimelinesService,
     private val statusCache: StatusCache,
 ) : StatusRepository {
@@ -132,6 +140,13 @@ internal class StatusRepositoryImpl(
             limit = limit,
         )
         emit(Data.Remote(remote))
+    }
+
+    override fun load(userCredential: UserCredential?, statusId: EntityKey): Flow<Data<Status>> = flow {
+        runCatching { statusCache.read(statusId) }.getOrNull()?.let { emit(Data.Local(it)) }
+
+        // When fetching fails, propagate the error.
+        emit(Data.Remote(statusesService.fetch(userCredential?.accessToken, statusId)))
     }
 
     private suspend fun readLatestSafely(instanceUrl: String, olderThan: Long, limit: Int): List<Status> = runCatching<List<Status>> {

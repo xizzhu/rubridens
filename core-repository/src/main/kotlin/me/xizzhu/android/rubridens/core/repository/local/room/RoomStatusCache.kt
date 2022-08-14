@@ -43,6 +43,15 @@ internal class RoomStatusCache(private val appDatabase: AppDatabase) : StatusCac
         buildStatuses(appDatabase.statusDao().readOldest(instanceUrl, newerThan, limit))
     }
 
+    override suspend fun read(statusId: EntityKey): Status? = appDatabase.withTransaction {
+        appDatabase.statusDao().readByStatusId(
+            instanceUrl = statusId.instanceUrl,
+            statusId = statusId.id,
+        )?.let { statusEntity ->
+            buildStatuses(listOf(statusEntity)).firstOrNull()
+        }
+    }
+
     private suspend fun buildStatuses(statusEntities: List<StatusEntity>): List<Status> {
         val statusIds = arrayListOf<String>()
         val userIds = hashSetOf<String>()
@@ -249,6 +258,16 @@ internal interface StatusDao {
         LIMIT :limit
     """)
     suspend fun readOldest(instanceUrl: String, newerThan: Long, limit: Int): List<StatusEntity>
+
+    @Query("""
+        SELECT *
+        FROM ${StatusEntity.TABLE_NAME}
+        WHERE
+            ${StatusEntity.COLUMN_NAME_INSTANCE_URL} = :instanceUrl
+            AND
+            ${StatusEntity.COLUMN_NAME_ID} = :statusId
+    """)
+    suspend fun readByStatusId(instanceUrl: String, statusId: String): StatusEntity?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun save(statuses: Collection<StatusEntity>)
