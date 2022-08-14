@@ -23,5 +23,7 @@ internal interface UserCredentialCache {
 
     suspend fun read(): List<UserCredential>
 
+    suspend fun readByInstanceUrl(instanceUrl: String): List<UserCredential>
+
     suspend fun save(userCredential: UserCredential)
 }

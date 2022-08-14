@@ -40,6 +40,7 @@ internal class RoomUserCredentialCacheTest : BaseRoomTest() {
     fun `test read from empty database`() = runTest {
         assertFalse(roomUserCredentialCache.hasCredential())
         assertTrue(roomUserCredentialCache.read().isEmpty())
+        assertTrue(roomUserCredentialCache.readByInstanceUrl("xizzhu.me").isEmpty())
     }
 
     @Test
@@ -61,6 +62,17 @@ internal class RoomUserCredentialCacheTest : BaseRoomTest() {
             ),
             roomUserCredentialCache.read()
         )
+        assertEquals(
+            listOf(
+                UserCredential(
+                    instanceUrl = "xizzhu.me",
+                    username = "username",
+                    accessToken = "access_token",
+                )
+            ),
+            roomUserCredentialCache.readByInstanceUrl("xizzhu.me")
+        )
+        assertTrue(roomUserCredentialCache.readByInstanceUrl("non_exist").isEmpty())
 
         roomUserCredentialCache.save(UserCredential(
             instanceUrl = "xizzhu.me",
@@ -89,5 +101,21 @@ internal class RoomUserCredentialCacheTest : BaseRoomTest() {
             ),
             roomUserCredentialCache.read()
         )
+        assertEquals(
+            setOf(
+                UserCredential(
+                    instanceUrl = "xizzhu.me",
+                    username = "username",
+                    accessToken = "access_token_2",
+                ),
+                UserCredential(
+                    instanceUrl = "xizzhu.me",
+                    username = "another_username",
+                    accessToken = "another_access_token",
+                )
+            ),
+            roomUserCredentialCache.readByInstanceUrl("xizzhu.me").toSet()
+        )
+        assertTrue(roomUserCredentialCache.readByInstanceUrl("non_exist").isEmpty())
     }
 }

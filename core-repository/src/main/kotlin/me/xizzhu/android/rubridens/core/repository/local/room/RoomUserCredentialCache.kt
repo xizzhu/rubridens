@@ -30,6 +30,9 @@ internal class RoomUserCredentialCache(private val appDatabase: AppDatabase) : U
 
     override suspend fun read(): List<UserCredential> = appDatabase.userCredentialDao().read().map { it.toUserCredential() }
 
+    override suspend fun readByInstanceUrl(instanceUrl: String): List<UserCredential> =
+        appDatabase.userCredentialDao().readByInstanceUrl(instanceUrl).map { it.toUserCredential() }
+
     override suspend fun save(userCredential: UserCredential) {
         appDatabase.userCredentialDao().save(UserCredentialEntity(userCredential))
     }
@@ -42,6 +45,9 @@ internal interface UserCredentialDao {
 
     @Query("SELECT * FROM ${UserCredentialEntity.TABLE_NAME}")
     suspend fun read(): List<UserCredentialEntity>
+
+    @Query("SELECT * FROM ${UserCredentialEntity.TABLE_NAME} WHERE ${UserCredentialEntity.COLUMN_NAME_INSTANCE_URL} = :instanceUrl")
+    suspend fun readByInstanceUrl(instanceUrl: String): List<UserCredentialEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun save(userCredential: UserCredentialEntity)
