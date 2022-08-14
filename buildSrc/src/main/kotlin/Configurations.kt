@@ -28,7 +28,7 @@ object Versions {
     }
 
     object Sdk {
-        const val classpath = "7.2.1"
+        const val classpath = "7.2.2"
         const val buildTools = "33.0.0"
         const val compile = 33
         const val min = 21
@@ -46,12 +46,12 @@ object Versions {
     }
 
     object AndroidX {
-        const val activity = "1.5.0"
+        const val activity = "1.5.1"
         const val annotation = "1.4.0"
-        const val appCompat = "1.4.2"
+        const val appCompat = "1.5.0"
         const val core = "1.8.0"
-        const val lifecycle = "2.5.0"
-        const val room = "2.4.2"
+        const val lifecycle = "2.5.1"
+        const val room = "2.4.3"
 
         object View {
             const val constraintLayout = "2.1.4"
@@ -75,7 +75,7 @@ object Versions {
         const val retrofit = "2.9.0"
     }
 
-    const val mockk = "1.12.4"
+    const val mockk = "1.12.5"
     const val robolectric = "4.8.1"
 }
 
