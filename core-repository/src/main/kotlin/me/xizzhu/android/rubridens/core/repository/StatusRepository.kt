@@ -26,6 +26,11 @@ import me.xizzhu.android.rubridens.core.repository.network.TimelinesService
 
 interface StatusRepository {
     /**
+     * Fetches the latest [Status] from server and emits them. If it fails to fetch from server, emits the locally cached [Status].
+     */
+    fun freshLatest(userCredential: UserCredential, limit: Int): Flow<Data<List<Status>>>
+
+    /**
      * If locally cached [Status] are available, emits the latest ones, then fetches immediate newer ones from the server and emits them.
      * Otherwise, fetches the latest [Status] from server and emits them.
      */
@@ -46,11 +51,28 @@ internal class StatusRepositoryImpl(
     private val timelinesService: TimelinesService,
     private val statusCache: StatusCache,
 ) : StatusRepository {
+    override fun freshLatest(userCredential: UserCredential, limit: Int): Flow<Data<List<Status>>> = flow {
+        val remote = runCatching {
+            fetchHome(userCredential = userCredential, minId = "", maxId = "", limit = limit)
+        }.getOrNull()
+        if (!remote.isNullOrEmpty()) {
+            emit(Data.Remote(remote))
+            return@flow
+        }
+
+        val local = readLatestSafely(
+            instanceUrl = userCredential.instanceUrl,
+            olderThan = Long.MAX_VALUE,
+            limit = limit,
+        )
+        emit(Data.Local(local))
+    }
+
     override fun loadLatest(userCredential: UserCredential, limit: Int): Flow<Data<List<Status>>> = flow {
         val local = readLatestSafely(
             instanceUrl = userCredential.instanceUrl,
             olderThan = Long.MAX_VALUE,
-            limit = limit
+            limit = limit,
         )
         if (local.isNotEmpty()) {
             emit(Data.Local(local))
@@ -61,7 +83,7 @@ internal class StatusRepositoryImpl(
             userCredential = userCredential,
             minId = local.firstOrNull()?.id?.id ?: "",
             maxId = "",
-            limit = limit
+            limit = limit,
         )
         emit(Data.Remote(remote))
     }
@@ -70,7 +92,7 @@ internal class StatusRepositoryImpl(
         val local = readOldestSafely(
             instanceUrl = userCredential.instanceUrl,
             newerThan = newerThan.created.toEpochMilliseconds(),
-            limit = limit
+            limit = limit,
         )
         if (local.isNotEmpty()) {
             emit(Data.Local(local))
@@ -93,7 +115,7 @@ internal class StatusRepositoryImpl(
         val local = readLatestSafely(
             instanceUrl = userCredential.instanceUrl,
             olderThan = olderThan.created.toEpochMilliseconds(),
-            limit = limit
+            limit = limit,
         )
         if (local.isNotEmpty()) {
             emit(Data.Local(local))

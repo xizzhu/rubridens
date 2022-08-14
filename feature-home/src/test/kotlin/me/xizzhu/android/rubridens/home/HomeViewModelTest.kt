@@ -79,7 +79,7 @@ class HomeViewModelTest {
 
     @Test
     fun `test initial view state`() = runTest {
-        assertEquals(HomeViewModel.ViewState(loading = false, items = emptyList()), homeViewModel.viewState().first())
+        assertEquals(HomeViewModel.ViewState(loading = false, items = emptyList(), scrollToPosition = -1), homeViewModel.viewState().first())
     }
 
     @Test
@@ -91,6 +91,8 @@ class HomeViewModelTest {
             listOf()
         }
 
+        homeViewModel.freshLatest()
+        homeViewModel.freshLatest()
         homeViewModel.loadLatest()
         homeViewModel.loadLatest()
         homeViewModel.loadOlder()
@@ -99,6 +101,55 @@ class HomeViewModelTest {
         homeViewModel.loadNewer()
 
         coVerify(exactly = 1) { authRepository.readUserCredentials() }
+    }
+
+    @Test
+    fun `test freshLatest without user credential`() = runTest {
+        coEvery { authRepository.readUserCredentials() } returns listOf()
+
+        val viewAction = async { homeViewModel.viewAction().first() }
+        delay(100)
+
+        homeViewModel.freshLatest()
+
+        assertEquals(HomeViewModel.ViewAction.RequestUserCredential, viewAction.await())
+        assertEquals(HomeViewModel.ViewState(loading = false, items = emptyList(), scrollToPosition = -1), homeViewModel.viewState().first())
+    }
+
+    @Test
+    fun `test freshLatest with local only`() = runTest {
+        val userCredential = mockk<UserCredential>()
+        val feedStatusHeaderItem = mockk<FeedStatusHeaderItem>()
+        coEvery { authRepository.readUserCredentials() } returns listOf(userCredential)
+        every { statusRepository.freshLatest(userCredential, any()) } returns flowOf(Data.Local(listOf(mockk())))
+        coEvery { homePresenter.feedItems() } returns listOf(feedStatusHeaderItem)
+
+        val viewAction = async { homeViewModel.viewAction().first() }
+        delay(100)
+
+        homeViewModel.freshLatest()
+
+        assertEquals(HomeViewModel.ViewAction.ShowNetworkError, viewAction.await())
+        assertEquals(
+            HomeViewModel.ViewState(loading = false, items = listOf(feedStatusHeaderItem), scrollToPosition = 0),
+            homeViewModel.viewState().first()
+        )
+    }
+
+    @Test
+    fun `test freshLatest with remote only`() = runTest {
+        val userCredential = mockk<UserCredential>()
+        val feedStatusHeaderItem = mockk<FeedStatusHeaderItem>()
+        coEvery { authRepository.readUserCredentials() } returns listOf(userCredential)
+        every { statusRepository.freshLatest(userCredential, any()) } returns flowOf(Data.Remote(listOf(mockk())))
+        coEvery { homePresenter.feedItems() } returns listOf(feedStatusHeaderItem)
+
+        homeViewModel.freshLatest()
+
+        assertEquals(
+            HomeViewModel.ViewState(loading = false, items = listOf(feedStatusHeaderItem), scrollToPosition = 0),
+            homeViewModel.viewState().first()
+        )
     }
 
     @Test
@@ -111,7 +162,7 @@ class HomeViewModelTest {
         homeViewModel.loadLatest()
 
         assertEquals(HomeViewModel.ViewAction.RequestUserCredential, viewAction.await())
-        assertEquals(HomeViewModel.ViewState(loading = false, items = emptyList()), homeViewModel.viewState().first())
+        assertEquals(HomeViewModel.ViewState(loading = false, items = emptyList(), scrollToPosition = -1), homeViewModel.viewState().first())
     }
 
     @Test
@@ -125,7 +176,7 @@ class HomeViewModelTest {
         homeViewModel.loadLatest()
 
         assertEquals(
-            HomeViewModel.ViewState(loading = false, items = listOf(feedStatusHeaderItem)),
+            HomeViewModel.ViewState(loading = false, items = listOf(feedStatusHeaderItem), scrollToPosition = -1),
             homeViewModel.viewState().first()
         )
     }
@@ -141,7 +192,7 @@ class HomeViewModelTest {
         homeViewModel.loadLatest()
 
         assertEquals(
-            HomeViewModel.ViewState(loading = false, items = listOf(feedStatusHeaderItem)),
+            HomeViewModel.ViewState(loading = false, items = listOf(feedStatusHeaderItem), scrollToPosition = 0),
             homeViewModel.viewState().first()
         )
     }
@@ -162,8 +213,8 @@ class HomeViewModelTest {
 
         assertEquals(
             listOf(
-                HomeViewModel.ViewState(loading = true, items = listOf(feedStatusHeaderItem)),
-                HomeViewModel.ViewState(loading = false, items = listOf(feedStatusHeaderItem))
+                HomeViewModel.ViewState(loading = true, items = listOf(feedStatusHeaderItem), scrollToPosition = 0),
+                HomeViewModel.ViewState(loading = false, items = listOf(feedStatusHeaderItem), scrollToPosition = -1),
             ),
             homeViewModel.viewState().take(2).toList()
         )
@@ -184,7 +235,7 @@ class HomeViewModelTest {
 
         assertEquals(HomeViewModel.ViewAction.ShowNetworkError, viewAction.await())
         assertEquals(
-            HomeViewModel.ViewState(loading = false, items = emptyList()),
+            HomeViewModel.ViewState(loading = false, items = emptyList(), scrollToPosition = -1),
             homeViewModel.viewState().first()
         )
     }
@@ -200,7 +251,7 @@ class HomeViewModelTest {
         homeViewModel.loadLatest()
 
         assertEquals(
-            HomeViewModel.ViewState(loading = false, items = emptyList()),
+            HomeViewModel.ViewState(loading = false, items = emptyList(), scrollToPosition = -1),
             homeViewModel.viewState().first()
         )
     }
@@ -220,7 +271,7 @@ class HomeViewModelTest {
 
         homeViewModel.loadLatest()
         assertEquals(
-            HomeViewModel.ViewState(loading = false, items = listOf(feedStatusHeaderItem)),
+            HomeViewModel.ViewState(loading = false, items = listOf(feedStatusHeaderItem), scrollToPosition = 0),
             homeViewModel.viewState().first()
         )
 
@@ -239,7 +290,7 @@ class HomeViewModelTest {
         every { statusRepository.loadNewer(any(), any(), any()) } returns flowOf(Data.Remote(mutableListOf<Status>().apply { repeat(20) { add(mockk()) } }))
         homeViewModel.loadNewer()
         assertEquals(
-            HomeViewModel.ViewState(loading = false, items = listOf(feedStatusHeaderItem, feedStatusHeaderItem)),
+            HomeViewModel.ViewState(loading = false, items = listOf(feedStatusHeaderItem, feedStatusHeaderItem), scrollToPosition = -1),
             homeViewModel.viewState().first()
         )
         verify(exactly = 2) { statusRepository.loadNewer(any(), any(), any()) }
@@ -248,7 +299,7 @@ class HomeViewModelTest {
         every { statusRepository.loadNewer(any(), any(), any()) } returns flowOf(Data.Remote(listOf(mockk())))
         homeViewModel.loadNewer()
         assertEquals(
-            HomeViewModel.ViewState(loading = false, items = listOf(feedStatusHeaderItem, feedStatusHeaderItem, feedStatusHeaderItem)),
+            HomeViewModel.ViewState(loading = false, items = listOf(feedStatusHeaderItem, feedStatusHeaderItem, feedStatusHeaderItem), scrollToPosition = -1),
             homeViewModel.viewState().first()
         )
         verify(exactly = 3) { statusRepository.loadNewer(any(), any(), any()) }
@@ -273,7 +324,7 @@ class HomeViewModelTest {
 
         homeViewModel.loadLatest()
         assertEquals(
-            HomeViewModel.ViewState(loading = false, items = listOf(feedStatusHeaderItem)),
+            HomeViewModel.ViewState(loading = false, items = listOf(feedStatusHeaderItem), scrollToPosition = 0),
             homeViewModel.viewState().first()
         )
 
@@ -292,7 +343,7 @@ class HomeViewModelTest {
         every { statusRepository.loadOlder(any(), any(), any()) } returns flowOf(Data.Remote(mutableListOf<Status>().apply { repeat(20) { add(mockk()) } }))
         homeViewModel.loadOlder()
         assertEquals(
-            HomeViewModel.ViewState(loading = false, items = listOf(feedStatusHeaderItem, feedStatusHeaderItem)),
+            HomeViewModel.ViewState(loading = false, items = listOf(feedStatusHeaderItem, feedStatusHeaderItem), scrollToPosition = -1),
             homeViewModel.viewState().first()
         )
         verify(exactly = 2) { statusRepository.loadOlder(any(), any(), any()) }
@@ -301,7 +352,7 @@ class HomeViewModelTest {
         every { statusRepository.loadOlder(any(), any(), any()) } returns flowOf(Data.Remote(listOf(mockk())))
         homeViewModel.loadOlder()
         assertEquals(
-            HomeViewModel.ViewState(loading = false, items = listOf(feedStatusHeaderItem, feedStatusHeaderItem, feedStatusHeaderItem)),
+            HomeViewModel.ViewState(loading = false, items = listOf(feedStatusHeaderItem, feedStatusHeaderItem, feedStatusHeaderItem), scrollToPosition = -1),
             homeViewModel.viewState().first()
         )
         coVerify(exactly = 1) { homePresenter.noMoreItemsToAppend() }

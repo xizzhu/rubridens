@@ -115,6 +115,50 @@ class StatusRepositoryTest {
     }
 
     @Test
+    fun `test freshLatest - both local and remote are empty`() = runTest {
+        coEvery { statusCache.readLatest(any(), any()) } returns emptyList()
+        coEvery { timelinesService.fetchHome(any(), any(), any(), any(), any(), any(), any()) } returns emptyList()
+
+        assertEquals(
+            listOf(Data.Local(emptyList())),
+            statusRepository.freshLatest(userCredential, 20).toList()
+        )
+    }
+
+    @Test
+    fun `test freshLatest - local is not empty, but remote is empty`() = runTest {
+        coEvery { statusCache.readLatest(any(), any()) } returns listOf(testStatus1)
+        coEvery { timelinesService.fetchHome(any(), any(), any(), any(), any(), any(), any()) } returns emptyList()
+
+        assertEquals(
+            listOf(Data.Local(listOf(testStatus1))),
+            statusRepository.freshLatest(userCredential, 20).toList()
+        )
+    }
+
+    @Test
+    fun `test freshLatest - local is empty, remote throws`() = runTest {
+        coEvery { statusCache.readLatest(any(), any()) } returns emptyList()
+        coEvery { timelinesService.fetchHome(any(), any(), any(), any(), any(), any(), any()) } throws RuntimeException("random exception")
+
+        assertEquals(
+            listOf(Data.Local(emptyList())),
+            statusRepository.freshLatest(userCredential, 20).toList()
+        )
+    }
+
+    @Test
+    fun `test freshLatest - remote is not empty`() = runTest {
+        coEvery { statusCache.readLatest(any(), any()) } returns listOf(testStatus1)
+        coEvery { timelinesService.fetchHome(any(), any(), any(), any(), any(), any(), any()) } returns listOf(testStatus2)
+
+        assertEquals(
+            listOf(Data.Remote(listOf(testStatus2))),
+            statusRepository.freshLatest(userCredential, 20).toList()
+        )
+    }
+
+    @Test
     fun `test loadLatest - both local and remote are empty`() = runTest {
         coEvery { statusCache.readLatest(any(), any()) } returns emptyList()
         coEvery { timelinesService.fetchHome(any(), any(), any(), any(), any(), any(), any()) } returns emptyList()

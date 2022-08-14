@@ -36,7 +36,7 @@ class HomeActivity : BaseActivity<HomeViewModel.ViewAction, HomeViewModel.ViewSt
     override val viewModel: HomeViewModel by viewModel()
 
     override fun onViewCreated() = with(viewBinding) {
-        swipeRefresher.setOnRefreshListener { viewModel.loadLatest() }
+        swipeRefresher.setOnRefreshListener { viewModel.freshLatest() }
 
         feed.init(
             openStatus = { status -> navigator.goToStatus(this@HomeActivity, status) },
@@ -73,6 +73,6 @@ class HomeActivity : BaseActivity<HomeViewModel.ViewAction, HomeViewModel.ViewSt
 
     override fun onViewState(viewState: HomeViewModel.ViewState) = with(viewBinding) {
         swipeRefresher.isRefreshing = viewState.loading
-        feed.setItems(viewState.items)
+        feed.setItems(viewState.items, viewState.scrollToPosition)
     }
 }

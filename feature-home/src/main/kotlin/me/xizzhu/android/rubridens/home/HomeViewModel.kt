@@ -20,6 +20,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.withIndex
 import kotlinx.coroutines.launch
 import me.xizzhu.android.rubridens.core.infra.BaseViewModel
 import me.xizzhu.android.rubridens.core.model.Data
@@ -39,6 +40,7 @@ class HomeViewModel(
     initialViewState = ViewState(
         loading = false,
         items = emptyList(),
+        scrollToPosition = -1,
     )
 ) {
     sealed class ViewAction {
@@ -46,7 +48,7 @@ class HomeViewModel(
         object ShowNetworkError : ViewAction()
     }
 
-    data class ViewState(val loading: Boolean, val items: List<FeedItem<*>>)
+    data class ViewState(val loading: Boolean, val items: List<FeedItem<*>>, val scrollToPosition: Int)
 
     companion object {
         private const val STATUSES_TO_LOAD_PER_REQUEST = 20
@@ -61,6 +63,51 @@ class HomeViewModel(
     private var hasOlderStatuses = true
     private var oldestStatus: Status? = null
 
+    fun freshLatest() = load {
+        val userCredential = getUserCredential() ?: return@load
+
+        emitViewState { currentViewState ->
+            currentViewState.copy(
+                loading = true,
+                items = emptyList(),
+                scrollToPosition = -1,
+            )
+        }
+
+        homePresenter.clear()
+        hasNewerStatuses = true
+        hasOlderStatuses = true
+
+        statusRepository.freshLatest(userCredential, STATUSES_TO_LOAD_PER_REQUEST)
+            .onEach { data ->
+                homePresenter.replace(data.data)
+
+                newestStatus = data.data.firstOrNull()
+                oldestStatus = data.data.lastOrNull()
+
+                when (data) {
+                    is Data.Local -> {
+                        emitViewAction(ViewAction.ShowNetworkError)
+                    }
+                    is Data.Remote -> {
+                        if (data.data.size < STATUSES_TO_LOAD_PER_REQUEST) {
+                            hasNewerStatuses = false
+                        }
+                    }
+                }
+
+                val items = homePresenter.feedItems()
+                emitViewState { currentViewState ->
+                    currentViewState.copy(
+                        loading = false,
+                        items = items,
+                        scrollToPosition = 0,
+                    )
+                }
+            }
+            .collect()
+    }
+
     fun loadLatest() = load {
         val userCredential = getUserCredential() ?: return@load
 
@@ -68,6 +115,7 @@ class HomeViewModel(
             currentViewState.copy(
                 loading = true,
                 items = emptyList(),
+                scrollToPosition = -1,
             )
         }
 
@@ -76,8 +124,9 @@ class HomeViewModel(
         hasOlderStatuses = true
 
         statusRepository.loadLatest(userCredential, STATUSES_TO_LOAD_PER_REQUEST)
-            .onEach { data ->
-                val isLoading = when (data) {
+            .withIndex()
+            .onEach { indexedValue ->
+                val isLoading = when (val data = indexedValue.value) {
                     is Data.Local -> {
                         homePresenter.replace(data.data)
                         newestStatus = data.data.first()
@@ -102,6 +151,7 @@ class HomeViewModel(
                     currentViewState.copy(
                         loading = isLoading,
                         items = items,
+                        scrollToPosition = if (indexedValue.index == 0) 0 else -1,
                     )
                 }
             }
@@ -124,7 +174,7 @@ class HomeViewModel(
                 data.data.firstOrNull()?.let { newestStatus = it }
 
                 val items = homePresenter.feedItems()
-                emitViewState { currentViewState -> currentViewState.copy(items = items) }
+                emitViewState { currentViewState -> currentViewState.copy(items = items, scrollToPosition = -1) }
             }
             .catch { e -> handleLoadingException(e) }
             .collect()
@@ -146,7 +196,7 @@ class HomeViewModel(
                 data.data.lastOrNull()?.let { oldestStatus = it }
 
                 val items = homePresenter.feedItems()
-                emitViewState { currentViewState -> currentViewState.copy(items = items) }
+                emitViewState { currentViewState -> currentViewState.copy(items = items, scrollToPosition = -1) }
             }
             .catch { e -> handleLoadingException(e) }
             .collect()
@@ -168,7 +218,7 @@ class HomeViewModel(
         if (e is NetworkException.Other) {
             emitViewAction(ViewAction.ShowNetworkError)
         }
-        emitViewState { currentViewState -> currentViewState.copy(loading = false) }
+        emitViewState { currentViewState -> currentViewState.copy(loading = false, scrollToPosition = -1) }
     }
 
     private suspend fun getUserCredential(): UserCredential? {
@@ -182,6 +232,7 @@ class HomeViewModel(
                 currentViewState.copy(
                     loading = false,
                     items = emptyList(),
+                    scrollToPosition = -1,
                 )
             }
         }
