@@ -20,6 +20,7 @@ import me.xizzhu.android.rubridens.auth.authModule
 import me.xizzhu.android.rubridens.core.infra.Navigator
 import me.xizzhu.android.rubridens.core.repository.repositoryModule
 import me.xizzhu.android.rubridens.home.homeModule
+import me.xizzhu.android.rubridens.status.statusModule
 import org.koin.dsl.module
 
 private val appModule = module {
@@ -33,6 +34,7 @@ val appModules = listOf(
     // feature modules
     authModule,
     homeModule,
+    statusModule,
 
     // app module
     appModule,

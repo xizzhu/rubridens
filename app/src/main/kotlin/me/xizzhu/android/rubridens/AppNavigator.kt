@@ -25,6 +25,7 @@ import me.xizzhu.android.rubridens.core.model.Media
 import me.xizzhu.android.rubridens.core.model.Status
 import me.xizzhu.android.rubridens.core.model.User
 import me.xizzhu.android.rubridens.home.HomeActivity
+import me.xizzhu.android.rubridens.status.StatusActivity
 
 class AppNavigator : Navigator {
     override fun goToAuthentication(activity: Activity) {
@@ -40,7 +41,7 @@ class AppNavigator : Navigator {
     }
 
     override fun goToStatus(activity: Activity, status: Status) {
-        // TODO
+        activity.startActivity(StatusActivity.newStartIntent(activity, status))
     }
 
     override fun goToTag(activity: Activity, tag: String) {

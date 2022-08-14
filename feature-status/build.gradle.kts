@@ -14,10 +14,8 @@
  * limitations under the License.
  */
 
-import java.util.Properties
-
 plugins {
-    id("com.android.application")
+    id("com.android.library")
     id("kotlin-android")
 }
 
@@ -34,15 +32,8 @@ android {
     compileSdk = Versions.Sdk.compile
 
     defaultConfig {
-        applicationId = Configurations.applicationId
-
         minSdk = Versions.Sdk.min
         targetSdk = Versions.Sdk.target
-
-        versionCode = Versions.App.code
-        versionName = Versions.App.name
-
-        resourceConfigurations.addAll(Configurations.supportedLocales)
     }
 
     buildFeatures {
@@ -57,31 +48,10 @@ android {
         getByName("test").java.srcDirs("src/test/kotlin")
     }
 
-    signingConfigs {
-        create("release") {
-            val keystorePropertiesFile = File("keystore.properties")
-            if (keystorePropertiesFile.exists()) {
-                val keystoreProperties = Properties()
-                keystoreProperties.load(keystorePropertiesFile.inputStream())
-
-                storeFile = File(rootDir, keystoreProperties.getProperty("KEYSTORE_FILE"))
-                storePassword = keystoreProperties.getProperty("KEYSTORE_PASSWORD")
-                keyAlias = keystoreProperties.getProperty("KEY_ALIAS")
-                keyPassword = keystoreProperties.getProperty("KEY_PASSWORD")
-            }
-        }
-    }
-
     buildTypes {
         getByName("release") {
-            isMinifyEnabled = true
-            isShrinkResources = true
-            signingConfig = signingConfigs.getByName("release")
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-        }
-        getByName("debug") {
-            applicationIdSuffix = ".debug"
-            versionNameSuffix = " debug"
+            isMinifyEnabled = false
+            isShrinkResources = false
         }
     }
 
@@ -114,16 +84,14 @@ dependencies {
     implementation(project(":core-infra"))
     implementation(project(":core-model"))
     implementation(project(":core-repository"))
-    implementation(project(":feature-auth"))
-    implementation(project(":feature-home"))
-    implementation(project(":feature-status"))
+    implementation(project(":core-view"))
 
     implementation(Dependencies.Kotlin.coroutines)
+    implementation(Dependencies.Kotlin.datetime)
 
     implementation(Dependencies.AndroidX.activity)
-    implementation(Dependencies.AndroidX.annotation)
-    implementation(Dependencies.AndroidX.appCompat)
-    implementation(Dependencies.AndroidX.Lifecycle.common)
+    implementation(Dependencies.AndroidX.View.constraintLayout)
+    implementation(Dependencies.AndroidX.View.swipeRefreshLayout)
 
     implementation(Dependencies.Koin.core)
 
@@ -132,8 +100,6 @@ dependencies {
     testImplementation(Dependencies.Kotlin.test)
     testImplementation(Dependencies.Kotlin.coroutinesTest)
     testImplementation(Dependencies.AndroidX.Test.core)
-    testImplementation(Dependencies.Koin.test)
     testImplementation(Dependencies.mockk)
     testImplementation(Dependencies.robolectric)
-    testImplementation(Dependencies.Retrofit.Retrofit.core)
 }

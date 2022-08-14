@@ -22,10 +22,12 @@ import io.mockk.MockKAnnotations
 import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
 import io.mockk.mockkObject
 import io.mockk.verify
 import me.xizzhu.android.rubridens.auth.AuthActivity
 import me.xizzhu.android.rubridens.home.HomeActivity
+import me.xizzhu.android.rubridens.status.StatusActivity
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -67,6 +69,16 @@ class AppNavigatorTest {
         every { HomeActivity.newStartIntent(activity) } returns intent
 
         appNavigator.goToHome(activity)
+
+        verify(exactly = 1) { activity.startActivity(intent) }
+    }
+
+    @Test
+    fun `test goToStatus`() {
+        mockkObject(StatusActivity.Companion)
+        every { StatusActivity.newStartIntent(activity, any()) } returns intent
+
+        appNavigator.goToStatus(activity, mockk())
 
         verify(exactly = 1) { activity.startActivity(intent) }
     }

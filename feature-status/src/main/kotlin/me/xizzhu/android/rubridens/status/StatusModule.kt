@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-include(":core-infra")
-include(":core-model")
-include(":core-repository")
-include(":core-view")
-include(":feature-auth")
-include(":feature-home")
-include(":feature-status")
-include(":app")
+package me.xizzhu.android.rubridens.status
+
+import org.koin.androidx.viewmodel.dsl.viewModel
+import org.koin.dsl.module
+
+val statusModule = module {
+    viewModel { StatusViewModel(get(), get()) }
+}
