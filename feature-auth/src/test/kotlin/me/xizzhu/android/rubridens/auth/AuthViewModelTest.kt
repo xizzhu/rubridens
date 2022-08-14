@@ -92,8 +92,7 @@ class AuthViewModelTest {
             )
         }
 
-        val viewAction = async { authViewModel.viewAction().first() }
-        delay(100)
+        val viewAction = async(testDispatcher) { authViewModel.viewAction().first() }
 
         authViewModel.selectInstance("xizzhu.me")
 
@@ -147,8 +146,7 @@ class AuthViewModelTest {
             vapidKey = "vapid_key",
         )
 
-        val viewAction = async { authViewModel.viewAction().first() }
-        delay(100)
+        val viewAction = async(testDispatcher) { authViewModel.viewAction().first() }
 
         authViewModel.selectInstance("xizzhu.me")
         assertEquals("xizzhu.me", (viewAction.await() as AuthViewModel.ViewAction.OpenLoginView).instanceUrl)
@@ -167,8 +165,7 @@ class AuthViewModelTest {
             vapidKey = "vapid_key",
         )
 
-        val viewAction = async { authViewModel.viewAction().first() }
-        delay(100)
+        val viewAction = async(testDispatcher) { authViewModel.viewAction().first() }
 
         authViewModel.selectInstance("xizzhu.me")
         assertEquals("xizzhu.me", (viewAction.await() as AuthViewModel.ViewAction.OpenLoginView).instanceUrl)
@@ -229,8 +226,7 @@ class AuthViewModelTest {
 
     @Test
     fun `test onLoginResult with successful login`() = runTest {
-        val viewAction = async { authViewModel.viewAction().first() }
-        delay(100)
+        val viewAction = async(testDispatcher) { authViewModel.viewAction().first() }
 
         authViewModel.onLoginResult(true)
 

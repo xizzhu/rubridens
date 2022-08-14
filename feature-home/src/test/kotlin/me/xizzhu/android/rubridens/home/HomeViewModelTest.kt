@@ -107,8 +107,7 @@ class HomeViewModelTest {
     fun `test freshLatest without user credential`() = runTest {
         coEvery { authRepository.readUserCredentials() } returns listOf()
 
-        val viewAction = async { homeViewModel.viewAction().first() }
-        delay(100)
+        val viewAction = async(testDispatcher) { homeViewModel.viewAction().first() }
 
         homeViewModel.freshLatest()
 
@@ -124,8 +123,7 @@ class HomeViewModelTest {
         every { statusRepository.freshLatest(userCredential, any()) } returns flowOf(Data.Local(listOf(mockk())))
         coEvery { homePresenter.feedItems() } returns listOf(feedStatusHeaderItem)
 
-        val viewAction = async { homeViewModel.viewAction().first() }
-        delay(100)
+        val viewAction = async(testDispatcher) { homeViewModel.viewAction().first() }
 
         homeViewModel.freshLatest()
 
@@ -156,8 +154,7 @@ class HomeViewModelTest {
     fun `test loadLatest without user credential`() = runTest {
         coEvery { authRepository.readUserCredentials() } returns listOf()
 
-        val viewAction = async { homeViewModel.viewAction().first() }
-        delay(100)
+        val viewAction = async(testDispatcher) { homeViewModel.viewAction().first() }
 
         homeViewModel.loadLatest()
 
@@ -228,8 +225,7 @@ class HomeViewModelTest {
             throw NetworkException.Other(RuntimeException("random error"))
         }
 
-        val viewAction = async { homeViewModel.viewAction().first() }
-        delay(100)
+        val viewAction = async(testDispatcher) { homeViewModel.viewAction().first() }
 
         homeViewModel.loadLatest()
 
@@ -278,8 +274,7 @@ class HomeViewModelTest {
         // Throws an exception, should emit the error.
         every { statusRepository.loadNewer(any(), any(), any()) } returns flow { throw NetworkException.Other(RuntimeException("random error")) }
 
-        val viewAction = async { homeViewModel.viewAction().first() }
-        delay(100)
+        val viewAction = async(testDispatcher) { homeViewModel.viewAction().first() }
 
         homeViewModel.loadNewer()
 
@@ -331,8 +326,7 @@ class HomeViewModelTest {
         // Throws an exception, should emit the error.
         every { statusRepository.loadOlder(any(), any(), any()) } returns flow { throw NetworkException.Other(RuntimeException("random error")) }
 
-        val viewAction = async { homeViewModel.viewAction().first() }
-        delay(100)
+        val viewAction = async(testDispatcher) { homeViewModel.viewAction().first() }
 
         homeViewModel.loadOlder()
 

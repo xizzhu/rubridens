@@ -26,7 +26,6 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
@@ -71,8 +70,7 @@ class LoginViewModelTest {
     fun `test login with success`() = runTest {
         coEvery { authRepository.getLoginUrl("xizzhu.me") } returns "xizzhu.me/login"
 
-        val viewAction = async { loginViewModel.viewAction().first() }
-        delay(100)
+        val viewAction = async(testDispatcher) { loginViewModel.viewAction().first() }
 
         loginViewModel.login("xizzhu.me")
 
@@ -85,8 +83,7 @@ class LoginViewModelTest {
     fun `test login with failure`() = runTest {
         coEvery { authRepository.getLoginUrl("xizzhu.me") } throws RuntimeException("random exception")
 
-        val viewAction = async { loginViewModel.viewAction().first() }
-        delay(100)
+        val viewAction = async(testDispatcher) { loginViewModel.viewAction().first() }
 
         loginViewModel.login("xizzhu.me")
 
@@ -128,8 +125,7 @@ class LoginViewModelTest {
 
         loginViewModel.login("xizzhu.me") // makes sure we have the login URL correctly set
 
-        val viewAction = async { loginViewModel.viewAction().first() }
-        delay(100)
+        val viewAction = async(testDispatcher) { loginViewModel.viewAction().first() }
 
         loginViewModel.onPageLoaded("xizzhu.me?code=auth_code", "")
 
@@ -166,8 +162,7 @@ class LoginViewModelTest {
 
         loginViewModel.login("xizzhu.me") // makes sure we have the login URL correctly set
 
-        val viewAction = async { loginViewModel.viewAction().first() }
-        delay(100)
+        val viewAction = async(testDispatcher) { loginViewModel.viewAction().first() }
 
         loginViewModel.onPageLoaded("xizzhu.me?code=auth_code", "")
 
