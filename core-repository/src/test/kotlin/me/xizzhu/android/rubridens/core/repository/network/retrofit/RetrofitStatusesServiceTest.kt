@@ -19,7 +19,9 @@ package me.xizzhu.android.rubridens.core.repository.network.retrofit
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Instant
 import me.xizzhu.android.rubridens.core.model.EntityKey
+import me.xizzhu.android.rubridens.core.model.Media
 import me.xizzhu.android.rubridens.core.model.Status
+import me.xizzhu.android.rubridens.core.model.StatusContext
 import me.xizzhu.android.rubridens.core.model.User
 import me.xizzhu.android.rubridens.core.repository.network.NetworkException
 import okhttp3.mockwebserver.MockResponse
@@ -37,12 +39,12 @@ class RetrofitStatusesServiceTest : BaseRetrofitTest() {
     }
 
     @Test(expected = IllegalArgumentException::class)
-    fun `test fetchHome with empty instanceUrl`() = runTest {
+    fun `test fetch with empty instanceUrl`() = runTest {
         retrofitStatusesService.fetch(null, EntityKey("", "id"))
     }
 
     @Test(expected = IllegalArgumentException::class)
-    fun `test fetchHome with empty userOAuthToken`() = runTest {
+    fun `test fetch with empty userOAuthToken`() = runTest {
         retrofitStatusesService.fetch(null, EntityKey("xizzhu.me", ""))
     }
 
@@ -118,5 +120,111 @@ class RetrofitStatusesServiceTest : BaseRetrofitTest() {
         mockWebServer.enqueue(MockResponse().setResponseCode(200).setBody("{}"))
 
         retrofitStatusesService.fetch(null, EntityKey("xizzhu.me", "id"))
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun `test fetchContext with empty instanceUrl`() = runTest {
+        retrofitStatusesService.fetchContext(null, EntityKey("", "id"))
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun `test fetch fetchContext empty userOAuthToken`() = runTest {
+        retrofitStatusesService.fetchContext(null, EntityKey("xizzhu.me", ""))
+    }
+
+    @Test
+    fun `test fetchContext with successful response`() = runTest {
+        mockWebServer.enqueue(
+            MockResponse()
+                .setResponseCode(200)
+                .setBody(
+                    """
+                        {
+                            "ancestors": [],
+                            "descendants": [
+                                {
+                                    "id": "12345",
+                                    "created_at": "2021-11-05T11:22:33.444Z",
+                                    "account": {
+                                        "id": "67890",
+                                        "acct": "random_username@xizzhu.me",
+                                        "username": "random_username",
+                                        "display_name": "Random Display Name",
+                                        "avatar": "https://xizzhu.me/avatar1.jpg"
+                                    },
+                                    "uri": "https://xizzhu.me/",
+                                    "content": "Let's Go Brandon!",
+                                    "replies_count": 1,
+                                    "reblogs_count": 2,
+                                    "favourites_count": 3,
+                                    "reblogged": false,
+                                    "favourited": true,
+                                    "media_attachments": [{
+                                        "type": "image",
+                                		"url": "https://xizzhu.me/media1.jpg",
+                                		"preview_url": "https://xizzhu.me/media_preview1.jpg"
+                                	}]
+                                }
+                            ]
+                        }
+                    """.trimIndent()
+                )
+        )
+
+        assertEquals(
+            StatusContext(
+                statusId = EntityKey("xizzhu.me", "id"),
+                ancestors = emptyList(),
+                descendants = listOf(
+                    Status(
+                        id = EntityKey("xizzhu.me", "12345"),
+                        uri = "https://xizzhu.me/",
+                        created = Instant.parse("2021-11-05T11:22:33.444Z"),
+                        sender = User(
+                            id = EntityKey("xizzhu.me", "67890"),
+                            username = "random_username",
+                            displayName = "Random Display Name",
+                            avatarUrl = "https://xizzhu.me/avatar1.jpg"
+                        ),
+                        reblogger = null,
+                        rebloggedInstanceUrl = null,
+                        inReplyToStatusId = null,
+                        inReplyToAccountId = null,
+                        content = "Let's Go Brandon!",
+                        tags = emptyList(),
+                        mentions = emptyList(),
+                        media = listOf(
+                            Media(
+                                type = Media.Type.IMAGE,
+                                url = "https://xizzhu.me/media1.jpg",
+                                previewUrl = "https://xizzhu.me/media_preview1.jpg",
+                                blurHash = ""
+                            )
+                        ),
+                        card = null,
+                        repliesCount = 1,
+                        reblogsCount = 2,
+                        favoritesCount = 3,
+                        reblogged = false,
+                        favorited = true,
+                    )
+                )
+            ),
+            retrofitStatusesService.fetchContext(null, EntityKey("xizzhu.me", "id"))
+        )
+    }
+
+    @Test(expected = NetworkException.HttpError::class)
+    fun `test fetchContext with non-200 response code`() = runTest {
+        mockWebServer.enqueue(MockResponse().setResponseCode(400))
+
+        retrofitStatusesService.fetchContext(null, EntityKey("xizzhu.me", "id"))
+    }
+
+    @Test(expected = NetworkException.MalformedResponseError::class)
+    fun `test fetchContext with malformed JSON`() = runTest {
+        mockWebServer.enqueue(MockResponse().setResponseCode(200).setBody("{}"))
+
+        retrofitStatusesService.fetchContext(null, EntityKey("xizzhu.me", "id"))
     }
 }

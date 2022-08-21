@@ -24,6 +24,7 @@ import me.xizzhu.android.rubridens.core.model.EntityKey
 import me.xizzhu.android.rubridens.core.model.Media
 import me.xizzhu.android.rubridens.core.model.Mention
 import me.xizzhu.android.rubridens.core.model.Status
+import me.xizzhu.android.rubridens.core.model.StatusContext
 import me.xizzhu.android.rubridens.core.model.User
 import me.xizzhu.android.rubridens.core.repository.network.StatusesService
 import retrofit2.http.GET
@@ -43,6 +44,19 @@ internal class RetrofitStatusesService : StatusesService {
             fetch(userOAuthToken?.let { createAuthHeader(it) }, statusId.id)
         }.toStatus(statusId.instanceUrl)
     }
+
+    override suspend fun fetchContext(userOAuthToken: String?, statusId: EntityKey): StatusContext {
+        if (statusId.instanceUrl.isEmpty()) {
+            throw IllegalArgumentException("instanceUrl is empty")
+        }
+        if (statusId.id.isEmpty()) {
+            throw IllegalArgumentException("statusId is empty")
+        }
+
+        return request<MastodonStatusesService, MastodonStatusContext>(statusId.instanceUrl) {
+            fetchContext(userOAuthToken?.let { createAuthHeader(it) }, statusId.id)
+        }.toStatusContext(statusId)
+    }
 }
 
 /**
@@ -54,6 +68,12 @@ internal interface MastodonStatusesService {
         @Header("Authorization") authorization: String?,
         @Path("id") statusId: String,
     ): MastodonStatus
+
+    @GET("api/v1/statuses/{id}/context")
+    suspend fun fetchContext(
+        @Header("Authorization") authorization: String?,
+        @Path("id") id: String,
+    ): MastodonStatusContext
 }
 
 /**
@@ -194,5 +214,20 @@ internal class MastodonStatus(
         favoritesCount = favoritesCount,
         reblogged = reblogged,
         favorited = favorited,
+    )
+}
+
+/**
+ * See https://docs.joinmastodon.org/entities/context/
+ */
+@JsonClass(generateAdapter = true)
+internal class MastodonStatusContext(
+    @Json(name = "ancestors") val ancestors: List<MastodonStatus>,
+    @Json(name = "descendants") val descendants: List<MastodonStatus>
+) {
+    fun toStatusContext(statusId: EntityKey): StatusContext = StatusContext(
+        statusId = statusId,
+        ancestors = ancestors.map { it.toStatus(statusId.instanceUrl) },
+        descendants = descendants.map { it.toStatus(statusId.instanceUrl) },
     )
 }

@@ -74,3 +74,9 @@ data class Status(
     val reblogged: Boolean,
     val favorited: Boolean,
 )
+
+data class StatusContext(
+    val statusId: EntityKey,
+    val ancestors: List<Status>,
+    val descendants: List<Status>
+)

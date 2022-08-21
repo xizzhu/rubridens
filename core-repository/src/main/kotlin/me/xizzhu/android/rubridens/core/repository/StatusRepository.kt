@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.flow
 import me.xizzhu.android.rubridens.core.model.Data
 import me.xizzhu.android.rubridens.core.model.EntityKey
 import me.xizzhu.android.rubridens.core.model.Status
+import me.xizzhu.android.rubridens.core.model.StatusContext
 import me.xizzhu.android.rubridens.core.model.UserCredential
 import me.xizzhu.android.rubridens.core.repository.local.StatusCache
 import me.xizzhu.android.rubridens.core.repository.network.StatusesService
@@ -52,6 +53,11 @@ interface StatusRepository {
      * Load the [Status] specified by [statusId] from local cache and emit it if available. Then fetch from backend and emit it.
      */
     fun load(userCredential: UserCredential?, statusId: EntityKey): Flow<Data<Status>>
+
+    /**
+     * Fetch [StatusContext] for the [Status] specified by [statusId].
+     */
+    suspend fun fetchContext(userCredential: UserCredential?, statusId: EntityKey): StatusContext
 }
 
 internal class StatusRepositoryImpl(
@@ -148,6 +154,9 @@ internal class StatusRepositoryImpl(
         // When fetching fails, propagate the error.
         emit(Data.Remote(statusesService.fetch(userCredential?.accessToken, statusId)))
     }
+
+    override suspend fun fetchContext(userCredential: UserCredential?, statusId: EntityKey): StatusContext =
+        statusesService.fetchContext(userCredential?.accessToken, statusId)
 
     private suspend fun readLatestSafely(instanceUrl: String, olderThan: Long, limit: Int): List<Status> = runCatching<List<Status>> {
         statusCache.readLatest(instanceUrl = instanceUrl, olderThan = olderThan, limit = limit)

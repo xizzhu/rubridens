@@ -18,7 +18,10 @@ package me.xizzhu.android.rubridens.core.repository.network
 
 import me.xizzhu.android.rubridens.core.model.EntityKey
 import me.xizzhu.android.rubridens.core.model.Status
+import me.xizzhu.android.rubridens.core.model.StatusContext
 
 internal interface StatusesService {
     suspend fun fetch(userOAuthToken: String?, statusId: EntityKey): Status
+
+    suspend fun fetchContext(userOAuthToken: String?, statusId: EntityKey): StatusContext
 }
