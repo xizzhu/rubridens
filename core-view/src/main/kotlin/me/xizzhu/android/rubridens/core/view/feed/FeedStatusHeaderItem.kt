@@ -29,22 +29,29 @@ import me.xizzhu.android.rubridens.core.view.ImageLoadingCancellable
 import me.xizzhu.android.rubridens.core.view.R
 import me.xizzhu.android.rubridens.core.view.cancelImageLoading
 import me.xizzhu.android.rubridens.core.view.databinding.ItemFeedStatusHeaderBinding
+import me.xizzhu.android.rubridens.core.view.formatDisplayName
+import me.xizzhu.android.rubridens.core.view.formatRelativeTimestamp
+import me.xizzhu.android.rubridens.core.view.formatSenderUsername
 import me.xizzhu.android.rubridens.core.view.loadImage
 
 data class FeedStatusHeaderItem(
     override val status: Status,
+    val hasAncestor: Boolean,
+    val hasDescendant: Boolean,
     val blogger: User,
-    val bloggerDisplayName: String,
-    val bloggerProfileImageUrl: String,
-    val rebloggedBy: String?,
-    val subtitle: String,
-) : FeedStatusItem<FeedStatusHeaderItem>(TYPE_STATUS_HEADER, status)
+    val reblogger: User?,
+) : FeedStatusItem<FeedStatusHeaderItem>(TYPE_STATUS_HEADER, status) {
+    internal val bloggerDisplayName: String by lazy(mode = LazyThreadSafetyMode.NONE) { blogger.formatDisplayName() }
+    internal val bloggerProfileImageUrl: String = blogger.avatarUrl
+    internal val rebloggedBy: String? by lazy(mode = LazyThreadSafetyMode.NONE) { reblogger?.formatDisplayName() }
+    internal val subtitle: String by lazy(mode = LazyThreadSafetyMode.NONE) { "${status.formatSenderUsername()} • ${status.formatRelativeTimestamp()}" }
+}
 
 internal class FeedStatusHeaderItemViewHolder(
     inflater: LayoutInflater,
     parent: ViewGroup,
     openStatus: (status: Status) -> Unit,
-    openBlogger: (blogger: User) -> Unit,
+    openUser: (user: User) -> Unit,
 ) : FeedItemViewHolder<FeedStatusHeaderItem, ItemFeedStatusHeaderBinding>(ItemFeedStatusHeaderBinding.inflate(inflater, parent, false)), ImageLoadingCancellable {
     init {
         viewBinding.root.setOnClickListener { item?.let { openStatus(it.status) } }
@@ -53,7 +60,7 @@ internal class FeedStatusHeaderItemViewHolder(
             .apply { DrawableCompat.setTint(this, Color.GRAY) }
         viewBinding.rebloggedBy.setCompoundDrawablesRelativeWithIntrinsicBounds(reblog, null, null, null)
 
-        val openUserListener = View.OnClickListener { item?.let { openBlogger(it.blogger) } }
+        val openUserListener = View.OnClickListener { item?.let { openUser(it.blogger) } }
         viewBinding.profileImage.setOnClickListener(openUserListener)
         viewBinding.displayName.setOnClickListener(openUserListener)
     }
@@ -62,7 +69,7 @@ internal class FeedStatusHeaderItemViewHolder(
         if (item.rebloggedBy.isNullOrEmpty()) {
             rebloggedBy.isVisible = false
         } else {
-            rebloggedBy.text = item.rebloggedBy
+            rebloggedBy.text = item.rebloggedBy?.let { itemView.resources.getString(R.string.feed_item_text_status_reblogged_by, it) }
             rebloggedBy.isVisible = true
         }
 

@@ -41,18 +41,16 @@ abstract class FeedItem<T : FeedItem<T>>(@ViewType internal val viewType: Int) {
         internal const val TYPE_STATUS_HEADER = 1
         internal const val TYPE_STATUS_FOOTER = 2
         internal const val TYPE_STATUS_TEXT = 3
-        internal const val TYPE_STATUS_ONE_MEDIA = 4
-        internal const val TYPE_STATUS_TWO_MEDIA = 5
-        internal const val TYPE_STATUS_THREE_MEDIA = 6
-        internal const val TYPE_STATUS_FOUR_MEDIA = 7
-        internal const val TYPE_STATUS_CARD = 8
-        internal const val TYPE_STATUS_THREAD = 9
+        internal const val TYPE_STATUS_MEDIA = 4
+        internal const val TYPE_STATUS_CARD = 5
+        internal const val TYPE_STATUS_THREAD = 6
+        internal const val TYPE_STATUS_DETAIL = 7
 
         @IntDef(
             TYPE_NO_MORE_STATUS,
             TYPE_STATUS_HEADER, TYPE_STATUS_FOOTER, TYPE_STATUS_TEXT,
-            TYPE_STATUS_ONE_MEDIA, TYPE_STATUS_TWO_MEDIA, TYPE_STATUS_THREE_MEDIA, TYPE_STATUS_FOUR_MEDIA,
-            TYPE_STATUS_CARD, TYPE_STATUS_THREAD
+            TYPE_STATUS_MEDIA, TYPE_STATUS_CARD, TYPE_STATUS_THREAD,
+            TYPE_STATUS_DETAIL,
         )
         @Retention(AnnotationRetention.SOURCE)
         internal annotation class ViewType
@@ -87,6 +85,7 @@ class FeedRecyclerView : RecyclerView {
         replyToStatus: (status: Status) -> Unit,
         reblogStatus: (status: Status) -> Unit,
         favoriteStatus: (status: Status) -> Unit,
+        shareStatus: (status: Status) -> Unit,
         openUser: (user: User) -> Unit,
         openMedia: (media: Media) -> Unit,
         openTag: (tag: String) -> Unit,
@@ -98,6 +97,7 @@ class FeedRecyclerView : RecyclerView {
             replyToStatus = replyToStatus,
             reblogStatus = reblogStatus,
             favoriteStatus = favoriteStatus,
+            shareStatus = shareStatus,
             openUser = openUser,
             openMedia = openMedia,
             openTag = openTag,
@@ -155,6 +155,7 @@ private class FeedItemAdapter(
     private val replyToStatus: (status: Status) -> Unit,
     private val reblogStatus: (status: Status) -> Unit,
     private val favoriteStatus: (status: Status) -> Unit,
+    private val shareStatus: (status: Status) -> Unit,
     private val openUser: (user: User) -> Unit,
     private val openMedia: (media: Media) -> Unit,
     private val openTag: (tag: String) -> Unit,
@@ -180,7 +181,7 @@ private class FeedItemAdapter(
                     inflater = inflater,
                     parent = parent,
                     openStatus = openStatus,
-                    openBlogger = openUser,
+                    openUser = openUser,
                 )
             }
             FeedItem.TYPE_STATUS_FOOTER -> {
@@ -203,16 +204,12 @@ private class FeedItemAdapter(
                     openUser = openUser,
                 )
             }
-            FeedItem.TYPE_STATUS_ONE_MEDIA,
-            FeedItem.TYPE_STATUS_TWO_MEDIA,
-            FeedItem.TYPE_STATUS_THREE_MEDIA,
-            FeedItem.TYPE_STATUS_FOUR_MEDIA -> {
-                FeedStatusMediaItemViewHolder.create(
+            FeedItem.TYPE_STATUS_MEDIA -> {
+                FeedStatusMediaItemViewHolder(
                     inflater = inflater,
                     parent = parent,
                     openStatus = openStatus,
                     openMedia = openMedia,
-                    viewType = viewType,
                 )
             }
             FeedItem.TYPE_STATUS_CARD -> {
@@ -228,6 +225,21 @@ private class FeedItemAdapter(
                     inflater = inflater,
                     parent = parent,
                     openStatus = openStatus,
+                )
+            }
+            FeedItem.TYPE_STATUS_DETAIL -> {
+                FeedStatusDetailItemViewHolder(
+                    inflater = inflater,
+                    parent = parent,
+                    openStatus = openStatus,
+                    replyToStatus = replyToStatus,
+                    reblogStatus = reblogStatus,
+                    favoriteStatus = favoriteStatus,
+                    shareStatus = shareStatus,
+                    openUser = openUser,
+                    openMedia = openMedia,
+                    openTag = openTag,
+                    openUrl = openUrl,
                 )
             }
             else -> throw IllegalStateException("Unsupported view type: $viewType")

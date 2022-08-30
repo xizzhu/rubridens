@@ -72,7 +72,7 @@ internal interface MastodonStatusesService {
     @GET("api/v1/statuses/{id}/context")
     suspend fun fetchContext(
         @Header("Authorization") authorization: String?,
-        @Path("id") id: String,
+        @Path("id") statusId: String,
     ): MastodonStatusContext
 }
 

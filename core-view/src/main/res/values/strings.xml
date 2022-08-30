@@ -3,4 +3,17 @@
 
     <string name="feed_item_text_no_more_status">You have reached end of the feed\nw(ﾟДﾟ)w</string>
     <string name="feed_item_text_show_thread">Show Thread</string>
+    <string name="feed_item_text_status_reblogged_by">%1$s boosted</string>
+
+    <plurals name="text_x_reblogs">
+        <item quantity="one">1 Boost</item>
+        <item quantity="other">%1$d Boosts</item>
+    </plurals>
+
+    <plurals name="text_x_favorites">
+        <item quantity="one">1 Favorite</item>
+        <item quantity="other">%1$d Favorites</item>
+    </plurals>
+
+    <string name="error_network_failure">Network unavailable ≧ω≦</string>
 </resources>

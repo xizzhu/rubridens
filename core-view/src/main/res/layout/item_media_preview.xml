@@ -9,29 +9,19 @@
         android:id="@+id/image"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginStart="80dp"
-        android:layout_marginTop="@dimen/padding"
-        android:layout_marginEnd="@dimen/padding"
         app:aspectRatio="16:9"
+        app:layout_constraintTop_toTopOf="parent"
         tools:background="@color/primary" />
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginStart="80dp"
-        android:layout_marginTop="@dimen/padding"
-        android:layout_marginEnd="@dimen/padding"
-        android:background="@drawable/bg_border" />
 
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/play"
         android:layout_width="64dp"
         android:layout_height="64dp"
-        android:layout_gravity="center"
-        android:layout_marginStart="40dp"
-        android:layout_marginTop="@dimen/padding"
-        android:layout_marginEnd="@dimen/padding_small"
         android:src="@drawable/ic_play_64"
         android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         tools:visibility="visible" />
 </FrameLayout>

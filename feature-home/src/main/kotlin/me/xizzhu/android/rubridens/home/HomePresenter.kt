@@ -16,29 +16,20 @@
 
 package me.xizzhu.android.rubridens.home
 
-import android.app.Application
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import me.xizzhu.android.rubridens.core.model.Media
 import me.xizzhu.android.rubridens.core.model.Status
-import me.xizzhu.android.rubridens.core.view.BlurHashDecoder
 import me.xizzhu.android.rubridens.core.view.feed.FeedItem
 import me.xizzhu.android.rubridens.core.view.feed.FeedNoMoreStatusItem
 import me.xizzhu.android.rubridens.core.view.feed.FeedStatusCardItem
 import me.xizzhu.android.rubridens.core.view.feed.FeedStatusFooterItem
 import me.xizzhu.android.rubridens.core.view.feed.FeedStatusHeaderItem
-import me.xizzhu.android.rubridens.core.view.feed.FeedStatusMediaInfo
 import me.xizzhu.android.rubridens.core.view.feed.FeedStatusMediaItem
 import me.xizzhu.android.rubridens.core.view.feed.FeedStatusTextItem
 import me.xizzhu.android.rubridens.core.view.feed.FeedStatusThreadItem
-import me.xizzhu.android.rubridens.core.view.formatCount
-import me.xizzhu.android.rubridens.core.view.formatDisplayName
-import me.xizzhu.android.rubridens.core.view.formatRelativeTimestamp
-import me.xizzhu.android.rubridens.core.view.formatSenderUsername
 
-class HomePresenter(
-    private val application: Application,
-) {
+class HomePresenter {
     private val dispatcher = Dispatchers.Default.limitedParallelism(1)
 
     private val feedItems = ArrayList<FeedItem<*>>()
@@ -83,45 +74,30 @@ class HomePresenter(
 
     private fun Status.toFeedStatusHeaderItem(): FeedStatusHeaderItem = FeedStatusHeaderItem(
         status = this,
+        hasAncestor = false,
+        hasDescendant = false,
         blogger = sender,
-        bloggerDisplayName = sender.formatDisplayName(),
-        bloggerProfileImageUrl = sender.avatarUrl,
-        rebloggedBy = reblogger?.formatDisplayName()?.let { application.resources.getString(R.string.home_text_status_reblogged_by, it) },
-        subtitle = "${formatSenderUsername()} • ${formatRelativeTimestamp()}",
+        reblogger = reblogger,
     )
 
-    private fun Status.toFeedStatusTextItem(): FeedStatusTextItem = FeedStatusTextItem(status = this)
+    private fun Status.toFeedStatusTextItem(): FeedStatusTextItem = FeedStatusTextItem(status = this, hasAncestor = false, hasDescendant = false)
 
-    private fun Status.toFeedStatusMediaItem(): FeedItem<*>? =
-        media.mapNotNull { media ->
-            if (media.type == Media.Type.IMAGE || media.type == Media.Type.GIF || media.type == Media.Type.VIDEO) {
-                FeedStatusMediaInfo(
-                    media = media,
-                    imageUrl = media.previewUrl.takeIf { it.isNotEmpty() } ?: media.url,
-                    placeholder = BlurHashDecoder.decode(media.blurHash, 32, 18),
-                    isPlayable = media.type == Media.Type.GIF || media.type == Media.Type.VIDEO,
-                )
-            } else {
-                null
-            }
-        }.takeIf { mediaInfoList ->
-            mediaInfoList.isNotEmpty()
-        }?.let { mediaInfoList ->
+    private fun Status.toFeedStatusMediaItem(): FeedStatusMediaItem? =
+        if (media.any { media -> media.type == Media.Type.IMAGE || media.type == Media.Type.GIF || media.type == Media.Type.VIDEO }) {
             FeedStatusMediaItem(
                 status = this,
-                mediaInfo = mediaInfoList,
+                hasAncestor = false,
+                hasDescendant = false,
             )
+        } else {
+            null
         }
 
     private fun Status.toFeedStatusCardItem(): FeedStatusCardItem? = card?.let { card ->
         FeedStatusCardItem(
             status = this,
-            title = card.title,
-            description = card.description,
-            author = card.author,
-            imageUrl = card.previewUrl,
-            placeholder = BlurHashDecoder.decode(card.blurHash, 16, 16),
-            url = card.url,
+            hasAncestor = false,
+            hasDescendant = false,
         )
     }
 
@@ -134,10 +110,7 @@ class HomePresenter(
 
     private fun Status.toFeedStatusFooterItem(): FeedStatusFooterItem = FeedStatusFooterItem(
         status = this,
-        replies = repliesCount.formatCount(),
-        reblogs = reblogsCount.formatCount(),
-        reblogged = reblogged,
-        favorites = favoritesCount.formatCount(),
-        favorited = favorited,
+        hasAncestor = false,
+        hasDescendant = false,
     )
 }

@@ -16,10 +16,21 @@
 
 package me.xizzhu.android.rubridens.status
 
-import org.koin.androidx.viewmodel.dsl.viewModel
-import org.koin.dsl.module
+import me.xizzhu.android.rubridens.core.model.Status
+import me.xizzhu.android.rubridens.core.model.StatusContext
+import me.xizzhu.android.rubridens.core.view.feed.FeedItem
+import me.xizzhu.android.rubridens.core.view.feed.FeedStatusDetailItem
 
-val statusModule = module {
-    factory { StatusPresenter() }
-    viewModel { StatusViewModel(get(), get(), get()) }
+class StatusPresenter {
+    fun buildFeedItems(status: Status, statusContext: StatusContext?): Pair<List<FeedItem<*>>, Int> {
+        val items = ArrayList<FeedItem<*>>()
+
+        items.add(FeedStatusDetailItem(
+            status = status,
+            hasAncestor = false,
+            hasDescendant = false,
+        ))
+
+        return items to -1
+    }
 }

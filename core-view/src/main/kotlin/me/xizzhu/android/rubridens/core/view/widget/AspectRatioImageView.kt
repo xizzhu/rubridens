@@ -52,14 +52,24 @@ class AspectRatioImageView : ShapeableImageView {
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        if (MeasureSpec.getMode(widthMeasureSpec) != MeasureSpec.EXACTLY) {
+        if (MeasureSpec.getMode(widthMeasureSpec) != MeasureSpec.EXACTLY && MeasureSpec.getMode(height) != MeasureSpec.EXACTLY) {
             super.onMeasure(widthMeasureSpec, heightMeasureSpec)
             return
         }
 
         // Keep the aspect ratio to be 16:9
         val measuredWidth = MeasureSpec.getSize(widthMeasureSpec)
-        val measuredHeight = (measuredWidth * aspectRatio).roundToInt()
-        setMeasuredDimension(measuredWidth, measuredHeight)
+        val measuredHeight = MeasureSpec.getSize(heightMeasureSpec)
+
+        val updatedWidth: Int
+        val updatedHeight: Int
+        if (measuredWidth != 0) {
+            updatedWidth = measuredWidth
+            updatedHeight = (measuredWidth * aspectRatio).roundToInt()
+        } else {
+            updatedWidth = (measuredHeight / aspectRatio).roundToInt()
+            updatedHeight = measuredHeight
+        }
+        setMeasuredDimension(updatedWidth, updatedHeight)
     }
 }

@@ -25,6 +25,8 @@ import androidx.core.text.HtmlCompat
 import androidx.core.util.PatternsCompat
 import me.xizzhu.android.rubridens.core.model.Status
 import me.xizzhu.android.rubridens.core.model.User
+import java.text.SimpleDateFormat
+import java.util.*
 import kotlin.math.min
 
 fun Int.formatCount(): String = when {
@@ -41,6 +43,8 @@ fun Status.formatSenderUsername(): String = if (id.instanceUrl == sender.id.inst
 } else {
     "@${sender.username}@${sender.id.instanceUrl}"
 }
+
+fun Status.formatAbsoluteTimestamp(): CharSequence = SimpleDateFormat("MMM d, yyyy hh:mmaaa", Locale.getDefault()).format(Date(created.toEpochMilliseconds()))
 
 fun Status.formatRelativeTimestamp(): CharSequence = DateUtils.getRelativeTimeSpanString(min(created.toEpochMilliseconds(), System.currentTimeMillis()))
 

@@ -16,7 +16,6 @@
 
 package me.xizzhu.android.rubridens.home
 
-import androidx.test.core.app.ApplicationProvider
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Instant
 import me.xizzhu.android.rubridens.core.model.Card
@@ -27,18 +26,14 @@ import me.xizzhu.android.rubridens.core.model.User
 import me.xizzhu.android.rubridens.core.view.feed.FeedStatusCardItem
 import me.xizzhu.android.rubridens.core.view.feed.FeedStatusFooterItem
 import me.xizzhu.android.rubridens.core.view.feed.FeedStatusHeaderItem
-import me.xizzhu.android.rubridens.core.view.feed.FeedStatusMediaInfo
 import me.xizzhu.android.rubridens.core.view.feed.FeedStatusMediaItem
 import me.xizzhu.android.rubridens.core.view.feed.FeedStatusTextItem
 import me.xizzhu.android.rubridens.core.view.feed.FeedStatusThreadItem
-import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-@RunWith(RobolectricTestRunner::class)
 class HomePresenterTest {
     private lateinit var homePresenter: HomePresenter
 
@@ -77,33 +72,25 @@ class HomePresenterTest {
     private val feedItems1 = listOf(
         FeedStatusHeaderItem(
             status = testStatus1,
+            hasAncestor = false,
+            hasDescendant = false,
             blogger = testUser1,
-            bloggerDisplayName = "Random Display Name",
-            bloggerProfileImageUrl = "https://xizzhu.me/avatar1.jpg",
-            rebloggedBy = null,
-            subtitle = "@random_username • Nov 5, 2021",
+            reblogger = null,
         ),
         FeedStatusTextItem(
             status = testStatus1,
+            hasAncestor = false,
+            hasDescendant = false,
         ),
         FeedStatusMediaItem(
             status = testStatus1,
-            mediaInfo = listOf(
-                FeedStatusMediaInfo(
-                    media = testMedia1,
-                    imageUrl = "https://xizzhu.me/media1.jpg",
-                    placeholder = null,
-                    isPlayable = false,
-                ),
-            ),
+            hasAncestor = false,
+            hasDescendant = false,
         ),
         FeedStatusFooterItem(
             status = testStatus1,
-            replies = "1",
-            reblogs = "2",
-            reblogged = false,
-            favorites = "3",
-            favorited = true,
+            hasAncestor = false,
+            hasDescendant = false,
         ),
     )
 
@@ -169,51 +156,33 @@ class HomePresenterTest {
     private val feedItems2 = listOf(
         FeedStatusHeaderItem(
             status = testStatus2,
+            hasAncestor = false,
+            hasDescendant = false,
             blogger = testUser2,
-            bloggerDisplayName = "Display Name 2",
-            bloggerProfileImageUrl = "",
-            rebloggedBy = "random_username_3 boosted",
-            subtitle = "@random_username_2@another_instance • Nov 5, 2021",
+            reblogger = testUser3,
         ),
         FeedStatusTextItem(
             status = testStatus2,
+            hasAncestor = false,
+            hasDescendant = false,
         ),
         FeedStatusMediaItem(
             status = testStatus2,
-            mediaInfo = listOf(
-                FeedStatusMediaInfo(
-                    media = testMedia2,
-                    imageUrl = "https://xizzhu.me/media_preview2.jpg",
-                    placeholder = null,
-                    isPlayable = true,
-                ),
-                FeedStatusMediaInfo(
-                    media = testMedia4,
-                    imageUrl = "https://xizzhu.me/media_preview4.jpg",
-                    placeholder = null,
-                    isPlayable = true,
-                ),
-            ),
+            hasAncestor = false,
+            hasDescendant = false,
         ),
         FeedStatusCardItem(
             status = testStatus2,
-            title = "card_title",
-            description = "card_description",
-            author = "card_author",
-            imageUrl = "https://xizzhu.me/media_preview2.jpg",
-            placeholder = null,
-            url = "https://xizzhu.me/",
+            hasAncestor = false,
+            hasDescendant = false,
         ),
         FeedStatusThreadItem(
             status = testStatus2,
         ),
         FeedStatusFooterItem(
             status = testStatus2,
-            replies = "1K+",
-            reblogs = "",
-            reblogged = false,
-            favorites = "7M+",
-            favorited = true,
+            hasAncestor = false,
+            hasDescendant = false,
         ),
     )
 
@@ -240,28 +209,26 @@ class HomePresenterTest {
     private val feedItems3 = listOf(
         FeedStatusHeaderItem(
             status = testStatus3,
+            hasAncestor = false,
+            hasDescendant = false,
             blogger = testUser1,
-            bloggerDisplayName = "Random Display Name",
-            bloggerProfileImageUrl = "https://xizzhu.me/avatar1.jpg",
-            rebloggedBy = null,
-            subtitle = "@random_username • Nov 8, 2016",
+            reblogger = null,
         ),
         FeedStatusTextItem(
             status = testStatus3,
+            hasAncestor = false,
+            hasDescendant = false,
         ),
         FeedStatusFooterItem(
             status = testStatus3,
-            replies = "1",
-            reblogs = "2",
-            reblogged = true,
-            favorites = "3",
-            favorited = false,
+            hasAncestor = false,
+            hasDescendant = false,
         ),
     )
 
     @BeforeTest
     fun setup() {
-        homePresenter = HomePresenter(ApplicationProvider.getApplicationContext())
+        homePresenter = HomePresenter()
     }
 
     @Test

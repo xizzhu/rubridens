@@ -25,15 +25,19 @@ import androidx.core.content.res.ResourcesCompat
 import me.xizzhu.android.rubridens.core.model.Status
 import me.xizzhu.android.rubridens.core.view.R
 import me.xizzhu.android.rubridens.core.view.databinding.ItemFeedStatusFooterBinding
+import me.xizzhu.android.rubridens.core.view.formatCount
 
 data class FeedStatusFooterItem(
     override val status: Status,
-    val replies: String,
-    val reblogs: String,
-    val reblogged: Boolean,
-    val favorites: String,
-    val favorited: Boolean,
-) : FeedStatusItem<FeedStatusFooterItem>(TYPE_STATUS_FOOTER, status)
+    val hasAncestor: Boolean,
+    val hasDescendant: Boolean,
+) : FeedStatusItem<FeedStatusFooterItem>(TYPE_STATUS_FOOTER, status) {
+    internal val replies: String by lazy(mode = LazyThreadSafetyMode.NONE) { status.repliesCount.formatCount() }
+    internal val reblogs: String by lazy(mode = LazyThreadSafetyMode.NONE) { status.reblogsCount.formatCount() }
+    internal val reblogged: Boolean = status.reblogged
+    internal val favorites: String by lazy(mode = LazyThreadSafetyMode.NONE) { status.favoritesCount.formatCount() }
+    internal val favorited: Boolean = status.favorited
+}
 
 internal class FeedStatusFooterItemViewHolder(
     inflater: LayoutInflater,

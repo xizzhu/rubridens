@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <View
+        android:id="@+id/ancestor_indicator"
+        android:layout_width="@dimen/status_context_indicator_width"
+        android:layout_height="40dp"
+        android:background="@color/gray"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@id/profile_image"
+        app:layout_constraintStart_toStartOf="@id/profile_image"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="visible" />
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/profile_image"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="@dimen/padding"
+        android:layout_marginTop="@dimen/padding"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:shapeAppearanceOverlay="@style/ImageView.Round"
+        tools:src="@color/primary" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/display_name"
+        style="@style/TextAppearance.Material3.TitleMedium"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/padding"
+        android:ellipsize="end"
+        android:lines="1"
+        app:layout_constraintStart_toEndOf="@id/profile_image"
+        app:layout_constraintTop_toTopOf="@id/profile_image"
+        tools:text="Xizhi Zhu" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/account_name"
+        style="@style/TextAppearance.Material3.TitleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:lines="1"
+        app:layout_constraintStart_toStartOf="@id/display_name"
+        app:layout_constraintTop_toBottomOf="@id/display_name"
+        tools:text="\@xizzhu" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/text"
+        style="@style/TextAppearance.Material3.BodyLarge"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/padding"
+        android:layout_marginTop="@dimen/padding"
+        android:layout_marginEnd="@dimen/padding"
+        app:layout_constraintTop_toBottomOf="@id/profile_image"
+        tools:text="Let me see what I can type here to create something that has no meaning but to make the preview work." />
+
+    <me.xizzhu.android.rubridens.core.view.widget.MediaPreviewView
+        android:id="@+id/media_preview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/padding"
+        android:layout_marginTop="@dimen/padding"
+        android:layout_marginEnd="@dimen/padding"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/text"
+        tools:visibility="visible"
+        tools:src="@color/primary" />
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/card_barrier"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        app:barrierAllowsGoneWidgets="false"
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="text, media_preview" />
+
+    <me.xizzhu.android.rubridens.core.view.widget.AspectRatioImageView
+        android:id="@+id/card_preview"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginStart="@dimen/padding"
+        android:layout_marginTop="@dimen/padding"
+        android:layout_marginEnd="@dimen/padding"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/card_barrier"
+        app:aspectRatio="16:9"
+        tools:visibility="visible" />
+
+    <View
+        android:id="@+id/card_divider"
+        android:layout_width="0dp"
+        android:layout_height="1px"
+        android:background="@color/gray"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@id/card_preview"
+        app:layout_constraintStart_toStartOf="@id/card_preview"
+        app:layout_constraintTop_toBottomOf="@id/card_preview"
+        tools:visibility="visible" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/card_title"
+        style="@style/TextAppearance.Material3.TitleMedium"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/padding_small"
+        android:layout_marginTop="@dimen/padding_small"
+        android:layout_marginEnd="@dimen/padding_small"
+        android:ellipsize="end"
+        android:lines="1"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@id/card_preview"
+        app:layout_constraintStart_toStartOf="@id/card_preview"
+        app:layout_constraintTop_toBottomOf="@id/card_divider"
+        tools:text="President Biden Tells Governors: \u0022There Is No Federal Solution\u0022 To Covid"
+        tools:visibility="visible" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/card_description"
+        style="@style/TextAppearance.Material3.BodyMedium"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/padding_small"
+        android:layout_marginTop="@dimen/padding_small"
+        android:layout_marginEnd="@dimen/padding_small"
+        android:ellipsize="end"
+        android:maxLines="4"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@id/card_preview"
+        app:layout_constraintStart_toStartOf="@id/card_preview"
+        app:layout_constraintTop_toBottomOf="@id/card_title"
+        tools:text="President Biden and the White House Covid-19 task force said during a conference call with the National Governors Association that states would have to \u0022solve\u0022 the pandemic \u0022at the state level.\u0022"
+        tools:visibility="visible" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/card_author"
+        style="@style/TextAppearance.Material3.LabelMedium"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/padding_small"
+        android:layout_marginEnd="@dimen/padding_small"
+        android:ellipsize="end"
+        android:lines="1"
+        android:paddingBottom="@dimen/padding_small"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@id/card_preview"
+        app:layout_constraintStart_toStartOf="@id/card_preview"
+        app:layout_constraintTop_toBottomOf="@id/card_description"
+        tools:text="RealClearPolitics"
+        tools:visibility="visible" />
+
+    <View
+        android:id="@+id/card_border"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@drawable/bg_border"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/card_author"
+        app:layout_constraintEnd_toEndOf="@id/card_preview"
+        app:layout_constraintStart_toStartOf="@id/card_preview"
+        app:layout_constraintTop_toTopOf="@id/card_preview"
+        tools:visibility="visible" />
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/date_time_barrier"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        app:barrierAllowsGoneWidgets="false"
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="text, media_preview, card_border" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/date_time"
+        style="@style/TextAppearance.Material3.LabelLarge"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/padding"
+        android:layout_marginTop="@dimen/padding"
+        android:layout_marginEnd="@dimen/padding"
+        android:textColor="@color/gray"
+        app:layout_constraintTop_toBottomOf="@id/date_time_barrier"
+        tools:text="Dec 25, 2021 06:04AM" />
+
+    <View
+        android:id="@+id/reblogs_favorites_divider"
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:layout_marginStart="@dimen/padding"
+        android:layout_marginTop="@dimen/padding"
+        android:layout_marginEnd="@dimen/padding"
+        android:background="@color/gray"
+        app:layout_constraintTop_toBottomOf="@id/date_time" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/reblogs_favorites"
+        style="@style/TextAppearance.Material3.LabelLarge"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/padding"
+        android:layout_marginTop="@dimen/padding"
+        android:layout_marginEnd="@dimen/padding"
+        android:textColor="@color/gray"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@id/reblogs_favorites_divider"
+        tools:text="89 Boosts  64 Favorites" />
+
+    <View
+        android:id="@+id/action_divider"
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:layout_marginStart="@dimen/padding"
+        android:layout_marginTop="@dimen/padding"
+        android:layout_marginEnd="@dimen/padding"
+        android:background="@color/gray"
+        app:layout_constraintTop_toBottomOf="@id/reblogs_favorites" />
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/action_barrier"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        app:barrierAllowsGoneWidgets="false"
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="reblogs_favorites_divider, action_divider" />
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/reply"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="@dimen/padding"
+        android:background="?attr/selectableItemBackground"
+        android:scaleType="center"
+        android:src="@drawable/ic_reply_24"
+        app:layout_constraintEnd_toStartOf="@id/reblog"
+        app:layout_constraintHorizontal_chainStyle="spread_inside"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/action_barrier"
+        tools:background="@color/primary" />
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/reblog"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="?attr/selectableItemBackground"
+        android:scaleType="center"
+        android:src="@drawable/ic_reblog_24"
+        app:layout_constraintEnd_toStartOf="@id/favorite"
+        app:layout_constraintStart_toEndOf="@id/reply"
+        app:layout_constraintTop_toTopOf="@id/reply"
+        tools:background="@color/primary" />
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/favorite"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="?attr/selectableItemBackground"
+        android:scaleType="center"
+        android:src="@drawable/ic_favorite_24"
+        app:layout_constraintEnd_toStartOf="@id/share"
+        app:layout_constraintStart_toEndOf="@id/reblog"
+        app:layout_constraintTop_toTopOf="@id/reply"
+        tools:background="@color/primary" />
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/share"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginEnd="@dimen/padding"
+        android:background="?attr/selectableItemBackground"
+        android:scaleType="center"
+        android:src="@drawable/ic_share_24"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/favorite"
+        app:layout_constraintTop_toTopOf="@id/reply"
+        tools:background="@color/primary" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="@color/gray"
+        app:layout_constraintTop_toBottomOf="@id/reply" />
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -27,6 +27,8 @@ import me.xizzhu.android.rubridens.core.view.formatTextContent
 
 data class FeedStatusTextItem(
     override val status: Status,
+    val hasAncestor: Boolean,
+    val hasDescendant: Boolean,
 ) : FeedStatusItem<FeedStatusTextItem>(TYPE_STATUS_TEXT, status) {
     internal var clickableSpanLastClicked: Long = 0L
 

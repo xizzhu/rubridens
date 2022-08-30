@@ -43,6 +43,7 @@ class HomeActivity : BaseActivity<HomeViewModel.ViewAction, HomeViewModel.ViewSt
             replyToStatus = { status -> /* TODO */ },
             reblogStatus = { status -> /* TODO */ },
             favoriteStatus = { status -> /* TODO */ },
+            shareStatus = { status -> /* TODO */ },
             openUser = { user -> navigator.gotoUser(this@HomeActivity, user) },
             openMedia = { media -> navigator.gotoMedia(this@HomeActivity, media) },
             openTag = { tag -> navigator.goToTag(this@HomeActivity, tag) },
@@ -67,7 +68,7 @@ class HomeActivity : BaseActivity<HomeViewModel.ViewAction, HomeViewModel.ViewSt
             finish()
         }
         HomeViewModel.ViewAction.ShowNetworkError -> {
-            toast(R.string.home_error_network_failure)
+            toast(R.string.error_network_failure)
         }
     }
 

@@ -20,6 +20,7 @@ import android.graphics.Bitmap
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import me.xizzhu.android.rubridens.core.model.Status
+import me.xizzhu.android.rubridens.core.view.BlurHashDecoder
 import me.xizzhu.android.rubridens.core.view.ImageLoadingCancellable
 import me.xizzhu.android.rubridens.core.view.R
 import me.xizzhu.android.rubridens.core.view.cancelImageLoading
@@ -28,13 +29,16 @@ import me.xizzhu.android.rubridens.core.view.loadImage
 
 data class FeedStatusCardItem(
     override val status: Status,
-    val title: String,
-    val description: String,
-    val author: String,
-    val imageUrl: String,
-    val placeholder: Bitmap?,
-    val url: String,
-) : FeedStatusItem<FeedStatusCardItem>(TYPE_STATUS_CARD, status)
+    val hasAncestor: Boolean,
+    val hasDescendant: Boolean,
+) : FeedStatusItem<FeedStatusCardItem>(TYPE_STATUS_CARD, status) {
+    internal val title: String = status.card!!.title
+    internal val description: String = status.card!!.description
+    internal val author: String = status.card!!.author
+    internal val imageUrl: String = status.card!!.previewUrl
+    internal val placeholder: Bitmap? = BlurHashDecoder.decode(status.card!!.blurHash, 16, 16)
+    internal val url: String = status.card!!.url
+}
 
 internal class FeedStatusCardItemViewHolder(
     inflater: LayoutInflater,

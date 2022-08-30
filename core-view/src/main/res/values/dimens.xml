@@ -4,4 +4,7 @@
     <dimen name="padding">16dp</dimen>
     <dimen name="padding_big">32dp</dimen>
     <dimen name="padding_small">8dp</dimen>
+
+    <dimen name="media_preview_left_margin">2dp</dimen>
+    <dimen name="status_context_indicator_width">2dp</dimen>
 </resources>

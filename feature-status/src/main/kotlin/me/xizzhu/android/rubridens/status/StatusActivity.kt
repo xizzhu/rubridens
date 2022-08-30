@@ -19,7 +19,9 @@ package me.xizzhu.android.rubridens.status
 import android.content.Context
 import android.content.Intent
 import me.xizzhu.android.rubridens.core.infra.BaseActivity
+import me.xizzhu.android.rubridens.core.model.EntityKey
 import me.xizzhu.android.rubridens.core.model.Status
+import me.xizzhu.android.rubridens.core.view.toast
 import me.xizzhu.android.rubridens.status.databinding.ActivityStatusBinding
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -47,22 +49,36 @@ class StatusActivity : BaseActivity<StatusViewModel.ViewAction, StatusViewModel.
     override val viewModel: StatusViewModel by viewModel()
 
     override fun onViewCreated() = with(viewBinding) {
-        swipeRefresher.setOnRefreshListener { /* TODO */ }
+        swipeRefresher.setOnRefreshListener { loadStatus() }
 
         feed.init(
             openStatus = { status -> navigator.goToStatus(this@StatusActivity, status) },
             replyToStatus = { status -> /* TODO */ },
             reblogStatus = { status -> /* TODO */ },
             favoriteStatus = { status -> /* TODO */ },
+            shareStatus = { status -> /* TODO */ },
             openUser = { user -> navigator.gotoUser(this@StatusActivity, user) },
             openMedia = { media -> navigator.gotoMedia(this@StatusActivity, media) },
             openTag = { tag -> navigator.goToTag(this@StatusActivity, tag) },
             openUrl = { url -> navigator.gotoUrl(this@StatusActivity, url) },
         )
+
+        loadStatus()
+    }
+
+    private fun loadStatus() {
+        viewModel.loadStatus(
+            statusId = EntityKey(
+                instanceUrl = intent.getStringExtra(KEY_STATUS_INSTANCE_URL)!!,
+                id = intent.getStringExtra(KEY_STATUS_ID)!!,
+            ),
+        )
     }
 
     override fun onViewAction(viewAction: StatusViewModel.ViewAction) = when (viewAction) {
-        else -> {}
+        StatusViewModel.ViewAction.ShowNetworkError -> {
+            toast(R.string.error_network_failure)
+        }
     }
 
     override fun onViewState(viewState: StatusViewModel.ViewState) = with(viewBinding) {

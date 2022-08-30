@@ -16,104 +16,31 @@
 
 package me.xizzhu.android.rubridens.core.view.feed
 
-import android.graphics.Bitmap
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.view.isVisible
-import androidx.viewbinding.ViewBinding
-import com.google.android.material.imageview.ShapeableImageView
 import me.xizzhu.android.rubridens.core.model.Media
 import me.xizzhu.android.rubridens.core.model.Status
-import me.xizzhu.android.rubridens.core.view.ImageLoadingCancellable
-import me.xizzhu.android.rubridens.core.view.cancelImageLoading
-import me.xizzhu.android.rubridens.core.view.databinding.ItemFeedStatusMediaFourBinding
-import me.xizzhu.android.rubridens.core.view.databinding.ItemFeedStatusMediaOneBinding
-import me.xizzhu.android.rubridens.core.view.databinding.ItemFeedStatusMediaThreeBinding
-import me.xizzhu.android.rubridens.core.view.databinding.ItemFeedStatusMediaTwoBinding
-import me.xizzhu.android.rubridens.core.view.loadImage
-import me.xizzhu.android.rubridens.core.view.widget.AspectRatioImageView
-
-data class FeedStatusMediaInfo(
-    val media: Media,
-    val imageUrl: String,
-    val placeholder: Bitmap?,
-    val isPlayable: Boolean,
-)
+import me.xizzhu.android.rubridens.core.view.databinding.ItemFeedStatusMediaBinding
 
 data class FeedStatusMediaItem(
     override val status: Status,
-    val mediaInfo: List<FeedStatusMediaInfo>,
-) : FeedStatusItem<FeedStatusMediaItem>(
-    viewType = when (mediaInfo.size) {
-        0 -> throw IllegalArgumentException("mediaInfo is empty")
-        1 -> TYPE_STATUS_ONE_MEDIA
-        2 -> TYPE_STATUS_TWO_MEDIA
-        3 -> TYPE_STATUS_THREE_MEDIA
-        else -> TYPE_STATUS_FOUR_MEDIA
-    },
-    status = status,
-)
+    val hasAncestor: Boolean,
+    val hasDescendant: Boolean,
+) : FeedStatusItem<FeedStatusMediaItem>(TYPE_STATUS_MEDIA, status)
 
-internal abstract class FeedStatusMediaItemViewHolder<VB : ViewBinding>(
-    viewBinding: VB,
-    private val imageViews: Array<AspectRatioImageView>,
-    private val playButtons: Array<ShapeableImageView>,
+internal class FeedStatusMediaItemViewHolder(
+    inflater: LayoutInflater,
+    parent: ViewGroup,
     openStatus: (status: Status) -> Unit,
     openMedia: (media: Media) -> Unit,
-) : FeedItemViewHolder<FeedStatusMediaItem, VB>(viewBinding), ImageLoadingCancellable {
-    companion object {
-        fun create(
-            inflater: LayoutInflater,
-            parent: ViewGroup,
-            openStatus: (status: Status) -> Unit,
-            openMedia: (media: Media) -> Unit,
-            @FeedItem.Companion.ViewType viewType: Int,
-        ): FeedStatusMediaItemViewHolder<*> {
-            val viewBinding: ViewBinding
-            val imageViews: Array<AspectRatioImageView>
-            val playButtons: Array<ShapeableImageView>
-            when (viewType) {
-                FeedItem.TYPE_STATUS_ONE_MEDIA -> {
-                    viewBinding = ItemFeedStatusMediaOneBinding.inflate(inflater, parent, false)
-                    imageViews = arrayOf(viewBinding.image)
-                    playButtons = arrayOf(viewBinding.play)
-                }
-                FeedItem.TYPE_STATUS_TWO_MEDIA -> {
-                    viewBinding = ItemFeedStatusMediaTwoBinding.inflate(inflater, parent, false)
-                    imageViews = arrayOf(viewBinding.image1, viewBinding.image2)
-                    playButtons = arrayOf(viewBinding.play1, viewBinding.play2)
-                }
-                FeedItem.TYPE_STATUS_THREE_MEDIA -> {
-                    viewBinding = ItemFeedStatusMediaThreeBinding.inflate(inflater, parent, false)
-                    imageViews = arrayOf(viewBinding.image1, viewBinding.image2, viewBinding.image3)
-                    playButtons = arrayOf(viewBinding.play1, viewBinding.play2, viewBinding.play3)
-                }
-                FeedItem.TYPE_STATUS_FOUR_MEDIA -> {
-                    viewBinding = ItemFeedStatusMediaFourBinding.inflate(inflater, parent, false)
-                    imageViews = arrayOf(viewBinding.image1, viewBinding.image2, viewBinding.image3, viewBinding.image4)
-                    playButtons = arrayOf(viewBinding.play1, viewBinding.play2, viewBinding.play3, viewBinding.play4)
-                }
-                else -> throw IllegalStateException("Unsupported view type: $viewType")
-            }
-            return object : FeedStatusMediaItemViewHolder<ViewBinding>(viewBinding, imageViews, playButtons, openStatus, openMedia) {}
-        }
-    }
+) : FeedItemViewHolder<FeedStatusMediaItem, ItemFeedStatusMediaBinding>(ItemFeedStatusMediaBinding.inflate(inflater, parent, false)) {
 
     init {
         viewBinding.root.setOnClickListener { item?.let { openStatus(it.status) } }
-        imageViews.forEachIndexed { i, imageView ->
-            imageView.setOnClickListener { item?.let { openMedia(it.mediaInfo[i].media) } }
-        }
+        viewBinding.preview.init(openMedia)
     }
 
     override fun bind(item: FeedStatusMediaItem, payloads: List<Any>) {
-        item.mediaInfo.forEachIndexed { i, mediaInfo ->
-            imageViews[i].loadImage(mediaInfo.imageUrl, placeholder = mediaInfo.placeholder)
-            playButtons[i].isVisible = mediaInfo.isPlayable
-        }
-    }
-
-    override fun cancelImageLoading() {
-        imageViews.forEach { it.cancelImageLoading() }
+        viewBinding.preview.setMedia(item.status.media)
     }
 }
